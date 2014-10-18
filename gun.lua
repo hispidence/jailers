@@ -226,11 +226,20 @@ function gun:updateSound(dt)
 	end
 end
 
+---------------------------------------------------------------------------------------------------
+--	gun:update(number dt)
+--	
+--	Fires the gun and moves the bullets.
+---------------------------------------------------------------------------------------------------
 function gun:update(dt)
 	if self.state == "active" then
 		if self.firingBehaviour ~= nil then self.firingBehaviour:fire(dt, self) else
 			if self.timeLastBullet > self.bulletTime then
-				self:addBullet(self.position+self.bulletOffset, self.bulletVel)
+				-- Make up for any "missed time": if the bullet fires late due to low framerate, make up for the intervening
+				-- time by moving the bullet forward
+				local timeDifference = self.timeLastBullet - self.bulletTime
+				extraOffset = self.bulletVel * timeDifference
+				self:addBullet(self.position+self.bulletOffset+extraOffset, self.bulletVel)
 				self.timeLastBullet = self.timeLastBullet - self.bulletTime
 			end
 			self.timeLastBullet = self.timeLastBullet + dt
@@ -238,7 +247,7 @@ function gun:update(dt)
 	end
 	for i, v in self:revIter(self.bullets) do
 		if v:getState() ~= "dead" then
-			v:move(v:getVel())
+			v:move(v:getVel() * dt)
 		end
 		self.ages[i] = self.ages[i] + dt
 
