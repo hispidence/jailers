@@ -184,7 +184,8 @@ end
 
 
 local levelAttribs = {
-	jailerSpeed = 5, 
+	vel_jailer = 5, 
+	vel_bullet_standard = 60,
 	offset = 16/2,
 	moverSpeed = 3,
 	blockSize = 16,
@@ -254,7 +255,7 @@ local lGuns = {
 	{id = "gun1",
 	pos = vector(16, 8),
 	size = vector(1, 1),
-	bulletVel = vector(1.5, 0),
+	--bulletVel = vector(1.5, 0),
 	bulletOffset = vector(1.0, 0.3),
 	bulletLife = 4,
 	bulletTime = 0.7,
@@ -265,7 +266,7 @@ local lGuns = {
 	invisible = false,	
 	shootingBehaviour = firingBehaviour(
 	 			{nBarrels = 7,
-				vel = 1.5,
+				vel = levelAttribs.vel_bullet_standard,
 --				bulletPositions = {							
 --					levelAttribs.blockSize * vector(1, 0.3),
 --					levelAttribs.blockSize * vector(0.3, 1),
@@ -300,7 +301,7 @@ local lGuns = {
 	{id = "gun2",
 	pos = vector(2, 14),
 	size = vector(1, 1),
-	bulletVel = vector(1.5, 0),
+	bulletVel = vector(levelAttribs.vel_bullet_standard, 0),
 	bulletOffset = vector(1.0, 0.3),
 	bulletLife = 3,
 	bulletTime = 2.1,
@@ -318,7 +319,7 @@ local lEnemies = {
 		{id = "jailer1",
 		pos = vector(5.5, 29),
 		category = "jailer_ranged",
-		speed = levelAttribs.jailerSpeed * (2/3),
+		speed = levelAttribs.vel_jailer * (2/3),
 		sound = {["attacking_path"] = {id = "jailer_pathingbeep", repeating = "true", time = 1}, ["attacking_direct"] = {id = "jailer_pathingbeep", repeating = "true", time = 0.5},
 			["dead"] = {id = "jailer_death", repeating = "false", time = 0.1}},
 		texture = {["dormant"] = "rangedjailer", ["attacking_path"] = "rangedjailer_flash", ["attacking_direct"] = "rangedjailer_red", ["dead"] = "rangedjailer_death" },

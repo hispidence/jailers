@@ -286,8 +286,9 @@ end
 
 
 local levelAttribs = {
-	jailerSpeed = 25, 
-
+	vel_jailer = 25, 
+	vel_bullet_standard = 60,
+	vel_bullet_biggun = 40,
 	offset = 16/2,
 	moverSpeed = 25,
 	blockSize = 16,
@@ -357,7 +358,7 @@ local lGuns = {
 	{id = "gun1",
 	pos = vector(22, 10),
 	size = vector(1, 1),
-	bulletVel = vector(1.5, 0),
+	bulletVel = vector(vel_bullet_standard, 0),
 	bulletOffset = vector(1.0, 0.3),
 	bulletLife = 4,
 	bulletTime = 0.7,
@@ -388,7 +389,7 @@ local lGuns = {
 	{id = "gun2",
 	pos = vector(2, 14),
 	size = vector(1, 1),
-	bulletVel = vector(1.5, 0),
+	bulletVel = vector(vel_bullet_standard, 0),
 	bulletOffset = vector(1.0, 0.3),
 	bulletLife = 3,
 	bulletTime = 2.1,
@@ -532,7 +533,7 @@ local lGuns = {
 	{id = "biggun",
 	pos = vector(13.8, 47.8),
 	size = vector(1, 1),
-	bulletVel = vector(1.5, 0),
+	bulletVel = vector(vel_bullet_standard, 0),
 	bulletOffset = vector(0, 0),
 	bulletLife = 4,
 	bulletTime = 0.7,
@@ -543,7 +544,7 @@ local lGuns = {
 	shootingBehaviour = firingBehaviour(
 	 			{
 				nBullets = 10,
-				vel = 1,
+				vel = vel_bullet_biggun,
 				bulletOffset = vector(0, 0),
 				bulletDirection = vector(-1, 0),
 				timeLastBullet = 1,
@@ -563,7 +564,7 @@ local lEnemies = {
 		{id = "jailer1",
 		pos = vector(7.5, 11.5),
 		category = "jailer_melee",
-		speed = levelAttribs.jailerSpeed,
+		speed = levelAttribs.vel_jailer,
 		sound = {["attacking_path"] = {id = "jailer_pathingbeep", repeating = "true", time = 1}, ["attacking_direct"] = {id = "jailer_pathingbeep", repeating = "true", time = 0.5},
 			["dead"] = {id = "jailer_death", repeating = "false", time = 0.1}},
 		texture = {["dormant"] = "meleejailer", ["attacking_path"] = "meleejailer_flash", ["attacking_direct"] = "meleejailer_red", ["dead"] = "meleejailer_death" },
@@ -574,7 +575,7 @@ local lEnemies = {
 		{id = "jailer2",
 		pos = vector(10.5, 48),
 		category = "jailer_ranged",
-		speed = levelAttribs.jailerSpeed * (2/3),
+		speed = levelAttribs.vel_jailer * (2/3),
 		sound = {["attacking_path"] = {id = "superjailer_breath", repeating = "true", time = 1}, ["attacking_direct"] = {id = "superjailer_breath", repeating = "true", time = 1},
 			["dead"] = {id = "jailer_death", repeating = "false", time = 0.1}},
 		texture = {["dormant"] = "rangedjailer", ["attacking_path"] = "superjailer_flash", ["attacking_direct"] = "superjailer_white", ["dead"] = "rangedjailer_death" },
