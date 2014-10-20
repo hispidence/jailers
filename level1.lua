@@ -114,7 +114,7 @@ end
 
 local levelAttribs = {
 	vel_jailer = 80, 
-	vel_bullet_standard = 60,
+	vel_bullet_standard = 45,
 	offset = 16/2,
 	moverSpeed_fast = 80,
 	blockSize = 16,

@@ -185,7 +185,7 @@ end
 
 local levelAttribs = {
 	vel_jailer = 5, 
-	vel_bullet_standard = 60,
+	vel_bullet_standard = 50,
 	offset = 16/2,
 	moverSpeed = 3,
 	blockSize = 16,
@@ -301,7 +301,7 @@ local lGuns = {
 	{id = "gun2",
 	pos = vector(2, 14),
 	size = vector(1, 1),
-	bulletVel = vector(levelAttribs.vel_bullet_standard, 0),
+	--bulletVel = vector(levelAttribs.vel_bullet_standard, 0),
 	bulletOffset = vector(1.0, 0.3),
 	bulletLife = 3,
 	bulletTime = 2.1,
@@ -309,7 +309,7 @@ local lGuns = {
 	texture= {["dormant"] = "gun_right_dormant", ["active"] = "gun_right_active"},
 	sound = {["active"] = {id = "gun_fire", repeating = "true", time = 0.7}, },
 	bulletTexture= {["dormant"] = "bullet", ["active"] = "bullet"},
-	shootingBehaviour = firingBehaviour({jailerSize = 1 * levelAttribs.blockSize, timeLastBullet = 0.25, timeBetweenBullets = 0.25, bulletSpeed = 2},
+	shootingBehaviour = firingBehaviour({jailerSize = 1 * levelAttribs.blockSize, timeLastBullet = 0.25, timeBetweenBullets = 0.25, bulletSpeed = levelAttribs.vel_bullet_standard},
 	fire_targeted, reset_standard, soundReady_standard),
 	state = "dormant"},
 
