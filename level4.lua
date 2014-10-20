@@ -288,7 +288,10 @@ end
 local levelAttribs = {
 	vel_jailer = 25, 
 	vel_bullet_standard = 60,
-	vel_bullet_biggun = 40,
+	vel_bullet_slow = 40,
+	vel_bullet_fast = 80,
+	life_bullet_standard = 10,
+	life_bullet_short = 5.75,
 	offset = 16/2,
 	moverSpeed = 25,
 	blockSize = 16,
@@ -306,12 +309,15 @@ local levelAttribs = {
 						["moving_horizontal"] = {id = "player_move", repeating = true, time = 0.3},}
 }
 
+-- not sure why these are here and not in levelAttribs.
+-- TODO: either remove these into levelAttribs or move levelAttribs stuff into here
+-- OR! rename them to something more descriptive eg hallGunAttribs
 local uniqueAttribs = {
-	bulletVelUp = vector(0, -1),
-	bulletVelDown = vector(0, 1),
-	bulletLife = 7,
+	bulletVelUp = vector(0, -levelAttribs.vel_bullet_slow),
+	bulletVelDown = vector(0, levelAttribs.vel_bullet_slow),
+	bulletLife = levelAttribs.life_bullet_short,
 	bulletOffset = vector(0.3, 0.3),
-	timeBetweenBullets = 1.5,
+	timeBetweenBullets = 1.75,
 }
 
 local anims = {
@@ -358,9 +364,9 @@ local lGuns = {
 	{id = "gun1",
 	pos = vector(22, 10),
 	size = vector(1, 1),
-	bulletVel = vector(vel_bullet_standard, 0),
+	bulletVel = vector(levelAttribs.vel_bullet_slow, 0),
 	bulletOffset = vector(1.0, 0.3),
-	bulletLife = 4,
+	bulletLife = levelAttribs.life_bullet_standard,
 	bulletTime = 0.7,
 	texture= {["dormant"] = "eyegun_dormant", ["active"] = "eyegun_active"},
 	sound = {["active"] = {id = "gun_fire", repeating = "true", time = 0.7}, },
@@ -372,7 +378,7 @@ local lGuns = {
 				rotDir = 1,
 				extents = {0.5235, -0.5235},
 				currentExtent = 1,
-				vel = 1.75,
+				vel = levelAttribs.vel_bullet_standard,
 				rotSpeed = 1.5,
 				bulletOffset = vector(levelAttribs.blockSize * 0.3, levelAttribs.blockSize * 0.3),
 				rotationAngle = 0,
@@ -389,15 +395,15 @@ local lGuns = {
 	{id = "gun2",
 	pos = vector(2, 14),
 	size = vector(1, 1),
-	bulletVel = vector(vel_bullet_standard, 0),
+	bulletVel = vector(0, 0),
 	bulletOffset = vector(1.0, 0.3),
-	bulletLife = 3,
+	bulletLife = levelAttribs.life_bullet_standard,
 	bulletTime = 2.1,
 	invisible = true,
 	texture= {["dormant"] = "gun_right_dormant", ["active"] = "gun_right_active"},
 	sound = {["active"] = {id = "gun_fire", repeating = "true", time = 0.7}, },
 	bulletTexture= {["dormant"] = "whitebullet", ["active"] = "whitebullet"},
-	shootingBehaviour = firingBehaviour({bulletOffset = vector(0.6, 9.0), jailerSize = 1 * levelAttribs.blockSize, timeLastBullet = 1, timeBetweenBullets = 1, bulletSpeed = 2},
+	shootingBehaviour = firingBehaviour({bulletOffset = vector(0.6, 9.0), jailerSize = 1 * levelAttribs.blockSize, timeLastBullet = 1, timeBetweenBullets = 1, bulletSpeed = levelAttribs.vel_bullet_fast},
 	fire_targetedTri, reset_standard, soundReady_standard),
 	state = "dormant"},
 
@@ -535,7 +541,7 @@ local lGuns = {
 	size = vector(1, 1),
 	bulletVel = vector(vel_bullet_standard, 0),
 	bulletOffset = vector(0, 0),
-	bulletLife = 4,
+	bulletLife = levelAttribs.life_bullet_standard,
 	bulletTime = 0.7,
 	sound = {["active"] = {id = "gun_fire", repeating = "true", time = 0.7}, },
 	bulletTexture= {["dormant"] = "bullet", ["active"] = "bullet"},
@@ -544,7 +550,7 @@ local lGuns = {
 	shootingBehaviour = firingBehaviour(
 	 			{
 				nBullets = 10,
-				vel = vel_bullet_biggun,
+				vel = levelAttribs.vel_bullet_slow,
 				bulletOffset = vector(0, 0),
 				bulletDirection = vector(-1, 0),
 				timeLastBullet = 1,
