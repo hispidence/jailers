@@ -1,3 +1,15 @@
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2014
+--
+--
+-- gameManager.lua
+--
+-- Uses global variables from main.lua even though it doesn't actually INCLUDE
+-- main.lua WHAT THE HELL.
+-------------------------------------------------------------------------------
+
+
+
 require("jlEvent")
 
 local ston = nil
@@ -224,18 +236,18 @@ function gameManager:getFadeInTimer()
 end
 
 function gameManager:saveState()
-	self.storedPlayerPos = thePlayer:getPos():clone()
+	self.storedPlayerPos = g_thePlayer:getPos():clone()
 	self.storedTranslateX = self.toX
 	self.storedTranslateY = self.toY
 
-	for i, v in ipairs(scenery) do
+	for i, v in ipairs(g_entityScenery) do
 		self.storedFloorsPos[i] = v:getPos():clone()
 	end
-	for i, v in ipairs(enemies) do
+	for i, v in ipairs(g_entityEnemies) do
 		self.storedEnemiesPos[i] = v:getPos():clone()
 		self.storedEnemiesState[i] = v:getState()
 	end
-	for i, v in ipairs(movers) do
+	for i, v in ipairs(g_entityMovers) do
 		self.storedMoversPos[i] = v:getPos():clone()
 		self.storedMoversState[i] = v:getState()
 		self.storedMoversDir[i] = v:getDir():clone()
@@ -243,11 +255,11 @@ function gameManager:saveState()
 		self.storedMoversCurrentExtent[i] = v:getCurrentExtent()
 		self.storedMoversOtherExtent[i] = v:getOtherExtent()
 	end
-	for i, v in ipairs(blocks) do
+	for i, v in ipairs(g_entityBlocks) do
 		self.storedWallsPos[i] = v:getPos():clone()
 		self.storedWallsState[i] = v:getState()
 	end
-	for i, v in ipairs(guns) do
+	for i, v in ipairs(g_entityGuns) do
 		self.storedGunsPos[i] = v:getPos():clone()
 		self.storedGunsState[i] = v:getState()
 		self.storedGunsBulletsMade[i] = v:getBulletsMade()
@@ -260,20 +272,20 @@ function gameManager:loadState()
 	self.deathTimer = 1.2
 	self.fadeTimer = 1.2
 	self.fadeInTimer = 0.0
-	thePlayer:setState("resting")
-	thePlayer:resetAnim("dead")
-	thePlayer:resetSounds()	
-	thePlayer:setPos(self.storedPlayerPos:clone())
+	g_thePlayer:setState("resting")
+	g_thePlayer:resetAnim("dead")
+	g_thePlayer:resetSounds()	
+	g_thePlayer:setPos(self.storedPlayerPos:clone())
 	self.currX = self.storedTranslateX
 	self.currY = self.storedTranslateY
 	self.toX = self.storedTranslateX
 	self.toY = self.storedTranslateY
 	
 	self.moving = false
-	for i, v in ipairs(scenery) do
+	for i, v in ipairs(g_entityScenery) do
 		v:setPos(self.storedFloorsPos[i]:clone())
 	end
-	for i, v in ipairs(enemies) do
+	for i, v in ipairs(g_entityEnemies) do
 		v:setPos(self.storedEnemiesPos[i]:clone())
 		v:setState(self.storedEnemiesState[i])
 		if v.resetBehaviour then v:resetBehaviour() end
@@ -286,7 +298,7 @@ function gameManager:loadState()
 		v:setPathTimer(1.1)
 		--v:setFlatMap(nil)
 	end
-	for i, v in ipairs(movers) do
+	for i, v in ipairs(g_entityMovers) do
 		v:setPos(self.storedMoversPos[i]:clone())
 		v:setState(self.storedMoversState[i])
 		v:setDir(self.storedMoversDir[i]:clone())
@@ -294,7 +306,7 @@ function gameManager:loadState()
 		v:setCurrentExtent(self.storedMoversCurrentExtent[i])
 		v:setOtherExtent(self.storedMoversOtherExtent[i])
 	end
-	for i, v in ipairs(blocks) do
+	for i, v in ipairs(g_entityBlocks) do
 		v:setPos(self.storedWallsPos[i]:clone())
 		v:setState(self.storedWallsState[i])
 		if v:getState() ~= "off" then
@@ -303,7 +315,7 @@ function gameManager:loadState()
 		if v:getState() ~= "dead" then youShallNotPass(pathMap, v:getPos(), v:getSize()) end
 	end
 
-	for i, v in ipairs(guns) do
+	for i, v in ipairs(g_entityGuns) do
 		v:setPos(self.storedGunsPos[i]:clone())
 		v:setState(self.storedGunsState[i])
 		v:setBulletsMade(self.storedGunsBulletsMade[i])
