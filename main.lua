@@ -118,6 +118,8 @@ end
 
 
 -------------------------------------------------------------------------------
+-- toWorldSpace
+--
 -- Get world space coordinates of grid position
 -------------------------------------------------------------------------------
 function toWorldSpace(col, row, ww, wh)
@@ -126,12 +128,19 @@ function toWorldSpace(col, row, ww, wh)
 	return x, y
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setupUI
+--
+-- Set menu texture and font sizes 
+-------------------------------------------------------------------------------
 function setupUI()
 	g_menuBGtex = love.graphics.newImage(uiData.menuBackGround)
-	g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
 	g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 20 * scale)
-	g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
 	g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * scale)
+	g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
+	g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
 	love.graphics.setFont(g_fonts[1])
 	g_gui.keyboard.disable()
 	g_gui.group.default.size[1] = uiData.btnMenuWidth * scale;
@@ -149,6 +158,13 @@ function setupUI()
 	g_gui.core.style.color.active.border = {0, 0, 0}
 end
 
+
+
+-------------------------------------------------------------------------------
+-- loadResources
+--
+-- Load the sounds and textures
+-------------------------------------------------------------------------------
 function loadResources()
 	for _, v in ipairs(lSounds) do
 		v.soundData = love.sound.newSoundData(v.fname)
@@ -159,6 +175,13 @@ function loadResources()
 	end
 end
 
+
+
+-------------------------------------------------------------------------------
+-- unloadLevel
+--
+-- Clear all of the level's entities 
+-------------------------------------------------------------------------------
 function unloadLevel()
 	g_menuRefreshed = false
 	g_gm:unload()
@@ -197,11 +220,19 @@ function unloadLevel()
 		v:freeResources(theCollider)
 		g_entityTriggers[k] = nil
 	end
-
 end
 
+
+
+-------------------------------------------------------------------------------
+-- loadLevel
+--
+--  
+-------------------------------------------------------------------------------
 function loadLevel()
-  	g_gm:setCurrX(g_currentLevel.levelAttribs.initialCamera.x * g_currentLevel.levelAttribs.blockSize)
+  	
+	-- Initialise camera positions
+	g_gm:setCurrX(g_currentLevel.levelAttribs.initialCamera.x * g_currentLevel.levelAttribs.blockSize)
   	g_gm:setCurrY(g_currentLevel.levelAttribs.initialCamera.y * g_currentLevel.levelAttribs.blockSize)
   	g_gm:setToX(g_gm:getCurrX())
   	g_gm:setToY(g_gm:getCurrY())
@@ -213,17 +244,23 @@ function loadLevel()
 
 	local pSize = vector(10, 10)
 	
+	-- Create player and initialise resources
 	g_thePlayer = character("player")
-	g_thePlayer:setTexture("resting", love.graphics.newImage("/textures/playerrest.png"), false)
-	g_thePlayer:setTexture("moving_vertical", love.graphics.newImage("/textures/playermoveup.png"),false)
-	g_thePlayer:setTexture("moving_horizontal", love.graphics.newImage("/textures/playermove.png"),false)
-	g_thePlayer:setTexture("dead", love.graphics.newImage("/textures/playerdeath.png"),false)
+	g_thePlayer:setTexture(	"resting",
+				love.graphics.newImage("/textures/playerrest.png"),
+				false)
+	g_thePlayer:setTexture(	"moving_vertical",
+				love.graphics.newImage("/textures/playermoveup.png"),
+				false)
+	g_thePlayer:setTexture(	"moving_horizontal",
+				love.graphics.newImage("/textures/playermove.png"),
+				false)	
+	g_thePlayer:setTexture(	"dead", 
+				love.graphics.newImage("/textures/playerdeath.png"),
+				false)
 	g_thePlayer:setSize(pSize)
 	g_thePlayer:setShapeOffsets(2, 2)
-	local pPos = vector(g_currentLevel.levelAttribs.playerStart.x*blockSize, g_currentLevel.levelAttribs.playerStart.y*blockSize)
-
 	g_thePlayer:setCollisionRectangle()	
-
 	g_thePlayer:setID("player")
 	g_thePlayer:setCategory("player")
 	g_thePlayer:setState("resting")
@@ -245,25 +282,27 @@ function loadLevel()
 
 
 	local sound = g_currentLevel.levelAttribs.playerSounds["dead"]
-	g_thePlayer:setSound("dead", 
-	lSounds[getSoundByID(sound.id)].soundData,
-	 sound.repeating, 
-	 sound.time)
+	g_thePlayer:setSound(	"dead", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
 
 	sound = g_currentLevel.levelAttribs.playerSounds["moving_horizontal"]
-	g_thePlayer:setSound("moving_horizontal", 
-	lSounds[getSoundByID(sound.id)].soundData,
-	 sound.repeating, 
-	 sound.time)
+	g_thePlayer:setSound(	"moving_horizontal", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
 
 	sound = g_currentLevel.levelAttribs.playerSounds["moving_vertical"]
-	g_thePlayer:setSound("moving_vertical", 
-	lSounds[getSoundByID(sound.id)].soundData,
-	 sound.repeating, 
-	 sound.time)
+	g_thePlayer:setSound(	"moving_vertical", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
 
+	local pPos = vector(g_currentLevel.levelAttribs.playerStart.x*blockSize, g_currentLevel.levelAttribs.playerStart.y*blockSize)
 	g_thePlayer:move(pPos)
 
+	-- Initialise guns
 	local g = 1
 	for n, v in ipairs(g_currentLevel.guns) do
 		g_entityGuns[g] = gun()
@@ -332,6 +371,7 @@ function loadLevel()
 		g = g + 1
 	end	
 
+	-- Initialise walls
 	local k = 1
 	for n, v in ipairs(g_currentLevel.walls) do
 		g_entityBlocks[k] = gameObject()
@@ -376,6 +416,7 @@ function loadLevel()
 		k = k + 1
 	end
 
+	-- Initialise triggers
 	k = 1
 	for n, v in ipairs(g_currentLevel.triggers) do
 		g_entityTriggers[k] = gameObject()
@@ -402,6 +443,7 @@ function loadLevel()
 		k = k + 1
 	end
 
+	-- Create map (TO BE REMOVED)
 	for n, v in ipairs(pathMap) do
 		local s = "";
 		for i, p in ipairs(v) do
@@ -409,6 +451,7 @@ function loadLevel()
 		end
 	end
 
+	-- Initialise floors
 	local i = 1
 	for n, v in ipairs(g_currentLevel.floors) do
 		g_entityScenery[i] = gameObject()
@@ -425,6 +468,7 @@ function loadLevel()
 		i = i + 1
 	end
 	
+	-- Initialise enemies
 	local j = 1
 	for n, v in ipairs(g_currentLevel.enemies) do
 		g_entityEnemies[j] = character("enemy")
@@ -459,8 +503,6 @@ function loadLevel()
 		g_entityEnemies[j]:setState(v.state)
 		g_entityEnemies[j]:setPathTimer(1.1)
 		g_entityEnemies[j]:setDeathBehaviour(v.deathBehaviour)
-		--g_entityEnemies[j]:setTexture("dormant", rTextures[getTextureByID(v.texture["dormant"])].data, false)
-		--g_entityEnemies[j]:setTexture("attacking", rTextures[getTextureByID(v.texture["attacking"])].data, false)
 		
 		if v.sound then
 			for k, t in pairs(v.sound) do
@@ -473,6 +515,7 @@ function loadLevel()
 		j = j + 1
 	end
 
+	-- Initialise movers
 	local m = 1
 	for n, v in ipairs(g_currentLevel.movers) do
 		g_entityMovers[m] = mover()
