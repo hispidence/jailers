@@ -87,7 +87,7 @@ rTextures = {
 	data = nil},
 
 	{id = "bullet",
-	fname = "/textures/bullet.png",
+	fname = "/textures/bullet_alt.png",
 	data = nil},
 
 	{id = "whitebullet",
@@ -265,7 +265,7 @@ rTextures = {
 	data = nil},
 
 	{id = "floor",
-	fname = "/textures/floor.png",
+	fname = "/textures/floor_alt.png",
 	data = nil},
 
 	{id = "floorboards",
@@ -281,15 +281,15 @@ rTextures = {
 	data = nil},
 
 	{id = "meleejailer",
-	fname = "/textures/meleejailer.png",
+	fname = "/textures/meleejailer_alt.png",
 	data = nil},
 
 	{id = "meleejailer_flash",
-	fname = "/textures/meleejailer_flash.png",
+	fname = "/textures/meleejailer_flash_alt.png",
 	data = nil},
 
 	{id = "meleejailer_red",
-	fname = "/textures/meleejailer_red.png",
+	fname = "/textures/meleejailer_red_alt.png",
 	data = nil},
 
 	{id = "meleejailer_death",
