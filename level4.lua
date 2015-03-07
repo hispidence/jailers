@@ -28,7 +28,7 @@ local function fire_targeted(self, dt, theGun)
 	timeBetweenBullets = self.data["timeBetweenBullets"]
 	if timeLastBullet > timeBetweenBullets then
 		local pos = theGun:getPos():clone()
-		local vel = (thePlayer:getPos() - pos)
+		local vel = (g_thePlayer:getPos() - pos)
 		vel = vel:normalized()
 
 		pos = pos + vector(0.5, 6.5)
@@ -76,7 +76,7 @@ local function fire_targetedTri(self, dt, theGun)
 		if timeLastBullet > timeBetweenBullets then
 
 			local pos = theGun:getPos():clone()
-			local dir = (thePlayer:getPos() - pos)
+			local dir = (g_thePlayer:getPos() - pos)
 			dir = dir:normalized()
 	
 			pos = pos + vector(0.5, 6.5)

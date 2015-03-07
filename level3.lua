@@ -27,7 +27,7 @@ local function fire_targeted(self, dt, theGun)
 	
 	if timeLastBullet > timeBetweenBullets then
 		local pos = theGun:getPos():clone()
-		local vel = (thePlayer:getPos() - pos)
+		local vel = (g_thePlayer:getPos() - pos)
 		vel = vel:normalized()
 
 		pos = pos + vector(0.5, 6.5)
@@ -290,7 +290,7 @@ local lGuns = {
 					vector(-0.70711, -0.70711),
 				},
 				timeLastBullet = 1,
-				timeBetweenBullets = 0.5,
+				timeBetweenBullets = 0.8,
 		},
 		fire_multidirectional,
 		reset_standard,
