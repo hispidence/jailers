@@ -290,7 +290,7 @@ function gameManager:loadState()
 		v:setState(self.storedEnemiesState[i])
 		if v.resetBehaviour then v:resetBehaviour() end
 		--if v:getState() ~= "dead" then v:resetAnim("dead") end
-		v:setPath(nil)
+		v:copyPath(nil)
 		if v:getState() ~= "dead" then
 			v:resetAnims()--("dead")
 			v:resetSounds()	

@@ -125,7 +125,10 @@ function mover:update(dt)
 	self.position.y = self.position.y + (self.dir.y * dt * self.speed)
 	self.dist = self.dist + self.oldPos:dist(self.position)
 	if self.dist >= self.extentsDist then
-		if self.sounds["stomp"] then TEsound.play(self.sounds["stomp"].data) end
+		if self.sounds["stomp"] then
+			--TEsound.play(self.sounds["stomp"].data)
+		end
+
 		self.dir.x, self.dir.y = -self.dir.x, -self.dir.y
 		local tempVar = self.dist - self.extentsDist
 		self.position.x = self.extents[self.otherExtent].x + (self.dir.x * tempVar)

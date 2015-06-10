@@ -1,0 +1,3 @@
+ISSUE 1
+Bullet speed is based on FPS of game - if FPS is slow (say, 15 or less), bullets will move more slowly.
+STATUS: FIXED - bullet speed now based on delta time.

@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2014
+-- Copyright (C) Brad Ellis 2013-2015
 --
 --
 -- main.lua
@@ -20,11 +20,15 @@ require("collider")
 require("sounds")
 require("textures")
 require("AnAL")
-require("astar_good")
-require("flatten")
 require("TEsound")
 require("shaders")
 require("jlEvent")
+--classes from Jumper
+local Grid = require "jumper.grid"
+local PathFinder = require "jumper.pathfinder"
+local jumperGrid
+local jumperFinder
+
 
 
 
@@ -45,7 +49,7 @@ g_gm = require("gameManager")
 g_currentLevel = require "level1"
 g_nextLevel = "level2"
 g_menuRefreshed = false
-FONT_PROCIONO_REGULAR = "Prociono-Regular.ttf"
+FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
 -------------------------------------------------------------------------------
@@ -70,14 +74,14 @@ g_thePlayer = nil
 
 
 -------------------------------------------------------------------------------
--- Build the map. TO BE SCRAPPED AND REPLACED WITH MY OWN A* PATHFINDING
+-- Build the map. 
 -------------------------------------------------------------------------------
 function buildMap(width, height)
 	local map = {}
 	for y = 1, height do
 		map[y] = {}
 		for x = 1, width do
-			map[y][x] = {}
+			map[y][x] = 0
 		end
 	end
 	return map
@@ -92,7 +96,8 @@ function youShallNotPass(theMap, wallPos, wallSize)
 		while tempSize.x < wallSize.x do
 			tablePosX = 1 + (wallPos.x + tempSize.x)/(blockSize)
 			tablePosY = 1 + (wallPos.y + tempSize.y)/(blockSize)
-			theMap[tablePosY][tablePosX].wall = true
+			--theMap[tablePosY][tablePosX].wall = true
+			theMap[tablePosY][tablePosX] = 1
 			tempSize.x = tempSize.x + blockSize
 		end
 		tempSize.y = tempSize.y + blockSize
@@ -108,10 +113,11 @@ function youCanPass(theMap, wallPos, wallSize)
 		while tempSize.x < wallSize.x do
 			tablePosX = 1 + (wallPos.x + tempSize.x)/(blockSize)
 			tablePosY = 1 + (wallPos.y + tempSize.y)/(blockSize)
-			theMap[tablePosY][tablePosX].wall = false
+			--theMap[tablePosY][tablePosX].wall = false
+			theMap[tablePosY][tablePosX] = 0
 			tempSize.x = tempSize.x + blockSize
 		end
-		tempSize.y = tempSize.y + blockSize
+   		tempSize.y = tempSize.y + blockSize
 	end
 end
 
@@ -247,16 +253,16 @@ function loadLevel()
 	-- Create player and initialise resources
 	g_thePlayer = character("player")
 	g_thePlayer:setTexture(	"resting",
-				love.graphics.newImage("/textures/playerrest.png"),
+				love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
 				false)
 	g_thePlayer:setTexture(	"moving_vertical",
-				love.graphics.newImage("/textures/playermoveup.png"),
+				love.graphics.newImage(TEXTURES_DIR .. "playermoveup.png"),
 				false)
 	g_thePlayer:setTexture(	"moving_horizontal",
-				love.graphics.newImage("/textures/playermove.png"),
+				love.graphics.newImage(TEXTURES_DIR .. "playermove.png"),
 				false)	
 	g_thePlayer:setTexture(	"dead", 
-				love.graphics.newImage("/textures/playerdeath.png"),
+				love.graphics.newImage(TEXTURES_DIR .. "playerdeath.png"),
 				false)
 	g_thePlayer:setSize(pSize)
 	g_thePlayer:setShapeOffsets(2, 2)
@@ -443,13 +449,11 @@ function loadLevel()
 		k = k + 1
 	end
 
-	-- Create map (TO BE REMOVED)
-	for n, v in ipairs(pathMap) do
-		local s = "";
-		for i, p in ipairs(v) do
-			if pathMap[n][i].wall then s = s.."1" else s =s .."0" end
-		end
-	end
+	
+	jumperGrid = Grid(pathMap)
+	jumperFinder = PathFinder(jumperGrid, 'ASTAR', 0)
+	jumperFinder:setMode("ORTHOGONAL")
+
 
 	-- Initialise floors
 	local i = 1
@@ -571,7 +575,7 @@ end
 function love.load()
 	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
-	love.window.setIcon(love.image.newImageData("/textures/meleejailer_red.png"))
+	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
 	g_gm:setState("splash")
  	fadeShader = love.graphics.newShader(fadeShaderSource)
  	invisShader = love.graphics.newShader(invisShaderSource)
@@ -665,6 +669,17 @@ function love.draw()
 		if not g_menuRefreshed then love.graphics.setShader(invisShader); g_menuRefreshed = true end
 		g_gui.core.draw()		
 	end
+
+	--If we're in debug mode, draw the current path
+	if currentPath and g_showBoxes then
+		bullet = love.graphics.newImage(TEXTURES_DIR .. "bullet_alt.png")
+		for a, b in pairs(currentPath) do
+			love.graphics.draw(bullet,
+			b.col * g_currentLevel.levelAttribs.blockSize,
+			b.row * g_currentLevel.levelAttribs.blockSize,
+			0, 2, 2, 0, 0, 0, 0)
+		end
+	end
 	love.graphics.setShader(fadeShader)
 end
 
@@ -743,7 +758,7 @@ function love.update(dt)
 		g_gui.Label{size = {"tight", "tight"}, text="THE END"}
 		love.graphics.setFont(g_fonts[3])
 		g_gui.Label{size = {"tight", "tight"}, text="You've escaped!\n\n" ..
-						"Or perhaps you haven't. Perhaps the polished-wood door at the end of the tunnel only\n"
+							"Or perhaps you haven't. Perhaps the polished-wood door at the end of the tunnel only\n"
 						.. "looks familiar because you remember the chamber beyond. You've been there before.\n"
 						.. "There'll be nothing there. No exits, no weak bricks, no loose floorboards. And you'll\n"
 						.. "turn around to go back the way you came, but that polished-wood door won't be there\n"
@@ -1069,10 +1084,10 @@ function love.update(dt)
 				local startPos = {r = startY, c = startX}
 				local endPos = {r = endY, c = endX}
 
-				v:setFlatMap(flattenMap(pathMap, endPos, v:getFlatMap()))
-				v:setPath(startPathing(v:getFlatMap(),
-							 	((startPos.r - 1) * g_currentLevel.levelAttribs.height) + startPos.c,
-								((endPos.r - 1) * g_currentLevel.levelAttribs.height) + endPos.c))
+				local path = jumperFinder:getPath(startX, startY, endX, endY)
+
+				v:copyPath(path);	
+				
 				currentPath = v:getPath()
 				
 				v:startPath(g_currentLevel.levelAttribs.blockSize)

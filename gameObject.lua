@@ -241,7 +241,7 @@ function gameObject:playSound()
 	if self.sounds == nil then return end
 	local s = self.sounds[self.state]
 	if s then
-		TEsound.play(s.data)
+		--TEsound.play(s.data)
 	end
 end
 
@@ -252,7 +252,7 @@ function gameObject:updateSound(dt)
 		if (s.repeating == "false" or s.repeating == "once") and s.done then return end
 		s.elapsed = s.elapsed + dt
 		if s.elapsed > s.wait then
-			TEsound.play(s.data)
+			--TEsound.play(s.data)
 			s.elapsed = s.elapsed - s.wait
 			if s.repeating == "false" or s.repeating == "once" then s.done = true end
 		end
