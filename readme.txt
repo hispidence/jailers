@@ -1,54 +1,11 @@
-JAILERS
+Copyright (c) 2015 Brad Ellis
 
-Jailers is a small action game that I made to practise Lua.
-You play an incompetent mage who has just trapped themselves in their own inter-dimensional prison!
-Use your wit and reflexes to evade the prison's traps as well as its guards, the eponymous jailers.
+This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
 
-Jailers can be played with keyboard or a gamepad (use a gamepad though (seriously, use a gamepad)).
-As it doesn't use any buttons you can play it one-handed. I've not tried it with any one-hand gamepads,
-but either analogue stick on (for example) an Xbox 360 pad can be used.
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
 
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
 
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 
-Keyboard controls:
-
-WASD or arrow keys to move
-P or Esc to pause
-
-
-
-Gamepad Controls:
-
-Left stick or right stick to move
-Any button to pause
-
-
-
-Libraries used:
-
-LOVE (love2d.org)
-AnAL
-HUMP
-Large Hardon Collider
-Quickie
-TESound
-Jumper
-
-
-
-Other resources used:
-
-Prociono font by Barry Schartz
-sfxr by DrPetter (http://www.drpetter.se/project_sfxr.html)
-
-
-
-Thanks to...
-
-YOU, for having downloaded the game
-Sam Vincent and Karl Hutchinson for testing the game and not hating it all that much
-The people who made LOVE and the libraries I used
-
-
-
-Jailers is Copyright (c) Brad Ellis
+3. This notice may not be removed or altered from any source distribution.
