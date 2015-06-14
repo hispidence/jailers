@@ -1,4 +1,4 @@
-require("gameObject")
+require("src/gameObject")
 
 
 character = {}

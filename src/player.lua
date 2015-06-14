@@ -1,4 +1,4 @@
-require("gameObject")
+require("src/gameobject")
 
 player = {}
 for k,v in pairs(gameObject) do

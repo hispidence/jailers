@@ -1,5 +1,5 @@
-vector = require("hump.vector")
-gm = require("gameManager")
+vector = require("src/hump.vector")
+gm = require("src/gameManager")
 
 local level = {}
 

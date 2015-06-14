@@ -1,6 +1,6 @@
-require("jailerUtil")
-	vector = require "hump.vector"
-	require("collider")
+require("src/jailerUtil")
+require("src/collider")
+vector = require("src/hump.vector")
 
 	gameObject = {}
 

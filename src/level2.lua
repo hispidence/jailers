@@ -1,6 +1,6 @@
-require("firingBehaviour")
-vector = require("hump.vector")
-gm = require("gameManager")
+require("src/firingBehaviour")
+vector = require("src/hump.vector")
+gm = require("src/gameManager")
 
 local level = {}
 

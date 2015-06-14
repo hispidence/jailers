@@ -1,4 +1,4 @@
-collider = require("hardoncollider")
+collider = require("src/hardoncollider")
 
 local MAX_TESTS = 4
 

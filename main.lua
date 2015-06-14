@@ -7,7 +7,7 @@
 -- Entry point for LÖVE
 -------------------------------------------------------------------------------
 
-require("gameMain")
+require("src/gameMain")
 
 function love.load()
 	gameLoad()

@@ -10,7 +10,7 @@
 
 
 
-require("jlEvent")
+require("src/jlEvent")
 
 local ston = nil
 

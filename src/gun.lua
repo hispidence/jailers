@@ -1,4 +1,4 @@
-require("gameObject")
+require("src/gameObject")
 
 gun = {}
 for k,v in pairs(gameObject) do

@@ -9,26 +9,27 @@
 
 
 
+require("src/mover")
+require("src/gun")
+require("src/character")
+require("src/uiData")
+require("src/collider")
+require("src/sounds")
+require("src/textures")
+require("src/AnAL")
+require("src/TEsound")
+require("src/shaders")
+require("src/jlEvent")
+
+
+
+--------------------------------------------------------------------------------
+-- Classes from Jumper 
 -------------------------------------------------------------------------------
--- Import the various helper files
--------------------------------------------------------------------------------
-require("mover")
-require("gun")
-require("character")
-require("uiData")
-require("collider")
-require("sounds")
-require("textures")
-require("AnAL")
-require("TEsound")
-require("shaders")
-require("jlEvent")
---classes from Jumper
-local Grid = require "jumper.grid"
-local PathFinder = require "jumper.pathfinder"
+local Grid = require("src/jumper.grid")
+local PathFinder = require("src/jumper.pathfinder")
 local jumperGrid
 local jumperFinder
-
 
 
 
@@ -44,9 +45,9 @@ g_showBoxes = false
 -------------------------------------------------------------------------------
 -- Set game manager, GUI, and gamestate variables 
 -------------------------------------------------------------------------------
-local g_gui = require "Quickie"
-g_gm = require("gameManager")
-g_currentLevel = require "level1"
+local g_gui = require("src/Quickie")
+g_gm = require("src/gameManager")
+g_currentLevel = require("src/level1")
 g_nextLevel = "level2"
 g_menuRefreshed = false
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
@@ -739,7 +740,7 @@ function gameUpdate(dt)
       unloadLevel()
       g_currentLevel = nil
       g_gm:unload()
-      g_currentLevel = require(g_nextLevel)
+      g_currentLevel = require("src/" .. g_nextLevel)
       loadLevel()
       g_gm:saveState()
       g_gm:setState("running")
@@ -947,7 +948,7 @@ function gameUpdate(dt)
 		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
 			local moveVec = v:getMoveVec()
 			local enemyPos = v:getPos()
-			v:pathCollision(g_currentLevel.levelAttribs.blockSize)
+			v:testPathCollision(g_currentLevel.levelAttribs.blockSize)
 			local target = v:getTarget()
 			local size = v:getSize()
 			moveVec.x = target.x - (enemyPos.x + (size.x/2))
