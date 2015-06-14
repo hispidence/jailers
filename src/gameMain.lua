@@ -2,7 +2,7 @@
 -- Copyright (C) Brad Ellis 2013-2015
 --
 --
--- main.lua
+-- gameMain.lua
 --
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
@@ -572,7 +572,7 @@ function loadLevel()
 	end
 end
 
-function love.load()
+function gameLoad()
 	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
 	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
@@ -586,7 +586,9 @@ function love.load()
 	g_gm:saveState()
 end
 
-function love.draw()
+
+
+function gameDraw()
 	if g_gm:getState() == "loading" or g_gm:getState() == "splash" or g_gm:getState() == "endsplash" then 
 		love.graphics.setShader()
 		if g_gm:getState() == "splash" then
@@ -681,6 +683,7 @@ function love.draw()
 		end
 	end
 	love.graphics.setShader(fadeShader)
+
 end
 
 
@@ -723,7 +726,7 @@ function processEvent(e)
 	end
 end
 
-function love.update(dt)
+function gameUpdate(dt)
 	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
 	dt = math.min(dt, 0.07)
 	g_gm:update(dt)
@@ -1098,7 +1101,7 @@ function love.update(dt)
 	TEsound.cleanup()
 end
 
-function love.keypressed(key)
+function gameKeyPressed(key)
 	if g_gm:getState() == "splash" then
 	
 		if key == " " then g_gm:setState("running") end
@@ -1150,10 +1153,10 @@ function love.keypressed(key)
 			end--unloadLevel() end
 		end
 	end
-	
-	end
 
-function love.joystickpressed(joystick, button)	
+end
+
+function gameJoystickPressed(joystick, button)
 	if g_gm:getState() == "paused" then
     if uiData.menuState == "paused" then
       g_gm:pause(); uiData.menuState = "paused"
@@ -1171,6 +1174,7 @@ function love.joystickpressed(joystick, button)
   elseif g_gm:getState() == "splash" then
         g_gm:setState("running")
   end
+
 end
 
 function img_iter(img)
