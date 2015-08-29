@@ -35,6 +35,12 @@ function gameManager:init()
 	self.numLevels = 0
 	self.playerLives = 0
 	self.gameState = "running"
+	self.slowed	   = false		-- are we slowed down?
+	self.slowTimeTotal 	    = 0
+	self.slowTimeElapsed    = 0			-- for how long are we slowed?
+	self.speedUpPoint		= 0.25		-- when should we start speeding up?
+	self.slowFactorInitial = 0.2		-- how slow are we?
+	self.slowFactorCurrent = 1
 	self.deathTimer = 1.2
 	self.fadeTimer = 1.2
  	self.fadeInTimer = 0
@@ -191,6 +197,55 @@ function gameManager:getFadeInMax()
   return self.fadeInMax
 end
 
+
+
+-------------------------------------------------------------------------------
+-- startSlowing
+--
+-- Slow the action down; start modifying DT
+--
+--	Arguments:
+--		slowFactor:	float between 0 and 1; the amount we should slow down by.
+--		For example, a factor of 0.5 would cause the action to run at half
+--		speed.
+--
+--		totalSlowTime: float; how long, in seconds, should the action be slowed?
+--
+--		speedUpPoint: float; How much time must have elapsed before we begin
+--		to speed the game up back to normal? For example, a speedUpPoint of
+--		0.5 with a totalSlowTime of 2 will cause time to begin to go back to
+--		normal after 1 second.
+-------------------------------------------------------------------------------
+function gameManager:startSlowing(slowFactor, totalSlowTime, speedUpPoint)
+	self.slowed = true
+	self.slowFactorInitial = slowFactor
+	self.slowFactorCurrent = slowFactor
+	self.slowTimeTotal = totalSlowTime
+	self.slowTimeElapsed = 0
+	self.speedUpPoint = speedUpPoint
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getModifiedDT
+--
+-- Does what it says on the tin. (self.slowFactorCurrent is 1 if action isn't
+-- being slowed down).
+-------------------------------------------------------------------------------
+function gameManager:getModifiedDT(dt)
+	return dt * self.slowFactorCurrent
+end
+
+
+
+-------------------------------------------------------------------------------
+-- update
+--
+-- Update gamestate timers with (unmodified!) dt. This lovely function controls
+-- things like slowdown and the fade effect that happens when you die or finish
+-- a level
+-------------------------------------------------------------------------------
 function gameManager:update(dt)
 	self:checkForPad()
 	if self.gameState == "running" then
@@ -220,6 +275,25 @@ function gameManager:update(dt)
 	end
 	if self.moving then
 		self:moveCameraGradual(dt)
+	end
+	
+	if self.slowed then
+		self.slowTimeElapsed = self.slowTimeElapsed + dt
+		local speedUpSeconds = self.slowTimeTotal * self.speedUpPoint
+		if self.slowTimeElapsed > self.slowTimeTotal then
+			self.slowFactorCurrent = 1
+			self.slowed = false
+		else
+			if self.slowTimeElapsed > speedUpSeconds then
+				-- How long will it take us to fully speed up back to normal?
+				local totalSpeedUpTime = self.slowTimeTotal - speedUpSeconds
+				-- how far are we into the speedup period?
+				local difference = self.slowTimeElapsed - speedUpSeconds
+				local progress = difference / totalSpeedUpTime
+				self.slowFactorCurrent = self.slowFactorInitial +
+					(1 - self.slowFactorInitial) * progress
+			end
+		end
 	end
 end
 
@@ -337,6 +411,13 @@ function gameManager:unload()
 	self.currY = 0
 	self.toX = 0
 	self.toY = 0
+
+	self.slowed = false
+	self.slowFactorInitial = 0
+	self.slowFactorCurrent = 1
+	self.slowTimeTotal = 0
+	self.slowTimeElapsed = 0
+	self.speedUpPoint = 0
 
 	self.moving = false
 
