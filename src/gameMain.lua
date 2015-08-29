@@ -47,7 +47,7 @@ g_showBoxes = false
 -------------------------------------------------------------------------------
 local g_gui = require("src/Quickie")
 g_gm = require("src/gameManager")
-g_currentLevel = require("src/level1")
+g_currentLevel = nil
 g_nextLevel = "level2"
 g_menuRefreshed = false
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
@@ -573,7 +573,13 @@ function loadLevel()
 	end
 end
 
-function gameLoad()
+-------------------------------------------------------------------------------
+-- gameLoad
+--
+--  
+-------------------------------------------------------------------------------
+function gameLoad(levelFileName)
+    g_currentLevel = require("src/" .. levelFileName)
 	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
 	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))

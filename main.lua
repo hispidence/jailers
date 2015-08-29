@@ -9,8 +9,10 @@
 
 require("src/gameMain")
 
-function love.load()
-	gameLoad()
+function love.load(args)
+-- args[2] contains the name of the level to be loaded; eg, to load level0 you
+-- would launch the game with love . level0
+	gameLoad(arg[2] or "level1")
 end
 function love.draw()
 	gameDraw()
