@@ -736,6 +736,12 @@ end
 function gameUpdate(dt)
 	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
 	dt = math.min(dt, 0.07)
+	-- Get the moodified delta time (the same as regular DT if action
+	-- isn't slowed down
+	modifiedDT = g_gm:getModifiedDT(dt)
+
+	-- Update the game manager, which, among other thigs, will calculate
+	-- a new slowdown factor if it needs
 	g_gm:update(dt)
   	if(g_gm:getState() == "finishinglevel") then return end
   	if(g_gm:getState() == "finishinggame") then return end
@@ -869,7 +875,7 @@ function gameUpdate(dt)
 				result = v:processEvent(e)
 				g_gm:removeEvent(v:getID(), i)
 			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-dt)
+				e:setTimer(e:getTimer()-modifiedDT)
 			end
 		end
 	end
@@ -880,7 +886,7 @@ function gameUpdate(dt)
 				result = v:processEvent(e)
 				g_gm:removeEvent(v:getID(), i)
 			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-dt)
+				e:setTimer(e:getTimer()-modifiedDT)
 			end
 		end
 	end
@@ -891,7 +897,7 @@ function gameUpdate(dt)
 				result = v:processEvent(e)
 				g_gm:removeEvent(v:getID(), i)
 			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-dt)
+				e:setTimer(e:getTimer()-modifiedDT)
 			end
 		end
 	end
@@ -944,7 +950,7 @@ function gameUpdate(dt)
 			end
 	end
 --		playerInc = playerInc:normalized()
-		playerInc = playerInc * dt * g_thePlayer:getSpeed()
+		playerInc = playerInc * modifiedDT * g_thePlayer:getSpeed()
 		pIncX.x = playerInc.x
 		pIncY.y = playerInc.y
 
@@ -961,32 +967,32 @@ function gameUpdate(dt)
 			moveVec.y = target.y - (enemyPos.y + (size.y/2))
 		
 			moveVec = moveVec:normalized()
-			moveVec = dt * v:getSpeed() * moveVec
+			moveVec = modifiedDT * v:getSpeed() * moveVec
 			
 			v:setMoveVec(moveVec)	
 		end
 	end		
 
-	g_thePlayer:updateAnim(dt)
+	g_thePlayer:updateAnim(modifiedDT)
 
-	g_thePlayer:updateSound(dt)
+	g_thePlayer:updateSound(modifiedDT)
 
 	for i,v in ipairs(g_entityEnemies) do
-		v:update(dt)
-		v:updateAnim(dt)
-		v:updateSound(dt)
+		v:update(modifiedDT)
+		v:updateAnim(modifiedDT)
+		v:updateSound(modifiedDT)
 	end
 
 	for i, v in ipairs(g_entityBlocks) do
-		v:updateSound(dt)
+		v:updateSound(modifiedDT)
 	end
 
 	for i,v in ipairs(g_entityMovers) do
-		v:updateSound(dt)
+		v:updateSound(modifiedDT)
 	end
 
 	for i,v in ipairs(g_entityGuns) do
-		v:updateSound(dt)
+		v:updateSound(modifiedDT)
 	end
 
 	--Move player and enemy on X
@@ -1000,7 +1006,7 @@ function gameUpdate(dt)
 			v:move(moveVecX)
 		end
 	end
-	theCollider:update(dt)
+	theCollider:update(modifiedDT)
 	
 
 	--Move player and enemy on Y
@@ -1014,14 +1020,14 @@ function gameUpdate(dt)
 			v:move(moveVecY)
 		end
 	end
-	theCollider:update(dt)
+	theCollider:update(modifiedDT)
 	for i,v in ipairs(g_entityGuns) do
-		v:update(dt)
+		v:update(modifiedDT)
 	end
 	for i,v in ipairs(g_entityMovers) do
-		if v:getState() == "active" then v:update(dt) end
+		if v:getState() == "active" then v:update(modifiedDT) end
 	end
-	theCollider:update(dt)
+	theCollider:update(modifiedDT)
 
 
 	--PATHFINDING: prepare view rays
@@ -1083,7 +1089,7 @@ function gameUpdate(dt)
 				v:setState("attacking_direct")
 				v:setTarget(pPos)
 			end	
-			v:incPathTimer(dt)
+			v:incPathTimer(modifiedDT)
 			
 			--Enemy generates a new path if player goes or out of line of sight,
 			--or if enemy is at end of current path or has been following it for more than 1 second
@@ -1150,6 +1156,7 @@ function gameKeyPressed(key)
 		if key == "m" then g_showGrid = not g_showGrid end
 		if key == "f5" then g_gm:saveState() end
 		if key == "f9" then g_gm:loadState() end
+		if key == "t" then g_gm:startSlowing(0.1, 5, 0.5) end
 		if key == "f1" then
 			if g_gm:getState() == "loading" then
 				g_currentLevel = require "level1"
