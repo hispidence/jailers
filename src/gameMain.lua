@@ -738,7 +738,7 @@ function gameUpdate(dt)
 	dt = math.min(dt, 0.07)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
-	modifiedDT = g_gm:getModifiedDT(dt)
+	local modifiedDT = g_gm:getModifiedDT(dt)
 
 	-- Update the game manager, which, among other thigs, will calculate
 	-- a new slowdown factor if it needs

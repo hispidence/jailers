@@ -346,6 +346,8 @@ function gameManager:loadState()
 	self.deathTimer = 1.2
 	self.fadeTimer = 1.2
 	self.fadeInTimer = 0.0
+	self.slowed = false
+	self.slowFactorCurrent = 1
 	g_thePlayer:setState("resting")
 	g_thePlayer:resetAnim("dead")
 	g_thePlayer:resetSounds()	
