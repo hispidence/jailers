@@ -33,6 +33,7 @@ Large Hardon Collider
 Quickie
 TESound
 Jumper
+Simple Tiled Implementation
 
 
 
@@ -40,7 +41,7 @@ Other resources used:
 
 Prociono font by Barry Schartz
 sfxr by DrPetter (http://www.drpetter.se/project_sfxr.html)
-
+Tiled by Thorbjørn Lindeijer 
 
 
 Thanks to...
