@@ -14,7 +14,9 @@ function love.load(args)
 -- would launch the game with love . level0
 	gameLoad(arg[2] or "level1")
 end
+
 function love.draw()
+	love.graphics.scale(2, 2)
 	gameDraw()
 end
 

@@ -1,4 +1,4 @@
-scale = 2  
+scale = 1  
 
 local blockSize = 16
 
