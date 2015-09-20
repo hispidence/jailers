@@ -8,6 +8,8 @@
 -------------------------------------------------------------------------------
 
 
+local windowWidth = 0
+local windowHeight = 0
 
 require("src/mover")
 require("src/gun")
@@ -20,6 +22,15 @@ require("src/AnAL")
 require("src/TEsound")
 require("src/shaders")
 require("src/jlEvent")
+
+
+local g_usingTiled = true
+
+local sti
+local tiledMap
+if g_usingTiled then
+sti = require("src/sti")
+end
 
 
 
@@ -47,7 +58,11 @@ g_showBoxes = false
 -------------------------------------------------------------------------------
 local g_gui = require("src/Quickie")
 g_gm = require("src/gameManager")
-g_currentLevel = nil
+if g_usingTiled then
+	g_currentLevel = "tiledLevel"
+else
+	g_currentLevel = nil
+end
 g_nextLevel = "level2"
 g_menuRefreshed = false
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
@@ -179,6 +194,7 @@ function loadResources()
 
 	for _, v in ipairs(rTextures) do
 		v.data = love.graphics.newImage(v.fname)
+		v.data:setFilter("nearest")
 	end
 end
 
@@ -237,7 +253,101 @@ end
 --  
 -------------------------------------------------------------------------------
 function loadLevel()
-  	
+  	if g_usingTiled then
+		tiledMap = sti.new("src/tiledlevel.lua")
+
+		tiledMap:setDrawRange(0, 0, windowWidth, windowHeight)
+
+		world = love.physics.newWorld(0, 0)
+		--love.physics.setMeter(32)
+		collision = tiledMap:initWorldCollision(world)	
+	
+	tiledMap.layers["objects"].visible = false;
+
+	local pSize = vector(10, 10)
+	local playerObj = tiledMap.objects["player"]
+	local blockSize = 16
+	local pPos = vector(playerObj.x, playerObj.y - blockSize)
+	g_thePlayer = character("player")
+	g_thePlayer:setTexture(	"resting",
+				love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
+				false)
+	g_thePlayer:setTexture(	"moving_vertical",
+				love.graphics.newImage(TEXTURES_DIR .. "playermoveup.png"),
+				false)
+	g_thePlayer:setTexture(	"moving_horizontal",
+				love.graphics.newImage(TEXTURES_DIR .. "playermove.png"),
+				false)	
+	g_thePlayer:setTexture(	"dead", 
+				love.graphics.newImage(TEXTURES_DIR .. "playerdeath.png"),
+				false)
+	g_thePlayer:setSize(pSize)
+	g_thePlayer:setShapeOffsets(2, 2)
+	g_thePlayer:setCollisionRectangle()	
+	g_thePlayer:setID("player")
+	g_thePlayer:setCategory("player")
+	g_thePlayer:setState("resting")
+	g_thePlayer:setPathBox()
+	g_thePlayer:setSpeed(g_currentLevel.levelAttribs.playerSpeed)	
+	g_thePlayer:setPos(pPos)
+
+
+	local anim = newAnimation(g_thePlayer:getTexture("dead"), 14, 14, 0.08, 6)
+	anim:setMode("once")
+	g_thePlayer:setAnim("dead", anim)
+
+	anim = newAnimation(g_thePlayer:getTexture("resting"), 14, 14, 0.15,4)
+	g_thePlayer:setAnim("resting", anim)
+
+	anim = newAnimation(g_thePlayer:getTexture("moving_horizontal"), 14, 14, 0.05, 12)
+	g_thePlayer:setAnim("moving_horizontal", anim)
+
+	anim = newAnimation(g_thePlayer:getTexture("moving_vertical"), 14, 14, 0.05, 12)
+	g_thePlayer:setAnim("moving_vertical", anim)
+
+
+	local sound = g_currentLevel.levelAttribs.playerSounds["dead"]
+	g_thePlayer:setSound(	"dead", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
+
+	sound = g_currentLevel.levelAttribs.playerSounds["moving_horizontal"]
+	g_thePlayer:setSound(	"moving_horizontal", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
+
+	sound = g_currentLevel.levelAttribs.playerSounds["moving_vertical"]
+	g_thePlayer:setSound(	"moving_vertical", 
+				lSounds[getSoundByID(sound.id)].soundData,
+				sound.repeating, 
+				sound.time)
+
+
+	-- Initialise walls
+	local k = 1
+		local size = vector(blockSize, blockSize)
+	for n, v in ipairs(collision) do
+		--print("size:", size.x, size.y)
+		g_entityBlocks[k] = gameObject()
+		local pos = vector(collision.body:getWorldPoints(v.shape:getPoints()))
+		print(pos)	
+		g_entityBlocks[k]:setSize(size)
+		pos.x = pos.x - size.x
+		g_entityBlocks[k]:setCollisionRectangle()
+		g_entityBlocks[k]:setID("wall")
+		g_entityBlocks[k]:setCategory("wall")
+		g_entityBlocks[k]:addToCollisionGroup("world")
+		g_entityBlocks[k]:move(pos)
+
+	--	if v.ignoresBullets then g_entityBlocks[k]:setIgnoresBullets(true) end
+	--	youShallNotPass(pathMap, g_entityBlocks[k]:getPos(), g_entityBlocks[k]:getSize())
+		k = k + 1
+	end
+	
+
+	else	
 	-- Initialise camera positions
 	g_gm:setCurrX(g_currentLevel.levelAttribs.initialCamera.x * g_currentLevel.levelAttribs.blockSize)
   	g_gm:setCurrY(g_currentLevel.levelAttribs.initialCamera.y * g_currentLevel.levelAttribs.blockSize)
@@ -571,6 +681,7 @@ function loadLevel()
 
 		m = m + 1
 	end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -581,6 +692,8 @@ end
 function gameLoad(levelFileName)
     g_currentLevel = require("src/" .. levelFileName)
 	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
+	windowWidth = love.window.getWidth()
+	windowHeight = love.window.getHeight()
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
 	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
 	g_gm:setState("splash")
@@ -596,6 +709,15 @@ end
 
 
 function gameDraw()
+	if not g_showBoxes then
+	tiledMap:draw()
+	else
+	tiledMap:drawWorldCollision(collision)
+	end
+		g_thePlayer:draw(g_showBoxes)
+if g_usingTiled then
+
+else
 	if g_gm:getState() == "loading" or g_gm:getState() == "splash" or g_gm:getState() == "endsplash" then 
 		love.graphics.setShader()
 		if g_gm:getState() == "splash" then
@@ -690,7 +812,7 @@ function gameDraw()
 		end
 	end
 	love.graphics.setShader(fadeShader)
-
+end
 end
 
 
@@ -734,12 +856,15 @@ function processEvent(e)
 end
 
 function gameUpdate(dt)
+
 	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
 	dt = math.min(dt, 0.07)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
 	local modifiedDT = g_gm:getModifiedDT(dt)
-
+	if g_usingTiled then
+		tiledMap:update(modifiedDT)
+	end
 	-- Update the game manager, which, among other thigs, will calculate
 	-- a new slowdown factor if it needs
 	g_gm:update(dt)
@@ -1027,7 +1152,7 @@ function gameUpdate(dt)
 	for i,v in ipairs(g_entityMovers) do
 		if v:getState() == "active" then v:update(modifiedDT) end
 	end
-	theCollider:update(modifiedDT)
+	--theCollider:update(modifiedDT)
 
 
 	--PATHFINDING: prepare view rays
@@ -1125,7 +1250,7 @@ function gameKeyPressed(key)
 	end
 	if g_gm:getState() == "paused" then
 		if uiData.menuState == "paused" then
-			if key == "q" then uiData.menuState = "exit" end
+			if key == "q" then love.event.push("quit") end--uiData.menuState = "exit" end
 			if key == "l" then uiData.menuState = "levels" end
 			if key == "s" then uiData.menuState = "settings" end
 			if key == "j" then uiData.menuState = "about" end
