@@ -282,7 +282,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- addEntityBlockWall
+-- addEntityBlock
 --
 -- Add block-based objects (i.e. switches, doors) to the g_entityBlocks table. 
 -------------------------------------------------------------------------------
@@ -345,8 +345,6 @@ function loadLevel()
 		tiledMap:setDrawRange(0, 0, windowWidth, windowHeight)
 
 		world = love.physics.newWorld(0, 0)
-		--love.physics.setMeter(32)
-		--collision = tiledMap:initWorldCollision(world)	
 	
 	-- No entities from the "objects" layer get drawn through the STI Tiled
 	-- library. Instead, we create entities based on them, and where draw
@@ -423,6 +421,7 @@ function loadLevel()
 		end
 	end
 
+	-- Initialise block-based objects
 	for i, data in ipairs(tiledMap.layers.objects.objects) do
 			local theType = data.type;
 			if theType == "block" then
