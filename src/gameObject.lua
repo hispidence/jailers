@@ -296,7 +296,8 @@ end
 
 function gameObject:setTexture(key, value, repeating)
 	if self.textures[key] == nil then
-		 self.textures[key] = {} end
+		 self.textures[key] = {}
+	end
 	value:setFilter("nearest")
 	self.textures[key].texture = value
 	if repeating then
