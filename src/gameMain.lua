@@ -34,7 +34,7 @@ end
 
 
 
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- Classes from Jumper 
 -------------------------------------------------------------------------------
 local Grid = require("src/jumper.grid")
@@ -65,6 +65,7 @@ else
 end
 g_nextLevel = "level2"
 g_menuRefreshed = false
+g_blockSize = 16
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
@@ -79,6 +80,7 @@ g_fonts = {}
 -------------------------------------------------------------------------------
 -- Create tables to hold game entities 
 -------------------------------------------------------------------------------
+g_entityWalls = {}
 g_entityBlocks = {}
 g_entityScenery = {}
 g_entityMovers = {}
@@ -248,6 +250,90 @@ end
 
 
 -------------------------------------------------------------------------------
+-- addEntityWall
+--
+-- Add walls to the g_entityWalls table. This will likely get moved to an
+-- entirely separate table later on. 
+-------------------------------------------------------------------------------
+function addEntityWall(block, x, y)
+	local blockID = #g_entityWalls+ 1;
+	g_entityWalls[blockID] = gameObject()
+
+	local size = vector(g_blockSize, g_blockSize)
+	g_entityWalls[blockID]:setSize(size)
+	
+	g_entityWalls[blockID]:setCollisionRectangle()
+	
+	g_entityWalls[blockID]:setID("wall")
+	
+	g_entityWalls[blockID]:setCategory("wall")
+	
+	g_entityWalls[blockID]:addToCollisionGroup("world")
+			
+	local pos = vector(x * g_blockSize, y * g_blockSize)
+	pos.x = pos.x - size.x
+	pos.y = pos.y - size.y
+	g_entityWalls[blockID]:move(pos)
+
+	--	if v.ignoresBullets then g_entityWalls[blockID]:setIgnoresBullets(true) end
+	--	youShallNotPass(pathMap, g_entityWalls[blockID]:getPos(), g_entityWalls[blockID]:getSize())
+end
+
+
+
+-------------------------------------------------------------------------------
+-- addEntityBlockWall
+--
+-- Add block-based objects (i.e. switches, doors) to the g_entityBlocks table. 
+-------------------------------------------------------------------------------
+function addEntityBlock(block)
+	local blockID = #g_entityBlocks + 1;
+	g_entityBlocks[blockID] = gameObject();
+
+	local prop = block.properties;
+
+	local size = vector(g_blockSize, g_blockSize)
+	g_entityBlocks[blockID]:setSize(size)
+	g_entityBlocks[blockID]:setQuad(love.graphics.newQuad(0,
+													0,
+													size.x,
+													size.y, 
+													size.x,
+													size.y))
+	g_entityBlocks[blockID]:setCollisionRectangle()
+	
+	if block.name then
+		g_entityBlocks[blockID]:setID(block.name)
+	else
+		print("Warning! A block has an empty name.")
+	end
+
+	if prop.category then	
+		g_entityBlocks[blockID]:setCategory(prop.category)
+	else
+		print("Warning! A block has an empty category.")
+	end
+	
+	if prop.textures then
+		local t = prop.textures
+		g_entityBlocks[blockID]:setTexture("dormant",
+									 rTextures[getTextureByID(t)].data,
+									 true)
+	end
+
+	g_entityBlocks[blockID]:setState("dormant");
+
+	g_entityBlocks[blockID]:addToCollisionGroup("world")
+
+	local pos = vector(block.x, block.y)
+
+	pos.y = pos.y - size.y;
+	g_entityBlocks[blockID]:move(pos)
+end
+
+
+
+-------------------------------------------------------------------------------
 -- loadLevel
 --
 --  
@@ -260,14 +346,19 @@ function loadLevel()
 
 		world = love.physics.newWorld(0, 0)
 		--love.physics.setMeter(32)
-		collision = tiledMap:initWorldCollision(world)	
+		--collision = tiledMap:initWorldCollision(world)	
 	
+	-- No entities from the "objects" layer get drawn through the STI Tiled
+	-- library. Instead, we create entities based on them, and where draw
+    -- those instead (where applicable).
+	--
+	-- Entities from the objects layer are put into one of the global tables
+	-- defined above.
 	tiledMap.layers["objects"].visible = false;
 
 	local pSize = vector(10, 10)
 	local playerObj = tiledMap.objects["player"]
-	local blockSize = 16
-	local pPos = vector(playerObj.x, playerObj.y - blockSize)
+	local pPos = vector(playerObj.x, playerObj.y - g_blockSize)
 	g_thePlayer = character("player")
 	g_thePlayer:setTexture(	"resting",
 				love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
@@ -326,26 +417,18 @@ function loadLevel()
 
 
 	-- Initialise walls
-	local k = 1
-		local size = vector(blockSize, blockSize)
-	for n, v in ipairs(collision) do
-		--print("size:", size.x, size.y)
-		g_entityBlocks[k] = gameObject()
-		local pos = vector(collision.body:getWorldPoints(v.shape:getPoints()))
-		print(pos)	
-		g_entityBlocks[k]:setSize(size)
-		pos.x = pos.x - size.x
-		g_entityBlocks[k]:setCollisionRectangle()
-		g_entityBlocks[k]:setID("wall")
-		g_entityBlocks[k]:setCategory("wall")
-		g_entityBlocks[k]:addToCollisionGroup("world")
-		g_entityBlocks[k]:move(pos)
-
-	--	if v.ignoresBullets then g_entityBlocks[k]:setIgnoresBullets(true) end
-	--	youShallNotPass(pathMap, g_entityBlocks[k]:getPos(), g_entityBlocks[k]:getSize())
-		k = k + 1
+	for y, tiles in ipairs(tiledMap.layers.statics.data) do
+		for x, data in pairs(tiles) do
+			addEntityWall(data, x, y)	
+		end
 	end
-	
+
+	for i, data in ipairs(tiledMap.layers.objects.objects) do
+			local theType = data.type;
+			if theType == "block" then
+				addEntityBlock(data)
+			end
+	end
 
 	else	
 	-- Initialise camera positions
@@ -517,7 +600,6 @@ function loadLevel()
 		for s, t in pairs(v.texture) do
 			g_entityBlocks[k]:setTexture(s, rTextures[getTextureByID(t)].data, true)
 		end
-
 
 
 		if v.sound then
@@ -710,11 +792,21 @@ end
 
 function gameDraw()
 	if not g_showBoxes then
-	tiledMap:draw()
+		tiledMap:draw()
 	else
-	tiledMap:drawWorldCollision(collision)
+		for i, v in ipairs(g_entityWalls) do
+			g_entityWalls[i]:drawQuad(g_showBoxes)
+		end
+	end	
+	
+	g_thePlayer:draw(g_showBoxes)
+
+	for i, v in ipairs(g_entityBlocks) do
+		if g_entityBlocks[i]:getState() ~= "dead" then
+			g_entityBlocks[i]:drawQuad(g_showBoxes)
+		end
 	end
-		g_thePlayer:draw(g_showBoxes)
+	
 if g_usingTiled then
 
 else
