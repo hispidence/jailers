@@ -7,6 +7,20 @@ function getTextureByID(id)
 	return 0
 end
 
+g_textureSets = {
+  
+  door_standard = {
+    dormant = "door",
+    off = "door"
+  },
+  
+  switch_standard = {
+    dormant = "switchoff",
+    off = "switchoff",
+    on = "switchon"
+  }
+}
+
 rTextures = {
 	{id = "shelf_decayed1",
 	fname = TEXTURES_DIR .. "shelf_decayed1.png",
@@ -331,4 +345,12 @@ rTextures = {
 	data = nil},
 }
 
+--Dirty and oh so temporary
+-- TODO: fix it
+rTextures.mt = {
+  __index = function(table, key)
+    return rawget(table, getTextureByID(key))
+  end
+}
 
+setmetatable(rTextures, rTextures.mt)
