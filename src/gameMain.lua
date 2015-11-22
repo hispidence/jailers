@@ -22,6 +22,8 @@ require("src/AnAL")
 require("src/TEsound")
 require("src/shaders")
 require("src/jlEvent")
+require("src/utils")
+require("src/levelFunctions")
 
 
 local g_usingTiled = true
@@ -252,8 +254,7 @@ end
 -------------------------------------------------------------------------------
 -- addEntityWall
 --
--- Add walls to the g_entityWalls table. This will likely get moved to an
--- entirely separate table later on. 
+-- Add walls to the g_entityWalls table. 
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
 	local blockID = #g_entityWalls+ 1;
@@ -290,7 +291,7 @@ function addEntityBlock(block)
 	local blockID = #g_entityBlocks + 1;
 	g_entityBlocks[blockID] = gameObject();
 
-	local prop = block.properties;
+	local prop = block.properties
 
 	local size = vector(g_blockSize, g_blockSize)
 	g_entityBlocks[blockID]:setSize(size)
@@ -302,24 +303,83 @@ function addEntityBlock(block)
 													size.y))
 	g_entityBlocks[blockID]:setCollisionRectangle()
 	
-	if block.name then
+	if block.name and block.name ~= "" then
 		g_entityBlocks[blockID]:setID(block.name)
 	else
-		print("Warning! A block has an empty name.")
+		print("Warning! A block has no name.")
+    block.name = "nameless_block_FIX_THIS_NOW"
 	end
 
-	if prop.category then	
+	if prop.category and prop.category ~= "" then	
 		g_entityBlocks[blockID]:setCategory(prop.category)
 	else
-		print("Warning! A block has an empty category.")
+		print("Warning! Block \"" .. block.name .. "\" has no category.")
 	end
 	
-	if prop.textures then
-		local t = prop.textures
-		g_entityBlocks[blockID]:setTexture("dormant",
-									 rTextures[getTextureByID(t)].data,
-									 true)
-	end
+  -- Does the entity specify a textureset?
+	if prop.textureset then
+
+		local t = g_textureSets[prop.textureset]
+    
+    -- Does the textureset exist?
+    if t then
+      for state, tex in pairs(t) do
+        
+        --do the asked-for textures exist?
+        if rTextures[tex] then
+          g_entityBlocks[blockID]:setTexture(state,
+            rTextures[tex].data,
+            true)
+        else
+          print("Warning! Texture \"" .. tex .. "\" does not exist " ..
+            "in the table of textures")
+        end
+        
+      end
+    else
+      print("Warning! Textureset \"" .. prop.textureset ..
+        "\" doesn't exist.")
+    end
+    
+	else
+    print("Warning! Block \"" .. block.name .. "\" no textureset.")
+  end
+  
+  
+  if prop.collision_behaviours then 
+    local behaviourTable = jSplit(prop.collision_behaviours)
+    for k, v in ipairs(behaviourTable) do
+      
+      -- Does the level data contain the collision behaviour in question?
+      if prop[v] then
+        local behaviourData = jSplit(prop[v])
+        
+        local behaviourType = behaviourData[1]
+        local behaviourTarget = behaviourData[2]
+        local behaviourSender = block.name
+        -- If the collision behaviour exists in the script, we can go ahead
+        if g_collisionBehaviours[behaviourType] ~= nil then
+         
+          local args =  { sender = block.name,
+                          target = behaviourTarget,
+                          data =   unpack(behaviourData, 3)
+                        }
+
+          g_entityBlocks[blockID]:addCollisionBehaviour(
+            g_collisionBehaviours[behaviourType](args)
+          )
+        else
+          print("Warning! Collison behaviour tables " ..
+            "hold no data for \"" .. v .. "\"")
+        end
+        
+      else
+        print("Warning! Object contains no behaviour for \"" .. 
+          behaviourType .."\"")
+      end
+      
+    end
+  end
 
 	g_entityBlocks[blockID]:setState("dormant");
 
@@ -771,7 +831,7 @@ end
 --  
 -------------------------------------------------------------------------------
 function gameLoad(levelFileName)
-    g_currentLevel = require("src/" .. levelFileName)
+  g_currentLevel = require("src/" .. levelFileName)
 	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
 	windowWidth = love.window.getWidth()
 	windowHeight = love.window.getHeight()
@@ -789,6 +849,11 @@ end
 
 
 
+-------------------------------------------------------------------------------
+-- gameDraw
+--
+--  
+-------------------------------------------------------------------------------
 function gameDraw()
 	if not g_showBoxes then
 		tiledMap:draw()
@@ -946,8 +1011,14 @@ function processEvent(e)
 	end
 end
 
-function gameUpdate(dt)
 
+
+-------------------------------------------------------------------------------
+-- gameUpdate
+--
+--  
+-------------------------------------------------------------------------------
+function gameUpdate(dt)
 	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
 	dt = math.min(dt, 0.07)
 	-- Get the moodified delta time (the same as regular DT if action
