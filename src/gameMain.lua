@@ -277,7 +277,7 @@ function addEntityWall(block, x, y)
 	g_entityWalls[blockID]:move(pos)
 
 	--	if v.ignoresBullets then g_entityWalls[blockID]:setIgnoresBullets(true) end
-	--	youShallNotPass(pathMap, g_entityWalls[blockID]:getPos(), g_entityWalls[blockID]:getSize())
+	-- youShallNotPass(pathMap, g_entityWalls[blockID]:getPos(), g_entityWalls[blockID]:getSize())
 end
 
 
@@ -413,6 +413,9 @@ function loadLevel()
 	-- Entities from the objects layer are put into one of the global tables
 	-- defined above.
 	tiledMap.layers["objects"].visible = false;
+
+  local sLayer = tiledMap.layers["statics"];
+  pathMap = buildMap(sLayer.width, sLayer.height)
 
 	local pSize = vector(10, 10)
 	local playerObj = tiledMap.objects["player"]
@@ -1020,6 +1023,9 @@ end
 -------------------------------------------------------------------------------
 function gameUpdate(dt)
 	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
+  -- Cap the delta time at 0.07. This should prevent players from accidentally
+  -- or deliberately running through walls if the game is running extremely
+  -- slowly.
 	dt = math.min(dt, 0.07)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
