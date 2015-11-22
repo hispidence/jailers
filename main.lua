@@ -10,9 +10,25 @@
 require("src/gameMain")
 
 function love.load(args)
--- args[2] contains the name of the level to be loaded; eg, to load level0 you
--- would launch the game with love . level0
-	gameLoad(arg[2] or "level1")
+  
+  -- Enable ZeroBrane Studio debugging
+  local isDebugging = false
+  if args[#args] == "-debug" then
+    isDebugging = true
+    require("mobdebug").start()
+  end
+  
+  -- Launch level based on commandline args; eg, to load level0
+  -- you would launch the game with love . level0
+  local levelName = "level1"
+  if (#args > 2 and isDebugging) or (#args == 2 and not isDebugging) then
+    levelName = args[2]
+  else
+    levelName = "level1"
+  end
+  
+	gameLoad(levelName)
+  
 end
 
 function love.draw()
