@@ -1,44 +1,105 @@
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2015
+--
+--
+-- collider.lua
+--
+-- Handles collision resolution; fires off events and repositions entities.
+-------------------------------------------------------------------------------
+
 collider = require("src/hardoncollider")
 
-local MAX_TESTS = 4
+local MAX_TESTS = 10
 
-function resolveCollision(a, b, dt)
+
+-------------------------------------------------------------------------------
+-- resolveCollision
+--
+-- Repositions an object to the nearest point outside of the object with which
+-- it has collided. i.e. We want object a to end up as close to object b as it
+-- can be without actually being inside of it.
+-------------------------------------------------------------------------------
+function resolveCollision(a, b)
+  
+  -- Players and enemies get reposition precedence over static objects
 	if b.object:getClass() == "player" then
-		a,b = b,a
+		a, b = b, a
+	elseif b.object:getClass() == "enemy" and
+     b.object:getState() ~= "dormant" and
+     b.object:getState() ~= "dead" then
+		a, b = b, a
 	end
 
-	if b.object:getClass() == "enemy" and b.object:getState() ~= "dormant" and b.object:getState() ~= "dead" then
-		a,b = b,a
-	end
+  -- Store object a's old position; i.e. their position in the last update
+  -- cycle when they hadn't yet collided with object b.
+	local recentGood = a.object:getOldPos():clone()
+  
+  -- Variables for the testCollision function
+  -- step:  how far along object a's movement vector should we (temporarily)
+  --        position it for the next test?
+  --
+  -- nTests:  how many positions for object a have we tested?
+  --
+  -- res: did object a and object b collide during the last test? We set
+  --      res to true here because it did just collide, which is why we're
+  --      in this function
+  --
+  -- moveVec: how far did object a move since the last frame?
+  --
+  -- vec: vector to store the new movement vector for the next test
+	local step = 1
+	local nTests = 0
+	local res = true
+  local moveVec = a.object:getFrameMoveVec()
+  local vec
 
-	recentGood = a.object:getOldPos():clone()
-	step = 1
-	nTests = 0
-	res = true
+  -- testCollision. Recursive. Horay for lexical scoping!
 	function testCollision(nTests, a, b, step, res)
-		if res == false then
-			recentGood = posHolder:clone() 
-			if nTests == MAX_TESTS then return else step = step + step/2 end
-		else
-			if nTests == MAX_TESTS then return else step = step - step/2 end
-		end
-		
-		vec = a.object:getFrameMoveVec();
-		
-		vec = vec:normalized();
-		
-		vec = vec * step * 50;
-	
+    
+    -- Calculate a new movement vector
+		vec = moveVec * step  
+    
+    -- Set a's new position. This position might be wrong, but since collision
+    -- detection is done entirely sequentially, this wrong position will be
+    -- overwritten by the correct one before it gets used in any calculations.
+    --
+    -- Note that this will not change the contents of a.object:oldPos
+    a.object:setPos(a.object:getOldPos() + vec)
+    
+    -- Are the objects still colliding after all that kerfuffle?
 		res = a:collidesWith(b)
+    
+    -- Increment the number of tests
 		nTests = nTests+1
+    
+    if nTests <= MAX_TESTS then
+      -- Did we collide? If we did, calculate a new step to bring us slightly
+      -- farther away from object b. If not, calculate one to bring us slightly
+      -- closer.
+      if res == false then
+        -- store the last non-colliding position; this might be one we
+        -- calculated in a previous step; see below.
+        recentGood = a.object:getPos() 
+        step = step + step/2
+      else
+        step = step - step/2
+      end
+      
+      -- Make use of Lua's tail call optimisation because we can.
+      -- (note: doesn't actually return a value)
+      return testCollision(nTests, a, b, step, res)
+    end
 	end
-	testCollision(nTests, a, b, step, res)
+  
+  -- Actually call the function
+  testCollision(nTests, a, b, step, res)
+  
+  -- Set the object's position to the one we've calculated, if any.
 	a.object:setPos(recentGood)
 end
 
 function onCollide(dt, objA, objB)
 
-	--print(objA.object:getCategory() .. " " .. objA.object:getState(), objB.object:getCategory() .. " " .. objB.object:getState())
 	if (objA.object:getCategory() == "trigger" and objA.object:getState() == "dormant")
 		or (objB.object:getCategory() == "trigger" and objB.object:getState() == "dormant") then return end
 
@@ -72,7 +133,7 @@ function onCollide(dt, objA, objB)
 		end
 
 	elseif 	objA.object:getCategory() ~= "bullet" and objB.object:getCategory() ~= "bullet" and
-		objA.object:getCategory() ~= "trigger" and objB.object:getCategory() ~= "trigger" then resolveCollision(objA, objB, dt) end
+		objA.object:getCategory() ~= "trigger" and objB.object:getCategory() ~= "trigger" then resolveCollision(objA, objB) end
 
 	if not collides then return end
 
