@@ -1,23 +1,26 @@
-require("src/jailerUtil")
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2015
+--
+--
+-- gameObject.lua
+--
+-- Game objects; basis for enemies and turrets, etc.
+-------------------------------------------------------------------------------
+
+require("src/utils")
 require("src/collider")
 vector = require("src/hump.vector")
 
-	gameObject = {}
+gameObject = {}
 
-	newTexture = {
-			  __newindex = function(t, k, v) 
-				rawset(t, k, v)
-				--t[k] = v
-			end}
+newTexture = {
+  __newindex = function(t, k, v) 
+		rawset(t, k, v)
+		--t[k] = v
+  end
+}
 
-
-			--__index = function(t, k) 
-			--	return t[k]
-			--end}
-
-
-
-	gameObject.__index = gameObject
+gameObject.__index = gameObject
 
 	setmetatable(gameObject,
 			{__call = function(cls, ...)
@@ -36,8 +39,8 @@ vector = require("src/hump.vector")
 		self.position = vector(0,0) 
 		self.direction = vector(0,0)
 		self.vel = vector(0,0)
-		self.behaviour = nil
-		self.resetBehaviour = nil
+		self.behaviour = {}
+		self.resetBehaviour = {}
 		self.bData = nil
 		self.invisible = false
 		self.state = "dormant"
@@ -48,7 +51,7 @@ vector = require("src/hump.vector")
 		self.id = nil
 		self.ignoredBullets = false
 		self.sounds = setmetatable({}, newTexture)
-		self.collisionBehaviour = nil
+		self.collisionBehaviour = {}
 		self.collisionShape = nil
 		self.category = nil
 		self.textures = setmetatable({}, newTexture)
@@ -153,11 +156,11 @@ vector = require("src/hump.vector")
 	function gameObject:setSound(key, value, repeating, time)
 		if 	self.sounds[key] == nil then
 			self.sounds[key] = {} end
-		self.sounds[key].data = value
-		self.sounds[key].repeating = repeating
-		self.sounds[key].wait = time
-		self.sounds[key].elapsed = time
-		self.sounds[key].done = false
+      self.sounds[key].data = value
+      self.sounds[key].repeating = repeating
+      self.sounds[key].wait = time
+      self.sounds[key].elapsed = time
+      self.sounds[key].done = false
 	end
 
   function gameObject:setShapeOffsets(x, y)
@@ -191,6 +194,11 @@ vector = require("src/hump.vector")
 	function gameObject:setCollisionBehaviour(c)
 		self.collisionBehaviour = c
 	end
+  
+  function gameObject:addCollisionBehaviour(c)
+		self.collisionBehaviour[#self.collisionBehaviour+1] = c
+	end
+
 
 	function gameObject:getCollisionBehaviour()
 		return self.collisionBehaviour
@@ -208,21 +216,21 @@ vector = require("src/hump.vector")
 		return self.size
 	end
 
-	function gameObject:setSize(vec)
-		self.size = vec
-	end
+function gameObject:setSize(vec)
+	self.size = vec
+end
 
-	function gameObject:setClass(newClass)
-		self.class = newClass
-	end
+function gameObject:setClass(newClass)
+	self.class = newClass
+end
 
-	function gameObject:getClass()
-		return self.class
-	end
+function gameObject:getClass()
+	return self.class
+end
 
-	function gameObject:setQuad(q)
-		self.quad = q
-	end
+function gameObject:setQuad(q)
+	self.quad = q
+end
 
 
 ----------------------------
