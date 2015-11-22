@@ -1,12 +1,29 @@
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2015
+--
+--
+-- character.lua
+--
+-- Game objects which can move (player and enemies)
+-------------------------------------------------------------------------------
+
 require("src/gameObject")
 
-
+-- OO inheritance, after a fashion: fill character with gameObject's functions
 character = {}
 for k,v in pairs(gameObject) do
 	character[k]=v
 end
+
+-- character objects have character as their metatable. When looking for
+-- something in a character object, look first in character.
 character.__index = character
 
+-- Set the metatable of character to gameObject. This means if we can't find
+-- a function called on a character object's metatable, we look instead at its
+-- metatable's metatable.
+--
+-- Give character a C++-style constructor.
 setmetatable(character,
 	{__index = gameObject,
 	__call = function(cls, ...)
@@ -15,7 +32,7 @@ setmetatable(character,
 	})
 
 function character.new(...)
-	local self = setmetatable(gameObject(), character)
+	local self = setmetatable({}, character)
 	self:init(...)
 	return self
 end
@@ -125,7 +142,6 @@ function character:getDeathBehaviour()
 end
 
 function character:setPos(pos)
-	--self.oldPos = pos:clone()
 	gameObject.setPos(self, pos)
 	self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
 					self.position.y +((self.size.y/2)))

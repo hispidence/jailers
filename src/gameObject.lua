@@ -11,27 +11,25 @@ require("src/utils")
 require("src/collider")
 vector = require("src/hump.vector")
 
+
+-- A cheeky bit of object orientation.
 gameObject = {}
 
-newTexture = {
-  __newindex = function(t, k, v) 
-		rawset(t, k, v)
-		--t[k] = v
-  end
-}
-
+-- When looking for a gameObject "instance"'s members, look in gameObject.
 gameObject.__index = gameObject
 
-	setmetatable(gameObject,
-			{__call = function(cls, ...)
-				return cls.new(...)
-			end})
+-- Give gameObject something resembling a C++-style constructor.
+setmetatable(gameObject,
+		{__call = function(cls, ...)
+			return cls.new(...)
+		end}
+)
 
-	function gameObject.new()
-		local self = setmetatable({}, gameObject)
-		self:init()
-		return self
-	end
+function gameObject.new()
+	local self = setmetatable({}, gameObject)
+	self:init()
+	return self
+end
 
 	function gameObject:init()
 		self.size = vector(1, 1)
@@ -50,12 +48,12 @@ gameObject.__index = gameObject
 		self.quad = nil
 		self.id = nil
 		self.ignoredBullets = false
-		self.sounds = setmetatable({}, newTexture)
+		self.sounds = {}
 		self.collisionBehaviour = {}
 		self.collisionShape = nil
 		self.category = nil
-		self.textures = setmetatable({}, newTexture)
-		self.anims = setmetatable({}, newTexture)
+		self.textures = {}
+		self.anims = {}
 	end
 
 
