@@ -68,7 +68,9 @@ end
 g_nextLevel = "level2"
 g_menuRefreshed = false
 g_blockSize = 16
+g_config = nil
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
+
 
 
 -------------------------------------------------------------------------------
@@ -91,6 +93,7 @@ g_entityGuns = {}
 g_entityTriggers = {}
 g_thePlayer = nil
 
+g_cameras = {}
 
 
 -------------------------------------------------------------------------------
@@ -163,14 +166,14 @@ end
 -------------------------------------------------------------------------------
 function setupUI()
 	g_menuBGtex = love.graphics.newImage(uiData.menuBackGround)
-	g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 20 * scale)
-	g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * scale)
-	g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
-	g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
+	g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 20 * g_config.scale)
+	g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * g_config.scale)
+	g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * g_config.scale)
+	g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * g_config.scale)
 	love.graphics.setFont(g_fonts[1])
 	g_gui.keyboard.disable()
-	g_gui.group.default.size[1] = uiData.btnMenuWidth * scale;
-	g_gui.group.default.size[2] = uiData.btnMenuHeight * scale;
+	g_gui.group.default.size[1] = uiData.btnMenuWidth * g_config.scale
+	g_gui.group.default.size[2] = uiData.btnMenuHeight * g_config.scale
 	g_gui.group.default.spacing = 0
 
 	g_gui.core.style.color.normal.bg = {0, 0, 0}
@@ -216,7 +219,7 @@ function unloadLevel()
 	pathMap = nil
   
 	g_thePlayer:freeResources(theCollider)
-	g_thePlayer = nil;
+	g_thePlayer = nil
 
 	for k, v in ipairs(g_entityBlocks) do
 		v:freeResources(theCollider)
@@ -247,6 +250,111 @@ function unloadLevel()
 		v:freeResources(theCollider)
 		g_entityTriggers[k] = nil
 	end
+  
+  for k, v in pairs(g_cameras) do
+    g_cameras[k] = nil
+  end
+end
+
+
+
+-------------------------------------------------------------------------------
+-- registerBehaviours
+--
+-- Populate object behaviours.
+-------------------------------------------------------------------------------
+function registerBehaviours(object, prop)
+  if prop.collision_behaviours then 
+    local behaviourTable = jSplit(prop.collision_behaviours)
+    for k, v in ipairs(behaviourTable) do
+      -- Does the level data contain the collision behaviour in question?
+      if prop[v] then
+        local behaviourData = jSplit(prop[v])
+        for i, x in pairs(behaviourData) do print(i, x) end
+        local behaviourType = behaviourData[1]
+        local behaviourTarget = behaviourData[2]
+        local behaviourSender = object:getID()
+        -- If the collision behaviour exists in the script, we can go ahead
+        if g_collisionBehaviours[behaviourType] ~= nil then
+          local args =  { sender = behaviourSender,
+                          target = behaviourTarget,
+                          data =   unpack(behaviourData, 3)
+                        }
+
+          object:addCollisionBehaviour(
+            g_collisionBehaviours[behaviourType](args)
+          )
+        else
+          print("Warning! Collison behaviour tables " ..
+            "hold no data for \"" .. v .. "\"")
+        end
+        
+      else
+        print("Warning! Object contains no behaviour for \"" .. 
+          behaviourType .."\"")
+      end
+      
+    end
+  end
+end
+
+
+
+-------------------------------------------------------------------------------
+-- addCamera
+--
+-- Add cameras to the g_cameras table.
+--
+-- A camera is literally nothing except a position and a name.
+-------------------------------------------------------------------------------
+function addCamera(camera)
+  if not camera.name or camera.name == "" then
+    camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
+	end
+  local theName = camera.name;
+  g_cameras[theName] = gameObject()
+  
+  g_cameras[theName]:setInvisible(true)
+  local pos = vector(camera.x, camera.y)
+  g_cameras[theName]:move(pos)
+
+end
+
+
+
+-------------------------------------------------------------------------------
+-- addEntityTrigger
+--
+-- Add triggers to the g_entityTriggers table.
+-------------------------------------------------------------------------------
+function addEntityTrigger(trig)
+  local trigID = #g_entityTriggers + 1
+  g_entityTriggers[trigID] = gameObject()
+  
+  if trig.name and trig.name ~= "" then
+		g_entityTriggers[trigID]:setID(trig.name)
+	else
+		print("Warning! A trigger has no name.")
+    block.name = "nameless_trigger_FIX_THIS_NOW_" .. trigID
+	end
+  
+  g_entityTriggers[trigID]:setCategory("trigger")
+  g_entityTriggers[trigID]:setState("active")
+  
+  -- Happily, the data from tiled is already aligned to the game size
+  local size = vector(trig.width, trig.height)
+  g_entityTriggers[trigID]:setSize(size)
+  g_entityTriggers[trigID]:setCollisionRectangle()
+  
+  registerBehaviours(g_entityTriggers[trigID],
+                     trig.properties)
+  
+
+  local pos = vector(trig.x, trig.y)
+	pos.x = pos.x
+	pos.y = pos.y
+	g_entityTriggers[trigID]:move(pos)
+  
 end
 
 
@@ -257,7 +365,7 @@ end
 -- Add walls to the g_entityWalls table. 
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
-	local blockID = #g_entityWalls+ 1;
+	local blockID = #g_entityWalls+ 1
 	g_entityWalls[blockID] = gameObject()
 
 	local size = vector(g_blockSize, g_blockSize)
@@ -307,7 +415,7 @@ function addEntityBlock(block)
 		g_entityBlocks[blockID]:setID(block.name)
 	else
 		print("Warning! A block has no name.")
-    block.name = "nameless_block_FIX_THIS_NOW"
+    block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
 	end
 
 	if prop.category and prop.category ~= "" then	
@@ -346,40 +454,7 @@ function addEntityBlock(block)
   end
   
   
-  if prop.collision_behaviours then 
-    local behaviourTable = jSplit(prop.collision_behaviours)
-    for k, v in ipairs(behaviourTable) do
-      
-      -- Does the level data contain the collision behaviour in question?
-      if prop[v] then
-        local behaviourData = jSplit(prop[v])
-        
-        local behaviourType = behaviourData[1]
-        local behaviourTarget = behaviourData[2]
-        local behaviourSender = block.name
-        -- If the collision behaviour exists in the script, we can go ahead
-        if g_collisionBehaviours[behaviourType] ~= nil then
-         
-          local args =  { sender = block.name,
-                          target = behaviourTarget,
-                          data =   unpack(behaviourData, 3)
-                        }
-
-          g_entityBlocks[blockID]:addCollisionBehaviour(
-            g_collisionBehaviours[behaviourType](args)
-          )
-        else
-          print("Warning! Collison behaviour tables " ..
-            "hold no data for \"" .. v .. "\"")
-        end
-        
-      else
-        print("Warning! Object contains no behaviour for \"" .. 
-          behaviourType .."\"")
-      end
-      
-    end
-  end
+  registerBehaviours(g_entityBlocks[blockID], prop)
 
 	g_entityBlocks[blockID]:setState("dormant");
 
@@ -477,16 +552,26 @@ function loadLevel()
 				sound.time)
 
 
-	-- Initialise walls
-	for y, tiles in ipairs(tiledMap.layers.statics.data) do
-		for x, data in pairs(tiles) do
+  -- Initialise walls
+	for y, tile in ipairs(tiledMap.layers.statics.data) do
+		for x, data in pairs(tile) do
 			addEntityWall(data, x, y)	
 		end
 	end
 
+	-- Initialise triggers
+	for y, trig in ipairs(tiledMap.layers.triggers.objects) do
+    addEntityTrigger(trig)	
+	end
+
+	-- Initialise cameras
+	for y, cam in ipairs(tiledMap.layers.cameras.objects) do
+    addCamera(cam)	
+	end
+
 	-- Initialise block-based objects
 	for i, data in ipairs(tiledMap.layers.objects.objects) do
-			local theType = data.type;
+			local theType = data.type
 			if theType == "block" then
 				addEntityBlock(data)
 			end
@@ -833,9 +918,10 @@ end
 --
 --  
 -------------------------------------------------------------------------------
-function gameLoad(levelFileName)
+function gameLoad(levelFileName, config)
   g_currentLevel = require("src/" .. levelFileName)
-	love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)
+  g_config = config
+	love.window.setMode(g_config.widthInBlocks * g_currentLevel.levelAttribs.blockSize, g_config.heightInBlocks * g_currentLevel.levelAttribs.blockSize)
 	windowWidth = love.window.getWidth()
 	windowHeight = love.window.getHeight()
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
@@ -858,6 +944,9 @@ end
 --  
 -------------------------------------------------------------------------------
 function gameDraw()
+  
+  love.graphics.scale(g_config.scale, g_config.scale)
+  love.graphics.translate(-g_gm:getCurrX(), -g_gm:getCurrY())
 	if not g_showBoxes then
 		tiledMap:draw()
 	else
@@ -873,9 +962,9 @@ function gameDraw()
 			g_entityBlocks[i]:drawQuad(g_showBoxes)
 		end
 	end
-	
-if g_usingTiled then
 
+if g_usingTiled then
+  
 else
 	if g_gm:getState() == "loading" or g_gm:getState() == "splash" or g_gm:getState() == "endsplash" then 
 		love.graphics.setShader()
@@ -999,10 +1088,18 @@ function processEvent(e)
 			youShallNotPass(pathMap, g_entityBlocks[i]:getPos(), g_entityBlocks[i]:getSize())
 		end
 	elseif e:getID() == "movecamera" then
-		g_gm:moveCamera(
-				e:getData()[1].x*g_currentLevel.levelAttribs.blockSize,
-				e:getData()[1].y*g_currentLevel.levelAttribs.blockSize,
-				e:getData()[2])	
+    -- Calculate the new position to move the camera to.
+    
+    -- Since camera logic is difficult to separate from graphics logic, we
+    -- have to apply the scale here (only for now, hopefully)
+    local newPosX = g_cameras[e:getData()[1]]:getPos().x -
+                    ((g_config.widthInBlocks/(2 * g_config.scale)) * g_blockSize)
+    local newPosY = g_cameras[e:getData()[1]]:getPos().y -
+                    ((g_config.heightInBlocks/(2 * g_config.scale)) * g_blockSize)
+    g_gm:moveCamera(
+      newPosX,
+      newPosY,
+			e:getData()[2])
 	elseif e:getID() == "endlevel" then
 		g_nextLevel = e:getDesc();
     	g_gm:setState("finishinglevel");
@@ -1054,7 +1151,7 @@ function gameUpdate(dt)
 
 	if g_gm:getState() == "splash" then
 		love.graphics.setFont(g_fonts[1])
-		g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - uiData.btnMenuWidth), (love.graphics.getHeight()/2 - uiData.btnMenuHeight*0.5)}, spacing = scale/2}
+		--g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - uiData.btnMenuWidth), (love.graphics.getHeight()/2 - uiData.btnMenuHeight*0.5)}, spacing = scale/2}
 		if g_gui.Button{size = {"tight", "tight"}, id = "btn_start", text = "Press space or push any button to begin"} then g_gm:setState("running") end		
 		
 		love.graphics.setFont(g_fonts[3])
@@ -1063,7 +1160,7 @@ function gameUpdate(dt)
 		return
 	elseif g_gm:getState() == "endsplash" then
 		love.graphics.setFont(g_fonts[1])
-		g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/3 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/3 - (scale * 0.5 * uiData.btnMenuHeight)*3)},}
+		--g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/3 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/3 - (scale * 0.5 * uiData.btnMenuHeight)*3)},}
 		g_gui.Label{size = {"tight", "tight"}, text="THE END"}
 		love.graphics.setFont(g_fonts[3])
 		g_gui.Label{size = {"tight", "tight"}, text="You've escaped!\n\n" ..
@@ -1084,14 +1181,14 @@ function gameUpdate(dt)
 						.. "See the readme for actual details. Thanks for playing."}	
 		return
 	elseif g_gm:getState() == "paused" then 
-		g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
-		g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 17.5 * scale)
-		g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
-		g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * scale)
+		--g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
+		--g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 17.5 * scale)
+		--g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
+		--g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * scale)
 		g_gui.group.default.spacing = scale	
 		love.graphics.setFont(g_fonts[1])
 		if uiData.menuState == "paused" then
-			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
+--			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
 			if g_gui.Button{size = {"tight", "tight"}, id = "btn_resume", text = "Back to Game (P)"} then uiData.menuState = "resume" end	
 			if g_gui.Button{size = {"tight", "tight"}, id = "btn_settings", text = "Settings (S)"} then uiData.menuState = "settings" end	
 			if g_gui.Button{size = {"tight", "tight"}, id = "btn_levels", text = "Level Select (L)"} then uiData.menuState = "levels" end	
