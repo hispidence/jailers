@@ -42,9 +42,10 @@ function gameManager:init()
 	self.slowFactorInitial = 0.2		-- how slow are we?
 	self.slowFactorCurrent = 1
 	self.deathTimer = 1.2
-	self.fadeTimer = 1.2
+	
+  self.fadeTimer = 1.2
  	self.fadeInTimer = 0
-  	self.fadeInMax = 0.4
+  self.fadeInMax = 0.4
 
 	self.hasPad = false
 	self.pad = nil
@@ -155,7 +156,7 @@ function gameManager:moveCameraGradual(dt)
 		self.currY = self.toY
 		self.moving = false
 		self.elapsed = 0
-	end
+	end 
 
 end
 
@@ -448,18 +449,30 @@ function gameManager:unload()
 	self.storedGunsBulletsMade = {}
 end
 
+
+
+
+-------------------------------------------------------------------------------
+-- gameManager:targets
+--
+-- Iterator which traverses the event list for key 'a' (if it exists) and
+-- returns the keys and values it finds.
+-------------------------------------------------------------------------------
 function gameManager:targets(a)
 	local i = 0
+  
 	if self.events[a] then
+    -- Set the index to the final element in the table
 		i = #self.events[a] + 1
 	end
+  
 	return function()
 		i = i - 1
 		if self.events[a] and self.events[a][i] then
 			return i, self.events[a][i]
 		end
-
 	end
+  
 end
 
 function gameManager:setCurrentLevel(l)
@@ -514,7 +527,8 @@ function gameManager:showEvents()
 			end
 	end
 end
-		
+  
+  
 function gameManager:pause()
 	if self.gameState == "paused" then self.gameState = "running"
 	elseif self.gameState == "running" then self.gameState = "paused"
