@@ -335,6 +335,17 @@ return {
           height = 0,
           visible = true,
           properties = {}
+        },
+        {
+          name = "camera_hall",
+          type = "camera",
+          shape = "rectangle",
+          x = 32,
+          y = 176,
+          width = 16,
+          height = 16,
+          visible = true,
+          properties = {}
         }
       }
     },
@@ -344,7 +355,22 @@ return {
       visible = true,
       opacity = 1,
       properties = {},
-      objects = {}
+      objects = {
+        {
+          name = "testTrigger",
+          type = "trigger",
+          shape = "rectangle",
+          x = 20,
+          y = 132,
+          width = 8,
+          height = 8,
+          visible = true,
+          properties = {
+            ["behaviour_move_camera"] = "move_camera camera_hall 3",
+            ["collision_behaviours"] = "behaviour_move_camera"
+          }
+        }
+      }
     }
   }
 }
