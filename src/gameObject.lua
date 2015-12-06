@@ -277,7 +277,7 @@ function gameObject:drawQuad(debug)
 	if(debug) then
 		self.collisionShape:draw("line")
 	else
-		love.graphics.draw(self:getTexture(self.state), self.quad, vec.x * scale, vec.y * scale, 0, scale, scale, 0, 0)
+		love.graphics.draw(self:getTexture(self.state), self.quad, vec.x, vec.y, 0, 1, 1, 0, 0)
 	end
 end
 
@@ -288,9 +288,9 @@ function gameObject:draw(debug)
 		if self.id == "player" then self.collisionShape:draw("fill") else self.collisionShape:draw("line") end
 	else
 		if self.anims[self.state] then 
-			self.anims[self.state]:draw(vec.x * scale, vec.y * scale, 0, scale, scale)
+			self.anims[self.state]:draw(vec.x, vec.y, 0, 1, 1)
 		else
-			love.graphics.draw(self:getTexture(self.state), vec.x * scale, vec.y * scale, 0, scale, scale, 0, 0)
+      love.graphics.draw(self:getTexture(self.state), vec.x * scale, vec.y * scale, 0, scale, scale, 0, 0)
 		end
 	end
 end
@@ -348,22 +348,27 @@ end
 --------------------------------------
 
 function gameObject:processEvent(e)
-	if e:getDesc() == "switchOff" then
-		self.state = "off"
+  
+	if e:getDesc() == "switchOn" then
+		self.state = "on"
+    
 	elseif e:getID() == "changestate" then 
 		self.state = e:getDesc()
 
 	elseif e:getID() == "move" then 
 		self:setPos(e:getData())
+    
 	elseif e:getID() == "removeblock" then
 		self.state = "dead"
 		local e = jlEvent(self.id, "main", "removeblock", "none")
 		gm:sendEvent(e)
+    
 	elseif e:getID() == "addblock" then
 		self.state = "dormant"
 		local e = jlEvent(self.id, "main", "addblock", "none")
 		gm:sendEvent(e)
 	end
+  
 end
 
 function gameObject:setCollisionRectangle()
