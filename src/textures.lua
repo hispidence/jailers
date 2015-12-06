@@ -1,3 +1,12 @@
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2015
+--
+--
+-- textures.lua
+--
+-- Textures and sets thereof.
+-------------------------------------------------------------------------------
+
 TEXTURES_DIR = "textures/"
 
 function getTextureByID(id)
@@ -7,6 +16,8 @@ function getTextureByID(id)
 	return 0
 end
 
+-- Each key corresponds to an object state, and each value corresponds
+-- to a texture ID from rTextures.
 g_textureSets = {
   
   door_standard = {
