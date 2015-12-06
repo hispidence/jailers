@@ -18,6 +18,13 @@ function love.load(args)
     require("mobdebug").start()
   end
   
+  -- Level scale
+  local config = {
+    widthInBlocks = 40,
+    heightInBlocks = 30,
+    scale = 2,
+  }
+  
   -- Launch level based on commandline args; eg, to load level0
   -- you would launch the game with love . level0
   local levelName = "level1"
@@ -27,12 +34,11 @@ function love.load(args)
     levelName = "level1"
   end
   
-	gameLoad(levelName)
+	gameLoad(levelName, config)
   
 end
 
 function love.draw()
-	love.graphics.scale(2, 2)
 	gameDraw()
 end
 
