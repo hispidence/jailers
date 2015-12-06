@@ -34,8 +34,8 @@ g_collisionBehaviours = {
 	doorswitch_open = 
 	function(args)
     return function()
-			e1 = jlEvent(args.sender, args.target, "none", "removeblock", args.data)
-			e2 = jlEvent(args.sender, args.sender, "switchOff", "none")
+			e1 = jlEvent(args.sender, args.target, "none", "removeblock")
+			e2 = jlEvent(args.sender, args.sender, "switchOn", "none")
 			gm:sendEvent(e1)
 			gm:sendEvent(e2)
     end
@@ -44,12 +44,26 @@ g_collisionBehaviours = {
   doorswitch_close = 
   function(args)
     return function()
-			e1 = jlEvent(args.sender, args.target, "none", "addblock", args.data)
+			e1 = jlEvent(args.sender, args.target, "none", "addblock")
 			e2 = jlEvent(args.sender, args.sender, "switchOff", "none")
 			gm:sendEvent(e1)
 			gm:sendEvent(e2)
     end
-  end
+  end,
+  
+  move_camera =
+	function(args)
+    return function()
+      -- In order to work with the mess that's the current event system, we
+      -- have to mangle and pack the arguments in a different way to the other
+      -- events.
+      local data = {args.target, tonumber(args.data)}
+      e1 = jlEvent(args.sender, "main", "none", "movecamera", data, 0)
+      e2 = jlEvent(args.sender, args.sender, "dormant", "changestate", args.data)
+      gm:sendEvent(e1)
+      gm:sendEvent(e2)
+    end
+	end
 }
 
 
