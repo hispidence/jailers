@@ -30,6 +30,8 @@ function resolveCollision(a, b)
 		a, b = b, a
 	end
 
+  
+
   -- Store object a's old position; i.e. their position in the last update
   -- cycle when they hadn't yet collided with object b.
 	local recentGood = a.object:getOldPos():clone()
@@ -152,7 +154,7 @@ function onCollide(dt, objA, objB)
 	if objA.object:getID() == "player" then playerInvolved = true; player = objA.object; nonPlayer = objB.object elseif
 	objB.object:getID() == "player" then playerInvolved = true; player = objB.object; nonPlayer = objA.object end
 	
-	local slideThresh = 3 * scale;
+	local slideThresh = 3
 
 	if playerInvolved then
 		local trP = vector()
