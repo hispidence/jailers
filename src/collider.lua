@@ -7,7 +7,7 @@
 -- Handles collision resolution; fires off events and repositions entities.
 -------------------------------------------------------------------------------
 
-collider = require("src/hardoncollider")
+collider = require("src/external/hardoncollider")
 
 local MAX_TESTS = 10
 

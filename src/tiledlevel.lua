@@ -180,16 +180,18 @@ return {
           }
         },
         {
-          name = "",
+          name = "door_hall",
           type = "block",
           shape = "rectangle",
-          x = 48,
+          x = 128,
           y = 240,
           width = 0,
           height = 0,
           gid = 10,
           visible = true,
           properties = {
+            ["category"] = "door",
+            ["state"] = "",
             ["textureset"] = "door_standard"
           }
         },
@@ -216,7 +218,7 @@ return {
           gid = 11,
           visible = true,
           properties = {
-            ["behaviour_open_door"] = "doorswitch_open  door_startroom   0",
+            ["behaviour_open_door"] = "target=door_startroom  type=doorswitch_open timer=0",
             ["category"] = "switch",
             ["collision_behaviours"] = "behaviour_open_door",
             ["textureset"] = "switch_standard"
@@ -291,30 +293,33 @@ return {
           }
         },
         {
-          name = "",
-          type = "block",
-          shape = "rectangle",
-          x = 128,
-          y = 240,
-          width = 0,
-          height = 0,
-          gid = 10,
-          visible = true,
-          properties = {
-            ["textureset"] = "door_standard"
-          }
-        },
-        {
           name = "player",
           type = "special",
           shape = "rectangle",
-          x = 48,
-          y = 48,
+          x = 70,
+          y = 98,
           width = 0,
           height = 0,
           gid = 9,
           visible = true,
           properties = {}
+        },
+        {
+          name = "switch_hall",
+          type = "block",
+          shape = "rectangle",
+          x = 32,
+          y = 272,
+          width = 0,
+          height = 0,
+          gid = 11,
+          visible = true,
+          properties = {
+            ["behaviour_open_door"] = "type=doorswitch_open target=door_hall  timer=0",
+            ["category"] = "switch",
+            ["collision_behaviours"] = "behaviour_open_door",
+            ["textureset"] = "switch_standard"
+          }
         }
       }
     },
@@ -326,22 +331,22 @@ return {
       properties = {},
       objects = {
         {
-          name = "camera0",
-          type = "camera",
-          shape = "rectangle",
-          x = 96,
-          y = 96,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {}
-        },
-        {
           name = "camera_hall",
           type = "camera",
           shape = "rectangle",
           x = 32,
           y = 176,
+          width = 16,
+          height = 16,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "camera_start",
+          type = "camera",
+          shape = "rectangle",
+          x = 96,
+          y = 96,
           width = 16,
           height = 16,
           visible = true,
@@ -357,16 +362,30 @@ return {
       properties = {},
       objects = {
         {
-          name = "testTrigger",
+          name = "cameraTrigger_hall",
           type = "trigger",
           shape = "rectangle",
           x = 20,
-          y = 132,
+          y = 163,
           width = 8,
           height = 8,
           visible = true,
           properties = {
-            ["behaviour_move_camera"] = "move_camera camera_hall 3",
+            ["behaviour_move_camera"] = "timer=3 type=move_camera coords=camera_hall",
+            ["collision_behaviours"] = "behaviour_move_camera"
+          }
+        },
+        {
+          name = "cameraTrigger_start",
+          type = "trigger",
+          shape = "rectangle",
+          x = 20,
+          y = 128,
+          width = 8,
+          height = 8,
+          visible = true,
+          properties = {
+            ["behaviour_move_camera"] = "type=move_camera coords=camera_start timer=3",
             ["collision_behaviours"] = "behaviour_move_camera"
           }
         }

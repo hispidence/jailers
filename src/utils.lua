@@ -10,7 +10,7 @@
 
 
 -------------------------------------------------------------------------------
--- jSplit
+-- jRound
 --
 -- Rounds a floating-point number to its nearest whole.
 -------------------------------------------------------------------------------
@@ -34,3 +34,26 @@ function jSplit(str)
   end
   return vals
 end
+
+
+
+-------------------------------------------------------------------------------
+-- jSplitKV
+--
+-- Splits the string into a table of values, using anything other than a
+-- letter, number or underscore as a delimiter. Additionally, this function
+-- returns a key-value table. 
+-------------------------------------------------------------------------------
+function jSplitKV(str)
+  local vals = jSplit(str)
+  local kvVals = {}
+  for i = 1, #vals, 2 do
+    if nil == vals[i+1] then
+      print("Warning! jSplitKV mismatch; no value found for string \"" ..
+        vals[i] .. "\".")
+    end
+    kvVals[vals[i]] = vals[i+1]
+  end
+  return kvVals
+end
+

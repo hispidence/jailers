@@ -9,7 +9,8 @@
 
 require("src/utils")
 require("src/collider")
-vector = require("src/hump.vector")
+vector = require("src/external/hump.vector")
+
 
 
 -- A cheeky bit of object orientation.
@@ -98,7 +99,8 @@ end
 	end
 
 	function gameObject:setPos(pos)
-		self.position = pos
+    self.position = pos
+
 		if not self.invisible then
 			self.collisionShape:moveTo(	self.position.x + (self.size.x/2) + self.shapeOffsetX,
 						self.position.y + (self.size.y/2) + self.shapeOffsetY)
@@ -272,8 +274,15 @@ function gameObject:resetSounds()
 	end
 end
 
-function gameObject:drawQuad(debug)
+function gameObject:drawQuad(debug, pixelLocked)
 	vec = self:getPos()
+  
+  if(pixelLocked) then
+    vec = vec:clone()
+    vec.x = jRound(vec.x)
+    vec.y = jRound(vec.y)
+  end
+  
 	if(debug) then
 		self.collisionShape:draw("line")
 	else
@@ -281,9 +290,16 @@ function gameObject:drawQuad(debug)
 	end
 end
 
-function gameObject:draw(debug)
+function gameObject:draw(debug, pixelLocked)
 	if self.invisible then return end
 	vec = self:getPos()
+  
+  if(pixelLocked) then
+    vec = vec:clone()
+    vec.x = jRound(vec.x)
+    vec.y = jRound(vec.y)
+  end
+  
 	if(debug) then
 		if self.id == "player" then self.collisionShape:draw("fill") else self.collisionShape:draw("line") end
 	else

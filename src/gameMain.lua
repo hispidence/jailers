@@ -18,12 +18,13 @@ require("src/uiData")
 require("src/collider")
 require("src/sounds")
 require("src/textures")
-require("src/AnAL")
-require("src/TEsound")
 require("src/shaders")
 require("src/jlEvent")
 require("src/utils")
 require("src/levelFunctions")
+
+require("src/external/AnAL")
+require("src/external/TEsound")
 
 
 local g_usingTiled = true
@@ -31,7 +32,7 @@ local g_usingTiled = true
 local sti
 local tiledMap
 if g_usingTiled then
-sti = require("src/sti")
+sti = require("src/external/sti")
 end
 
 
@@ -39,8 +40,8 @@ end
 -------------------------------------------------------------------------------
 -- Classes from Jumper 
 -------------------------------------------------------------------------------
-local Grid = require("src/jumper.grid")
-local PathFinder = require("src/jumper.pathfinder")
+local Grid = require("src/external/jumper.grid")
+local PathFinder = require("src/external/jumper.pathfinder")
 local jumperGrid
 local jumperFinder
 
@@ -58,7 +59,7 @@ g_showBoxes = false
 -------------------------------------------------------------------------------
 -- Set game manager, GUI, and gamestate variables 
 -------------------------------------------------------------------------------
-local g_gui = require("src/Quickie")
+local g_gui = require("src/external/Quickie")
 g_gm = require("src/gameManager")
 if g_usingTiled then
 	g_currentLevel = "tiledLevel"
@@ -69,6 +70,7 @@ g_nextLevel = "level2"
 g_menuRefreshed = false
 g_blockSize = 16
 g_config = nil
+g_pixelLocked = true
 FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
@@ -269,20 +271,16 @@ function registerBehaviours(object, prop)
     for k, v in ipairs(behaviourTable) do
       -- Does the level data contain the collision behaviour in question?
       if prop[v] then
-        local behaviourData = jSplit(prop[v])
-        for i, x in pairs(behaviourData) do print(i, x) end
-        local behaviourType = behaviourData[1]
-        local behaviourTarget = behaviourData[2]
-        local behaviourSender = object:getID()
+        local b = jSplitKV(prop[v])
+        
         -- If the collision behaviour exists in the script, we can go ahead
-        if g_collisionBehaviours[behaviourType] ~= nil then
-          local args =  { sender = behaviourSender,
-                          target = behaviourTarget,
-                          data =   unpack(behaviourData, 3)
-                        }
-
+        if g_collisionBehaviours[b["type"]] ~= nil then
+          local args =  b
+          args.timer = args.timer and tonumber(args.timer) or 0
+          args["sender"] = object:getID()
+          
           object:addCollisionBehaviour(
-            g_collisionBehaviours[behaviourType](args)
+            g_collisionBehaviours[b["type"]](args)
           )
         else
           print("Warning! Collison behaviour tables " ..
@@ -456,7 +454,11 @@ function addEntityBlock(block)
   
   registerBehaviours(g_entityBlocks[blockID], prop)
 
-	g_entityBlocks[blockID]:setState("dormant");
+	if prop.state and prop.state ~= "" then	
+		g_entityBlocks[blockID]:setState(prop.state)
+	else
+		g_entityBlocks[blockID]:setState("dormant");
+	end
 
 	g_entityBlocks[blockID]:addToCollisionGroup("world")
 
@@ -483,7 +485,7 @@ function loadLevel()
 	
 	-- No entities from the "objects" layer get drawn through the STI Tiled
 	-- library. Instead, we create entities based on them, and where draw
-    -- those instead (where applicable).
+   -- those instead (where applicable).
 	--
 	-- Entities from the objects layer are put into one of the global tables
 	-- defined above.
@@ -946,20 +948,23 @@ end
 function gameDraw()
   
   love.graphics.scale(g_config.scale, g_config.scale)
-  love.graphics.translate(-g_gm:getCurrX(), -g_gm:getCurrY())
+  
+  -- Round the new position so it aligns with a pixel. I'm not convinced about
+  -- this. I don't think it looks smooth.
+  love.graphics.translate(jRound(-g_gm:getCurrX()), jRound(-g_gm:getCurrY()))
 	if not g_showBoxes then
 		tiledMap:draw()
 	else
 		for i, v in ipairs(g_entityWalls) do
-			g_entityWalls[i]:drawQuad(g_showBoxes)
+			g_entityWalls[i]:drawQuad(g_showBoxes, g_pixelLocked)
 		end
 	end	
-	
-	g_thePlayer:draw(g_showBoxes)
+
+	g_thePlayer:draw(g_showBoxes, g_pixelLocked)
 
 	for i, v in ipairs(g_entityBlocks) do
 		if g_entityBlocks[i]:getState() ~= "dead" then
-			g_entityBlocks[i]:drawQuad(g_showBoxes)
+			g_entityBlocks[i]:drawQuad(g_showBoxes, g_pixelLocked)
 		end
 	end
 

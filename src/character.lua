@@ -343,9 +343,11 @@ end
 -- debug -	if true, draws the character's outline and the outline of its
 -- 		   	pathbox instread of the graphic for the character itself
 --
+-- pixelLocked -  Are the graphics aligned to the 'pixel' grid?
+--
 -- Draws either the character or its and its path box's bounding boxes
 -------------------------------------------------------------------------------
-function character:draw(debug)
-	gameObject.draw(self, debug)
+function character:draw(debug, pixelLocked)
+	gameObject.draw(self, debug, pixelLocked)
 	if(debug) then self.pathBox:draw("line") end
 end
