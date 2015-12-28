@@ -50,18 +50,20 @@ g_collisionBehaviours = {
 			gm:sendEvent(e2)
     end
   end,
-  
+
+
   move_camera =
 	function(args)
     return function()
       -- In order to work with the mess that's the current event system, we
       -- have to mangle and pack the arguments in a different way to the other
       -- events.
-      local data = {args.coords, args.timer}
-      e1 = jlEvent(args.sender, "main", "none", "movecamera", data, 0)
-      e2 = jlEvent(args.sender, args.sender, "dormant", "changestate", args.data)
+      local data = {args.target, args.timer}
+      e1 = jlEvent(args.sender, "main",       "none",     "movecamera", data, 0)
+      e2 = jlEvent(args.sender, args.target,  "dormant",  "changestate", nil, 0)
       gm:sendEvent(e1)
       gm:sendEvent(e2)
+      
     end
 	end
 }
