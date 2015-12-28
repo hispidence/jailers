@@ -303,19 +303,26 @@ end
 --
 -- Add cameras to the g_cameras table.
 --
--- A camera is literally nothing except a position and a name.
+-- A camera is literally nothing except a position, a name, and a state.
 -------------------------------------------------------------------------------
 function addCamera(camera)
+  local newCamera = gameObject()
+  
   if not camera.name or camera.name == "" then
     camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
 	end
   local theName = camera.name;
-  g_cameras[theName] = gameObject()
   
-  g_cameras[theName]:setInvisible(true)
+ 
+  
+  newCamera:setID(theName)
+  
+  newCamera:setInvisible(true)
   local pos = vector(camera.x, camera.y)
-  g_cameras[theName]:move(pos)
-
+  newCamera:move(pos)
+  newCamera:setState("active")
+  
+  g_cameras[theName] = newCamera
 end
 
 
@@ -1082,36 +1089,46 @@ function getBlockByID(id)
 end
 
 function processEvent(e)
-	if e:getDesc() == "removeblock" then
+  -- An event's ID and description are basically the same thing, but somehow
+  -- different. It's an oddity which I haven't yet had the courage to
+  -- investigate/fix.
+  eDesc = e:getDesc();
+  eID = e:getID();
+	if eDesc == "removeblock" then
 		local i = getBlockByID(e:getSender())
 		if i ~= 0 then
 			youCanPass(pathMap, g_entityBlocks[i]:getPos(), g_entityBlocks[i]:getSize())
 		end
-	elseif e:getDesc() == "addblock" then
+	elseif eDesc == "addblock" then
 		local i = getBlockByID(e:getSender())
 		if i ~= 0 then
 			youShallNotPass(pathMap, g_entityBlocks[i]:getPos(), g_entityBlocks[i]:getSize())
 		end
-	elseif e:getID() == "movecamera" then
+	elseif eID == "movecamera" then
+    local cameraName = e:getData()[1]
+    local cameraTimer = e:getData()[2]
+    local theCamera = g_cameras[cameraName]
     -- Calculate the new position to move the camera to.
-    
+      
     -- Since camera logic is difficult to separate from graphics logic, we
     -- have to apply the scale here (only for now, hopefully)
-    local newPosX = g_cameras[e:getData()[1]]:getPos().x -
+    local newPosX = theCamera:getPos().x -
                     ((g_config.widthInBlocks/(2 * g_config.scale)) * g_blockSize)
-    local newPosY = g_cameras[e:getData()[1]]:getPos().y -
+    local newPosY = theCamera:getPos().y -
                     ((g_config.heightInBlocks/(2 * g_config.scale)) * g_blockSize)
     g_gm:moveCamera(
+      cameraName,
       newPosX,
       newPosY,
-			e:getData()[2])
-	elseif e:getID() == "endlevel" then
+      cameraTimer)
+    
+	elseif eID == "endlevel" then
 		g_nextLevel = e:getDesc();
     	g_gm:setState("finishinglevel");
-	elseif e:getID() == "endgame" then
+	elseif eID == "endgame" then
     	g_gm:setState("finishinggame");
 	end
-	if e:getID() == "save" then
+	if eID == "save" then
 		g_gm:saveState();
 	end
 end
@@ -1251,6 +1268,8 @@ function gameUpdate(dt)
 			if e:getTimer() == nil or e:getTimer() <= 0 then
 				result = v:processEvent(e)
 				g_gm:removeEvent(v:getID(), i)
+			elseif e:getTimer() > 0 then
+				e:setTimer(e:getTimer()-modifiedDT)
 			end
 		end
 	end
