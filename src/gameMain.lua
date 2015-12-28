@@ -334,32 +334,34 @@ end
 -------------------------------------------------------------------------------
 function addEntityTrigger(trig)
   local trigID = #g_entityTriggers + 1
-  g_entityTriggers[trigID] = gameObject()
+  local theTrigger = gameObject()
+  
   
   if trig.name and trig.name ~= "" then
-		g_entityTriggers[trigID]:setID(trig.name)
+		theTrigger:setID(trig.name)
 	else
 		print("Warning! A trigger has no name.")
     block.name = "nameless_trigger_FIX_THIS_NOW_" .. trigID
 	end
   
-  g_entityTriggers[trigID]:setCategory("trigger")
-  g_entityTriggers[trigID]:setState("active")
+  theTrigger:setCategory("trigger")
+  theTrigger:setState("active")
   
   -- Happily, the data from tiled is already aligned to the game size
   local size = vector(trig.width, trig.height)
-  g_entityTriggers[trigID]:setSize(size)
-  g_entityTriggers[trigID]:setCollisionRectangle()
+  theTrigger:setSize(size)
+  theTrigger:setCollisionRectangle()
   
-  registerBehaviours(g_entityTriggers[trigID],
+  registerBehaviours(theTrigger,
                      trig.properties)
   
 
   local pos = vector(trig.x, trig.y)
 	pos.x = pos.x
 	pos.y = pos.y
-	g_entityTriggers[trigID]:move(pos)
+	theTrigger:move(pos)
   
+  g_entityTriggers[trigID] = theTrigger
 end
 
 
@@ -371,24 +373,26 @@ end
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
 	local blockID = #g_entityWalls+ 1
-	g_entityWalls[blockID] = gameObject()
+	local theBlock = gameObject()
 
 	local size = vector(g_blockSize, g_blockSize)
-	g_entityWalls[blockID]:setSize(size)
+	theBlock:setSize(size)
 	
-	g_entityWalls[blockID]:setCollisionRectangle()
+	theBlock:setCollisionRectangle()
 	
-	g_entityWalls[blockID]:setID("wall")
+	theBlock:setID("wall")
 	
-	g_entityWalls[blockID]:setCategory("wall")
+	theBlock:setCategory("wall")
 	
-	g_entityWalls[blockID]:addToCollisionGroup("world")
-			
+	theBlock:addToCollisionGroup("world")
+
 	local pos = vector(x * g_blockSize, y * g_blockSize)
 	pos.x = pos.x - size.x
 	pos.y = pos.y - size.y
-	g_entityWalls[blockID]:move(pos)
+	theBlock:move(pos)
 
+  g_entityWalls[blockID] = theBlock
+  
 	--	if v.ignoresBullets then g_entityWalls[blockID]:setIgnoresBullets(true) end
 	-- youShallNotPass(pathMap, g_entityWalls[blockID]:getPos(), g_entityWalls[blockID]:getSize())
 end
@@ -402,29 +406,29 @@ end
 -------------------------------------------------------------------------------
 function addEntityBlock(block)
 	local blockID = #g_entityBlocks + 1;
-	g_entityBlocks[blockID] = gameObject();
+  local theBlock = gameObject()
 
 	local prop = block.properties
 
 	local size = vector(g_blockSize, g_blockSize)
-	g_entityBlocks[blockID]:setSize(size)
-	g_entityBlocks[blockID]:setQuad(love.graphics.newQuad(0,
+	theBlock:setSize(size)
+	theBlock:setQuad(love.graphics.newQuad(0,
 													0,
 													size.x,
 													size.y, 
 													size.x,
 													size.y))
-	g_entityBlocks[blockID]:setCollisionRectangle()
+	theBlock:setCollisionRectangle()
 	
 	if block.name and block.name ~= "" then
-		g_entityBlocks[blockID]:setID(block.name)
+		theBlock:setID(block.name)
 	else
 		print("Warning! A block has no name.")
     block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
 	end
 
 	if prop.category and prop.category ~= "" then	
-		g_entityBlocks[blockID]:setCategory(prop.category)
+		theBlock:setCategory(prop.category)
 	else
 		print("Warning! Block \"" .. block.name .. "\" has no category.")
 	end
@@ -440,7 +444,7 @@ function addEntityBlock(block)
         
         --do the asked-for textures exist?
         if rTextures[tex] then
-          g_entityBlocks[blockID]:setTexture(state,
+          theBlock:setTexture(state,
             rTextures[tex].data,
             true)
         else
@@ -459,20 +463,23 @@ function addEntityBlock(block)
   end
   
   
-  registerBehaviours(g_entityBlocks[blockID], prop)
+  registerBehaviours(theBlock, prop)
 
 	if prop.state and prop.state ~= "" then	
-		g_entityBlocks[blockID]:setState(prop.state)
+		theBlock:setState(prop.state)
 	else
-		g_entityBlocks[blockID]:setState("dormant");
+		theBlock:setState("dormant");
 	end
 
-	g_entityBlocks[blockID]:addToCollisionGroup("world")
+	theBlock:addToCollisionGroup("world")
 
 	local pos = vector(block.x, block.y)
 
 	pos.y = pos.y - size.y;
-	g_entityBlocks[blockID]:move(pos)
+	theBlock:move(pos)
+  
+  g_entityBlocks[blockID] = theBlock
+  
 end
 
 
