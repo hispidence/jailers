@@ -57,6 +57,7 @@ function gameManager:init()
 	self.cameraTime = 0
 	self.elapsed = 0
 	self.moving = false
+  self.lastCamera = nil
 
 	self.storedPlayerPos = vector(0, 0)
 	self.storedFloorsPos = {}
@@ -162,12 +163,15 @@ end
 
 
 
-function gameManager:moveCamera(toX, toY, time)
-	self.toX = toX
-	self.toY = toY
-	self.cameraTime = time
-	self.elapsed = 0
-	self.moving = true
+function gameManager:moveCamera(camName, toX, toY, time)
+	if camName ~= self.lastCamera then
+    self.toX = toX
+    self.toY = toY
+    self.cameraTime = time
+    self.elapsed = 0
+    self.moving = true
+    self.lastCamera = camName
+  end
 end
 
 function gameManager:getCurrX()
@@ -357,6 +361,7 @@ function gameManager:loadState()
 	self.currY = self.storedTranslateY
 	self.toX = self.storedTranslateX
 	self.toY = self.storedTranslateY
+  self.lastCamera = nil
 	
 	self.moving = false
 	for i, v in ipairs(g_entityScenery) do
