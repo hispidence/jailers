@@ -366,12 +366,12 @@ return {
           type = "trigger",
           shape = "rectangle",
           x = 20,
-          y = 163,
+          y = 160,
           width = 8,
           height = 8,
           visible = true,
           properties = {
-            ["behaviour_move_camera"] = "timer=3 type=move_camera coords=camera_hall",
+            ["behaviour_move_camera"] = "timer=3 type=move_camera target=camera_hall",
             ["collision_behaviours"] = "behaviour_move_camera"
           }
         },
@@ -385,7 +385,7 @@ return {
           height = 8,
           visible = true,
           properties = {
-            ["behaviour_move_camera"] = "type=move_camera coords=camera_start timer=3",
+            ["behaviour_move_camera"] = "type=move_camera target=camera_start timer=3",
             ["collision_behaviours"] = "behaviour_move_camera"
           }
         }
