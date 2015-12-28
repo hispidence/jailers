@@ -13,7 +13,7 @@ function love.load(args)
   
   -- Enable ZeroBrane Studio debugging
   local isDebugging = false
-  if args[#args] == "-debug" then
+  if "-debug" == args[#args] then
     isDebugging = true
     require("mobdebug").start()
   end

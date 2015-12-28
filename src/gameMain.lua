@@ -308,7 +308,7 @@ end
 function addCamera(camera)
   local newCamera = gameObject()
   
-  if not camera.name or camera.name == "" then
+  if not camera.name or "" == camera.name then
     camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
 	end
   local theName = camera.name;
@@ -588,7 +588,7 @@ function loadLevel()
 	-- Initialise block-based objects
 	for i, data in ipairs(tiledMap.layers.objects.objects) do
 			local theType = data.type
-			if theType == "block" then
+			if "block" == theType then
 				addEntityBlock(data)
 			end
 	end
@@ -678,7 +678,7 @@ function loadLevel()
 			local size = vector(v.size.x*blockSize, v.size.y*blockSize)
 			g_entityGuns[g]:setSize(size)
 			g_entityGuns[g]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-			if v.shape == nil or v.shape == "quad" then
+			if nil == v.shape or "quad" == v.shape then
 				g_entityGuns[g]:setCollisionRectangle()
 			else
 				g_entityGuns[g]:setCollisionCircle()
@@ -701,7 +701,7 @@ function loadLevel()
 
 			g_entityGuns[g]:move(pos)
 		end
-		if v.state ~= nil then g_entityGuns[g]:setState(v.state) else g_entityGuns[g]:setState("dormant") end
+		if nil ~= v.state then g_entityGuns[g]:setState(v.state) else g_entityGuns[g]:setState("dormant") end
 	
 			
 		g_entityGuns[g]:setFiringBehaviour(v.shootingBehaviour)
@@ -746,7 +746,7 @@ function loadLevel()
 		local qX, qY = 16, 16
 		if v.imageSizeX and v.imageSizeY then qX = v.imageSizeX; qY = v.imageSizeY end
 		g_entityBlocks[k]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, qX, qY))
-		if v.shape == nil or v.shape == "quad" then
+		if nil == v.shape or "quad" == v.shape then
 			g_entityBlocks[k]:setCollisionRectangle()
 		else
 			g_entityBlocks[k]:setCollisionCircle()
@@ -885,7 +885,7 @@ function loadLevel()
 		g_entityMovers[m]:setSize(size)
 		g_entityMovers[m]:setCollisionBehaviour(v.behaviour)
 		g_entityMovers[m]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-		if v.shape == nil or v.shape == "quad" then
+		if nil == v.shape or "quad" == v.shape then
 			g_entityMovers[m]:setCollisionRectangle()
 		else
 			g_entityMovers[m]:setCollisionCircle()
@@ -1059,7 +1059,7 @@ else
 		end
 	end
 	
-	if g_gm:getState() == "paused" then
+	if "paused" == g_gm:getState()  then
  		love.graphics.translate(-g_gm:getCurrX() * scale, -g_gm:getCurrY() * scale)
  		love.graphics.translate(0, 0)
 		love.graphics.draw(g_menuBGtex, love.graphics.getWidth()/2-(g_menuBGtex:getWidth() * scale/2), love.graphics.getHeight()/2 - (g_menuBGtex:getHeight()*scale/2), 0, scale, scale, 0, 0)
@@ -1090,7 +1090,7 @@ local pPos = vector(0,0)
 
 function getBlockByID(id)
 	for i, v in ipairs(g_entityBlocks) do
-		if v:getID() == id then return i end
+		if id == v:getID() then return i end
 	end
 	return 0
 end
@@ -1101,17 +1101,17 @@ function processEvent(e)
   -- investigate/fix.
   eDesc = e:getDesc();
   eID = e:getID();
-	if eDesc == "removeblock" then
+	if "removeblock" == eDesc then
 		local i = getBlockByID(e:getSender())
 		if i ~= 0 then
 			youCanPass(pathMap, g_entityBlocks[i]:getPos(), g_entityBlocks[i]:getSize())
 		end
-	elseif eDesc == "addblock" then
+	elseif "addblock" == eDesc then
 		local i = getBlockByID(e:getSender())
 		if i ~= 0 then
 			youShallNotPass(pathMap, g_entityBlocks[i]:getPos(), g_entityBlocks[i]:getSize())
 		end
-	elseif eID == "movecamera" then
+	elseif "movecamera" == eID then
     local cameraName = e:getData()[1]
     local cameraTimer = e:getData()[2]
     local theCamera = g_cameras[cameraName]
@@ -1129,13 +1129,13 @@ function processEvent(e)
       newPosY,
       cameraTimer)
     
-	elseif eID == "endlevel" then
+	elseif "endlevel" == eID then
 		g_nextLevel = e:getDesc();
     	g_gm:setState("finishinglevel");
-	elseif eID == "endgame" then
+	elseif "endgame" == eID then
     	g_gm:setState("finishinggame");
 	end
-	if eID == "save" then
+	if "save" == eID then
 		g_gm:saveState();
 	end
 end
@@ -1162,9 +1162,9 @@ function gameUpdate(dt)
 	-- Update the game manager, which, among other thigs, will calculate
 	-- a new slowdown factor if it needs
 	g_gm:update(dt)
-  	if(g_gm:getState() == "finishinglevel") then return end
-  	if(g_gm:getState() == "finishinggame") then return end
-	if(g_gm:getState() == "loading") then 
+  if "finishinglevel" == g_gm:getState() then return end
+  if "finishinggame" == g_gm:getState() then return end
+  if "loading" == g_gm:getState()  then 
 		love.graphics.setFont(g_fonts[1])
 			g_gui.group.push{grow = "down", pos = {love.graphics.getWidth()/2 - uiData.btnMenuWidth/2, love.graphics.getHeight()/2 - uiData.btnMenuHeight*0.75}}
 			g_gui.Label{size = {"tight", "tight"}, text = "Loading..."}
@@ -1264,70 +1264,48 @@ function gameUpdate(dt)
 
 
 	for i, e in g_gm:targets("main") do
-		if e:getTimer() == nil or e:getTimer() <= 0 then
-			processEvent(e)
-			g_gm:removeEvent("main", i)
-		end
+		processEvent(e)
+		g_gm:removeEvent("main", i)
 	end
 
 	for _, v in ipairs(g_entityTriggers) do
 		for i, e in g_gm:targets(v:getID()) do
-			if e:getTimer() == nil or e:getTimer() <= 0 then
-				result = v:processEvent(e)
-				g_gm:removeEvent(v:getID(), i)
-			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-modifiedDT)
-			end
+      result = v:processEvent(e)
+      g_gm:removeEvent(v:getID(), i)
 		end
 	end
 
 	for _, v in ipairs(g_entityEnemies) do
 		for i, e in g_gm:targets(v:getID()) do
-			if e:getTimer() == nil or e:getTimer() <= 0 then
-				result = v:processEvent(e)
-				g_gm:removeEvent(v:getID(), i)
-			end
+      result = v:processEvent(e)
+      g_gm:removeEvent(v:getID(), i)
 		end
 	end
 	
 	for _, v in ipairs(g_entityBlocks) do
 		for i, e in g_gm:targets(v:getID()) do
-			if e:getTimer() == nil or e:getTimer() <= 0 then
-				result = v:processEvent(e)
-				g_gm:removeEvent(v:getID(), i)
-			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-modifiedDT)
-			end
+      result = v:processEvent(e)
+      g_gm:removeEvent(v:getID(), i)
 		end
 	end
 
 	for _, v in ipairs(g_entityMovers) do
 		for i, e in g_gm:targets(v:getID()) do
-			if e:getTimer() == nil or e:getTimer() <= 0 then
-				result = v:processEvent(e)
-				g_gm:removeEvent(v:getID(), i)
-			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-modifiedDT)
-			end
+      result = v:processEvent(e)
+      g_gm:removeEvent(v:getID(), i)
 		end
 	end
 	
 	for _, v in ipairs(g_entityGuns) do
 		for i, e in g_gm:targets(v:getID()) do
-			if e:getTimer() == nil or e:getTimer() <= 0 then
-				result = v:processEvent(e)
-				g_gm:removeEvent(v:getID(), i)
-			elseif e:getTimer() > 0 then
-				e:setTimer(e:getTimer()-modifiedDT)
-			end
+      result = v:processEvent(e)
+      g_gm:removeEvent(v:getID(), i)
 		end
 	end
 
 	for i, e in g_gm:targets("mainwait") do
-		if e:getTimer() == nil or e:getTimer() <= 0 then
-			processEvent(e)
-			g_gm:removeEvent("mainwait", i)
-		end
+		processEvent(e)
+		g_gm:removeEvent("mainwait", i)
 	end
 	--Prepare to move player
 
@@ -1335,7 +1313,7 @@ function gameUpdate(dt)
 	upStages = {0, 0.3, 0.6, 0.9}
 	local stickX, stickY = g_gm:getBandedAxes(upStages, downStages)
 	playerInc.x, playerInc.y = 0, 0
-	if g_thePlayer:getState() ~= "dead" then
+	if  "dead" ~= g_thePlayer:getState() then
 		
 		if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
 			playerInc.y = -0.9
@@ -1362,8 +1340,8 @@ function gameUpdate(dt)
 		if playerInc.y > 0 then playerInc.y = 0.6 end
 	end
 
-	if g_thePlayer:getState() ~= "dead" and g_thePlayer:getState() ~= "stopped" then
-		if playerInc.x == 0 and playerInc.y == 0 then g_thePlayer:setState("resting")
+	if "dead" ~= g_thePlayer:getState() and "stopped" ~= g_thePlayer:getState() then
+		if 0 == playerInc.x and 0 == playerInc.y then g_thePlayer:setState("resting")
 			elseif math.abs(playerInc.x) > math.abs(playerInc.y) then
 				g_thePlayer:setState("moving_horizontal")
 			else
