@@ -459,17 +459,19 @@ end
 -------------------------------------------------------------------------------
 -- gameManager:targets
 --
--- Iterator which traverses the event list for key 'a' (if it exists) and
--- returns the keys and values it finds.
+-- Factory for an iterator which traverses the event list for key 'a' (if it
+-- exists) and returns the keys and values it finds.
 -------------------------------------------------------------------------------
 function gameManager:targets(a)
 	local i = 0
   
 	if self.events[a] then
-    -- Set the index to the final element in the table
+    -- Set the index to the final element in the table. Note the "i = i - 1"
+    -- in the iterator proper.
 		i = #self.events[a] + 1
 	end
   
+  -- return the iterator itself
 	return function()
 		i = i - 1
 		if self.events[a] and self.events[a][i] then
