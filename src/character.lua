@@ -336,6 +336,7 @@ function character:testPathCollision(blockSize)
 end
 
 
+
 -------------------------------------------------------------------------------
 -- character:draw
 --
