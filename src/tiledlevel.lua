@@ -207,8 +207,9 @@ return {
           visible = true,
           properties = {
             ["behaviour_open_door"] = "target=door_startroom  type=doorswitch_open timer=0",
+            ["behaviour_start_mover"] = "target=mover_test type=activate_something timer=0",
             ["category"] = "switch",
-            ["collision_behaviours"] = "behaviour_open_door",
+            ["collision_behaviours"] = "behaviour_open_door behaviour_start_mover",
             ["textureset"] = "switch_standard"
           }
         },
@@ -224,9 +225,9 @@ return {
           visible = true,
           properties = {
             ["extents"] = "x=2 y=0",
-            ["initialdirection"] = "x=-1 y=0",
+            ["initialdirection"] = "x=1 y=0",
             ["speed"] = "2",
-            ["textureset"] = "switch_standard"
+            ["textureset"] = "mover_standard"
           }
         },
         {
