@@ -166,7 +166,7 @@ return {
       objects = {
         {
           name = "door_startroom",
-          type = "block",
+          type = "door",
           shape = "rectangle",
           x = 48,
           y = 128,
@@ -181,7 +181,7 @@ return {
         },
         {
           name = "door_hall",
-          type = "block",
+          type = "door",
           shape = "rectangle",
           x = 128,
           y = 240,
@@ -196,20 +196,8 @@ return {
           }
         },
         {
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 81,
-          y = 144,
-          width = 0,
-          height = 0,
-          gid = 11,
-          visible = true,
-          properties = {}
-        },
-        {
           name = "switch_startroom",
-          type = "block",
+          type = "switch",
           shape = "rectangle",
           x = 80,
           y = 144,
@@ -225,31 +213,24 @@ return {
           }
         },
         {
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 80,
-          y = 143,
-          width = 0,
-          height = 0,
-          gid = 11,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "",
+          name = "mover_test",
           type = "mover",
           shape = "rectangle",
-          x = 176,
-          y = 240,
+          x = 32,
+          y = 64,
           width = 0,
           height = 0,
           gid = 22,
           visible = true,
-          properties = {}
+          properties = {
+            ["extents"] = "x=2 y=0",
+            ["initialdirection"] = "x=-1 y=0",
+            ["speed"] = "2",
+            ["textureset"] = "switch_standard"
+          }
         },
         {
-          name = "",
+          name = "the_jailer",
           type = "enemy",
           shape = "rectangle",
           x = 240,
@@ -258,11 +239,13 @@ return {
           height = 0,
           gid = 23,
           visible = true,
-          properties = {}
+          properties = {
+            ["textureset"] = "switch_standard"
+          }
         },
         {
-          name = "",
-          type = "",
+          name = "door_final_room",
+          type = "door",
           shape = "rectangle",
           x = 256,
           y = 224,
@@ -276,7 +259,7 @@ return {
         },
         {
           name = "danger_switch",
-          type = "block",
+          type = "switch",
           shape = "rectangle",
           x = 240,
           y = 304,
@@ -306,7 +289,7 @@ return {
         },
         {
           name = "switch_hall",
-          type = "block",
+          type = "switch",
           shape = "rectangle",
           x = 32,
           y = 272,
