@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- gameMain.lua
@@ -11,8 +11,7 @@
 local windowWidth = 0
 local windowHeight = 0
 
-require("src/mover")
-require("src/gun")
+require("src/entities/categories")
 require("src/character")
 require("src/uiData")
 require("src/collider")
@@ -50,9 +49,9 @@ local jumperFinder
 -------------------------------------------------------------------------------
 -- Set debugging variables
 -------------------------------------------------------------------------------
-DEBUG_ENABLED = true
-g_showGrid = false
-g_showBoxes = false
+local DEBUG_ENABLED = true
+local g_showGrid = false
+local g_showBoxes = false
 
 
 
@@ -60,42 +59,42 @@ g_showBoxes = false
 -- Set game manager, GUI, and gamestate variables 
 -------------------------------------------------------------------------------
 local g_gui = require("src/external/Quickie")
-g_gm = require("src/gameManager")
+local g_gm = require("src/gameManager")
 if g_usingTiled then
-	g_currentLevel = "tiledLevel"
+	local g_currentLevel = "tiledLevel"
 else
-	g_currentLevel = nil
+	local g_currentLevel = nil
 end
-g_nextLevel = "level2"
-g_menuRefreshed = false
-g_blockSize = 16
-g_config = nil
-g_pixelLocked = true
-FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
+local g_nextLevel = "level2"
+local g_menuRefreshed = false
+local g_blockSize = 16
+local g_config = nil
+local g_pixelLocked = true
+local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
 
 -------------------------------------------------------------------------------
 -- Make variables to hold GUI resources 
 -------------------------------------------------------------------------------
-g_menuBGtex = nil 
-g_fonts = {}
+local g_menuBGtex = nil 
+local g_fonts = {}
 
 
 
 -------------------------------------------------------------------------------
 -- Create tables to hold game entities 
 -------------------------------------------------------------------------------
-g_entityWalls = {}
-g_entityBlocks = {}
-g_entityScenery = {}
-g_entityMovers = {}
-g_entityEnemies = {}
-g_entityGuns = {}
-g_entityTriggers = {}
-g_thePlayer = nil
+local g_entityWalls = {}
+local g_entityBlocks = {}
+local g_entityScenery = {}
+local g_entityMovers = {}
+local g_entityEnemies = {}
+local g_entityGuns = {}
+local g_entityTriggers = {}
+local g_thePlayer = nil
 
-g_cameras = {}
+local g_cameras = {}
 
 
 -------------------------------------------------------------------------------
@@ -303,7 +302,7 @@ end
 --
 -- Add cameras to the g_cameras table.
 --
--- A camera is literally nothing except a position, a name, and a state.
+-- A camera comprises only a position, a name, and a state.
 -------------------------------------------------------------------------------
 function addCamera(camera)
   local newCamera = gameObject()
@@ -402,13 +401,33 @@ end
 -------------------------------------------------------------------------------
 -- addEntityBlock
 --
--- Add block-based objects (i.e. switches, doors) to the g_entityBlocks table. 
+-- Add block-based objects (e.g. switches, doors) to the g_entityBlocks table. 
 -------------------------------------------------------------------------------
 function addEntityBlock(block)
-	local blockID = #g_entityBlocks + 1;
-  local theBlock = gameObject()
+	local blockID = #g_entityBlocks + 1
+  
+  local prop = block.properties
+  
+  if not block.name or "" == block.name then
+    print("Warning! A block has no name.")
+    block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
+	end
 
-	local prop = block.properties
+	if not block.type or "" == block.type then	
+		print("Warning! Block \"" .. block.name .. "\" has no type.")
+    block.type = "block"
+	end
+
+  local theBlock = buildByCategory(block.type)
+  if not theBlock then
+    print("Warning! Block \"" .. block.name .. "\" has an invalid type; " ..
+      "reverting to gameObject")
+    theBlock = gameObject()
+  end
+  theBlock:setID(block.name)
+  theBlock:setCategory(block.type)
+
+	
 
 	local size = vector(g_blockSize, g_blockSize)
 	theBlock:setSize(size)
@@ -420,18 +439,7 @@ function addEntityBlock(block)
 													size.y))
 	theBlock:setCollisionRectangle()
 	
-	if block.name and block.name ~= "" then
-		theBlock:setID(block.name)
-	else
-		print("Warning! A block has no name.")
-    block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
-	end
-
-	if prop.category and prop.category ~= "" then	
-		theBlock:setCategory(prop.category)
-	else
-		print("Warning! Block \"" .. block.name .. "\" has no category.")
-	end
+	
 	
   -- Does the entity specify a textureset?
 	if prop.textureset then
@@ -587,10 +595,10 @@ function loadLevel()
 
 	-- Initialise block-based objects
 	for i, data in ipairs(tiledMap.layers.objects.objects) do
-			local theType = data.type
-			if "block" == theType then
-				addEntityBlock(data)
-			end
+    --Skip if the entity is "special" (e.g. the player)
+    if "special" ~= data.type then
+      addEntityBlock(data)
+    end
 	end
 
 	else	
