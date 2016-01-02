@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- gameObject.lua
@@ -57,8 +57,8 @@ end
 		self.anims = {}
 	end
   
-  function gameObject:assignFromProperties(properties)
-    return true;
+  function gameObject:assignFromProperties(prop)
+    return true
   end
 
 
