@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2014
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- gameManager.lua
@@ -315,34 +315,31 @@ function gameManager:getFadeInTimer()
 end
 
 function gameManager:saveState()
-	self.storedPlayerPos = g_thePlayer:getPos():clone()
-	self.storedTranslateX = self.toX
-	self.storedTranslateY = self.toY
+--	self.storedPlayerPos = g_thePlayer:getPos():clone()
+--	self.storedTranslateX = self.toX
+--	self.storedTranslateY = self.toY
 
-	for i, v in ipairs(g_entityScenery) do
-		self.storedFloorsPos[i] = v:getPos():clone()
-	end
-	for i, v in ipairs(g_entityEnemies) do
-		self.storedEnemiesPos[i] = v:getPos():clone()
-		self.storedEnemiesState[i] = v:getState()
-	end
-	for i, v in ipairs(g_entityMovers) do
-		self.storedMoversPos[i] = v:getPos():clone()
-		self.storedMoversState[i] = v:getState()
-		self.storedMoversDir[i] = v:getDir():clone()
-		self.storedMoversDist[i] = v:getDist()
-		self.storedMoversCurrentExtent[i] = v:getCurrentExtent()
-		self.storedMoversOtherExtent[i] = v:getOtherExtent()
-	end
-	for i, v in ipairs(g_entityBlocks) do
-		self.storedWallsPos[i] = v:getPos():clone()
-		self.storedWallsState[i] = v:getState()
-	end
-	for i, v in ipairs(g_entityGuns) do
-		self.storedGunsPos[i] = v:getPos():clone()
-		self.storedGunsState[i] = v:getState()
-		self.storedGunsBulletsMade[i] = v:getBulletsMade()
-	end
+--	for i, v in ipairs(g_entityEnemies) do
+--		self.storedEnemiesPos[i] = v:getPos():clone()
+--		self.storedEnemiesState[i] = v:getState()
+--	end
+--	for i, v in ipairs(g_entityMovers) do
+--		self.storedMoversPos[i] = v:getPos():clone()
+--		self.storedMoversState[i] = v:getState()
+--		self.storedMoversDir[i] = v:getDir():clone()
+--		self.storedMoversDist[i] = v:getDist()
+--		self.storedMoversCurrentExtent[i] = v:getCurrentExtent()
+--		self.storedMoversOtherExtent[i] = v:getOtherExtent()
+--	end
+--	for i, v in ipairs(g_entityBlocks) do
+--		self.storedWallsPos[i] = v:getPos():clone()
+--		self.storedWallsState[i] = v:getState()
+--	end
+--	for i, v in ipairs(g_entityGuns) do
+--		self.storedGunsPos[i] = v:getPos():clone()
+--		self.storedGunsState[i] = v:getState()
+--		self.storedGunsBulletsMade[i] = v:getBulletsMade()
+--	end
 end
 
 
