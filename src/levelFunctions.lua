@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- levelFunctions.lua
@@ -10,13 +10,13 @@
 
 
 
-gm = require("src/gameManager")
+local gm = require("src/gameManager")
 
 g_collisionBehaviours = {
 	endLevel =
 	function(args)
     return function()
-      e1 = jlEvent(args.sender, args.target, args.data, "endlevel")
+      local e1 = jlEvent(args.sender, args.target, args.data, "endlevel")
       gm:sendEvent(e1)	
     end
 	end,
@@ -24,18 +24,26 @@ g_collisionBehaviours = {
 	checkpoint =
 	function(args)
     return function()
-      e1 = jlEvent(args.sender, args.sender, "active", "endlevel")
-      e2 = jlEvent(args.sender, args.target, "none", "save")
+      local e1 = jlEvent(args.sender, args.sender, "active", "endlevel")
+      local e2 = jlEvent(args.sender, args.target, "none", "save")
       gm:sendEvent(e1)
       gm:sendEvent(e2)
     end
 	end,
 
+  activate_something =
+  function(args)
+    return function()
+      local e1 = jlEvent(args.sender, args.target, "active",  "changestate")
+      gm:sendEvent(e1)
+    end
+	end,
+  
 	doorswitch_open = 
 	function(args)
     return function()
-			e1 = jlEvent(args.sender, args.target, "none", "removeblock")
-			e2 = jlEvent(args.sender, args.sender, "switchOn", "none")
+			local e1 = jlEvent(args.sender, args.target, "none", "removeblock")
+			local e2 = jlEvent(args.sender, args.sender, "switchOn", "none")
 			gm:sendEvent(e1)
 			gm:sendEvent(e2)
     end
@@ -44,8 +52,8 @@ g_collisionBehaviours = {
   doorswitch_close = 
   function(args)
     return function()
-			e1 = jlEvent(args.sender, args.target, "none", "addblock")
-			e2 = jlEvent(args.sender, args.sender, "switchOff", "none")
+			local e1 = jlEvent(args.sender, args.target, "none", "addblock")
+			local e2 = jlEvent(args.sender, args.sender, "switchOff", "none")
 			gm:sendEvent(e1)
 			gm:sendEvent(e2)
     end
@@ -59,8 +67,8 @@ g_collisionBehaviours = {
       -- have to mangle and pack the arguments in a different way to the other
       -- events.
       local data = {args.target, args.timer}
-      e1 = jlEvent(args.sender, "main",       "none",     "movecamera", data, 0)
-      e2 = jlEvent(args.sender, args.target,  "dormant",  "changestate", nil, 0)
+      local e1 = jlEvent(args.sender, "main",       "none",     "movecamera", data, 0)
+      local e2 = jlEvent(args.sender, args.target,  "dormant",  "changestate", nil, 0)
       gm:sendEvent(e1)
       gm:sendEvent(e2)
       
