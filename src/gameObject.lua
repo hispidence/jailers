@@ -56,6 +56,10 @@ end
 		self.textures = {}
 		self.anims = {}
 	end
+  
+  function gameObject:assignFromProperties(properties)
+    return true;
+  end
 
 
 	---------------------------
