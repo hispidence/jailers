@@ -11,7 +11,7 @@
 local windowWidth = 0
 local windowHeight = 0
 
-require("src/entities/categories")
+require("src/entities/objectFauxFactory")
 require("src/character")
 require("src/uiData")
 require("src/collider")
@@ -87,14 +87,9 @@ local g_fonts = {}
 -------------------------------------------------------------------------------
 local g_entityWalls = {}
 local g_entityBlocks = {}
-local g_entityScenery = {}
-local g_entityMovers = {}
-local g_entityEnemies = {}
-local g_entityGuns = {}
 local g_entityTriggers = {}
-local g_thePlayer = nil
-
 local g_cameras = {}
+g_thePlayer = nil
 
 
 -------------------------------------------------------------------------------
@@ -212,6 +207,8 @@ end
 -- unloadLevel
 --
 -- Clear all of the level's entities 
+--
+-- This needs to be looked over.
 -------------------------------------------------------------------------------
 function unloadLevel()
 	g_menuRefreshed = false
@@ -225,27 +222,12 @@ function unloadLevel()
 	for k, v in ipairs(g_entityBlocks) do
 		v:freeResources(theCollider)
 		g_entityBlocks[k] = nil	
+	end
+  
+  for k, v in ipairs(g_entityWalls) do
+		v:freeResources(theCollider)
+		g_entityWalls[k] = nil	
 	end	
-	
-	for k, v in ipairs(g_entityScenery) do
-		v:freeResources(theCollider)
-		g_entityScenery[k] = nil
-	end	
-
-	for k, v in ipairs(g_entityEnemies) do
-		v:freeResources(theCollider)
-		g_entityEnemies[k] = nil
-	end
-
-	for k, v in ipairs(g_entityGuns) do
-		v:freeResources(theCollider)
-		g_entityGuns[k] = nil
-	end
-
-	for k, v in ipairs(g_entityMovers) do
-		v:freeResources(theCollider)
-		g_entityMovers[k] = nil
-	end
 
 	for k, v in ipairs(g_entityTriggers) do
 		v:freeResources(theCollider)
@@ -415,10 +397,10 @@ function addEntityBlock(block)
 
 	if not block.type or "" == block.type then	
 		print("Warning! Block \"" .. block.name .. "\" has no type.")
-    block.type = "block"
+    block.type = "typeless"
 	end
 
-  local theBlock = buildByCategory(block.type)
+  local theBlock = buildByType(block.type)
   if not theBlock then
     print("Warning! Block \"" .. block.name .. "\" has an invalid type; " ..
       "reverting to gameObject")
@@ -469,8 +451,7 @@ function addEntityBlock(block)
 	else
     print("Warning! Block \"" .. block.name .. "\" no textureset.")
   end
-  
-  
+
   registerBehaviours(theBlock, prop)
 
 	if prop.state and prop.state ~= "" then	
@@ -485,6 +466,10 @@ function addEntityBlock(block)
 
 	pos.y = pos.y - size.y;
 	theBlock:move(pos)
+  
+  -- property assignment should not depend on anything other than the entity
+  -- existing, but movers need to know their position beforehand for now
+  theBlock:assignFromProperties(prop)
   
   g_entityBlocks[blockID] = theBlock
   
@@ -1282,29 +1267,8 @@ function gameUpdate(dt)
       g_gm:removeEvent(v:getID(), i)
 		end
 	end
-
-	for _, v in ipairs(g_entityEnemies) do
-		for i, e in g_gm:targets(v:getID()) do
-      result = v:processEvent(e)
-      g_gm:removeEvent(v:getID(), i)
-		end
-	end
 	
 	for _, v in ipairs(g_entityBlocks) do
-		for i, e in g_gm:targets(v:getID()) do
-      result = v:processEvent(e)
-      g_gm:removeEvent(v:getID(), i)
-		end
-	end
-
-	for _, v in ipairs(g_entityMovers) do
-		for i, e in g_gm:targets(v:getID()) do
-      result = v:processEvent(e)
-      g_gm:removeEvent(v:getID(), i)
-		end
-	end
-	
-	for _, v in ipairs(g_entityGuns) do
 		for i, e in g_gm:targets(v:getID()) do
       result = v:processEvent(e)
       g_gm:removeEvent(v:getID(), i)
@@ -1363,56 +1327,56 @@ function gameUpdate(dt)
 
     g_thePlayer:setDir(vector(pIncX.x, pIncY.y))
 	--Prepare to move enemy
-	for i,v in ipairs(g_entityEnemies) do
-		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-			local moveVec = v:getMoveVec()
-			local enemyPos = v:getPos()
-			v:testPathCollision(g_currentLevel.levelAttribs.blockSize)
-			local target = v:getTarget()
-			local size = v:getSize()
-			moveVec.x = target.x - (enemyPos.x + (size.x/2))
-			moveVec.y = target.y - (enemyPos.y + (size.y/2))
+	--for i,v in ipairs(g_entityEnemies) do
+--		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
+	--		local moveVec = v:getMoveVec()
+	--		local enemyPos = v:getPos()
+	--		v:testPathCollision(g_currentLevel.levelAttribs.blockSize)
+	--		local target = v:getTarget()
+	--		local size = v:getSize()
+	---		moveVec.x = target.x - (enemyPos.x + (size.x/2))
+	--		moveVec.y = target.y - (enemyPos.y + (size.y/2))
 		
-			moveVec = moveVec:normalized()
-			moveVec = modifiedDT * v:getSpeed() * moveVec
+	--		moveVec = moveVec:normalized()
+	--		moveVec = modifiedDT * v:getSpeed() * moveVec
 			
-			v:setMoveVec(moveVec)	
-		end
-	end		
+	--		v:setMoveVec(moveVec)	
+	--	end
+	--end		
 
 	g_thePlayer:updateAnim(modifiedDT)
 
 	g_thePlayer:updateSound(modifiedDT)
 
-	for i,v in ipairs(g_entityEnemies) do
-		v:update(modifiedDT)
-		v:updateAnim(modifiedDT)
-		v:updateSound(modifiedDT)
-	end
+	--for i,v in ipairs(g_entityEnemies) do
+	--	v:update(modifiedDT)
+	--	v:updateAnim(modifiedDT)
+	--	v:updateSound(modifiedDT)
+	--end
 
 	for i, v in ipairs(g_entityBlocks) do
 		v:updateSound(modifiedDT)
 	end
 
-	for i,v in ipairs(g_entityMovers) do
-		v:updateSound(modifiedDT)
-	end
+	--for i,v in ipairs(g_entityMovers) do
+	--	v:updateSound(modifiedDT)
+	--end
 
-	for i,v in ipairs(g_entityGuns) do
-		v:updateSound(modifiedDT)
-	end
+	--for i,v in ipairs(g_entityGuns) do
+	--	v:updateSound(modifiedDT)
+	--end
 
 	--Move player and enemy on X
 
 	g_thePlayer:move(pIncX)
 	
-	for i,v in ipairs(g_entityEnemies) do
-		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-			local moveVec = v:getMoveVec()
-			local moveVecX = vector(moveVec.x, 0)
-			v:move(moveVecX)
-		end
-	end
+	--for i,v in ipairs(g_entityEnemies) do
+	--	if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
+	--		local moveVec = v:getMoveVec()
+	--		local moveVecX = vector(moveVec.x, 0)
+	--		v:move(moveVecX)
+	--	end
+	--end
 	theCollider:update(modifiedDT)
 	
 
@@ -1420,18 +1384,21 @@ function gameUpdate(dt)
 
 	g_thePlayer:move(pIncY)
 	
-	for i,v in ipairs(g_entityEnemies) do
-		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-			local moveVec = v:getMoveVec()
-			local moveVecY = vector(0, moveVec.y)
-			v:move(moveVecY)
-		end
-	end
+	--for i,v in ipairs(g_entityEnemies) do
+	--	if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
+	--		local moveVec = v:getMoveVec()
+	--		local moveVecY = vector(0, moveVec.y)
+	--		v:move(moveVecY)
+	--	end
+	--end
 	theCollider:update(modifiedDT)
-	for i,v in ipairs(g_entityGuns) do
-		v:update(modifiedDT)
-	end
-	for i,v in ipairs(g_entityMovers) do
+
+
+--	for i,v in ipairs(g_entityGuns) do
+	--	v:update(modifiedDT)
+    
+	--end
+	for i,v in ipairs(g_entityBlocks) do
 		if v:getState() == "active" then v:update(modifiedDT) end
 	end
 	--theCollider:update(modifiedDT)
@@ -1463,60 +1430,60 @@ function gameUpdate(dt)
 	g_thePlayer:getBottomLeft(rayStarts[3])
 	g_thePlayer:getBottomRight(rayStarts[4])
 
-	for i,v in ipairs(g_entityEnemies) do
-		if v:getState() ~= "dead" and v:getState() ~= "dormant" then 
-			v:getTopLeft(rayStarts[5])
-			v:getTopRight(rayStarts[6])
-			v:getBottomLeft(rayStarts[7])
-			v:getBottomRight(rayStarts[8])
-			for k, r in ipairs(rayDirs) do
-				if k < 5 then
-					r.x = rayStarts[k+4].x - rayStarts[k].x
-					r.y = rayStarts[k+4].y - rayStarts[k].y
-				else
-					r.x = -rayDirs[k-4].x
-					r.y = -rayDirs[k-4].y
-				end
-			end
+	--for i,v in ipairs(g_entityEnemies) do
+	--	if v:getState() ~= "dead" and v:getState() ~= "dormant" then 
+	--		v:getTopLeft(rayStarts[5])
+	--		v:getTopRight(rayStarts[6])
+	--		v:getBottomLeft(rayStarts[7])
+	--		v:getBottomRight(rayStarts[8])
+	--		for k, r in ipairs(rayDirs) do
+	--			if k < 5 then
+	--				r.x = rayStarts[k+4].x - rayStarts[k].x
+	--				r.y = rayStarts[k+4].y - rayStarts[k].y
+	--			else
+	--				r.x = -rayDirs[k-4].x
+	--				r.y = -rayDirs[k-4].y
+	--			end
+	--		end
 
 			--Is there a direct line of sight to the player? If so forget the path and go straight there
-			local readyToPath = false
-			local directRoute = true
-			for j,o in ipairs(g_entityBlocks) do
-				if o:getState() ~= "dead" then
-					
-					if o:collidesRays(rayStarts, rayDirs) then
-							if v:getState() == "attacking_direct" then readyToPath = true end
-							directRoute = false
-							v:setState("attacking_path")
-					end
-				end
-			end
-			if directRoute then
-				v:setState("attacking_direct")
-				v:setTarget(pPos)
-			end	
-			v:incPathTimer(modifiedDT)
+	--		local readyToPath = false
+	--		local directRoute = true
+	--		for j,o in ipairs(g_entityBlocks) do
+	--			if o:getState() ~= "dead" then
+	--				
+	--				if o:collidesRays(rayStarts, rayDirs) then
+	--						if v:getState() == "attacking_direct" then readyToPath = true end
+	--						directRoute = false
+	--						v:setState("attacking_path")
+	--				end
+	--			end
+	---		end
+	--		if directRoute then
+	--			v:setState("attacking_direct")
+	--			v:setTarget(pPos)
+	--		end	
+	--		v:incPathTimer(modifiedDT)
 			
 			--Enemy generates a new path if player goes or out of line of sight,
 			--or if enemy is at end of current path or has been following it for more than 1 second
-			if not readyToPath then readyToPath = v:testPathTimer(1) or v:isAtEndOfPath()  end	
-			if readyToPath and v:getState() == "attacking_path" then
-				local startX, startY = v:findNearest(g_currentLevel.levelAttribs.blockSize)
-				local endX, endY = g_thePlayer:findNearest(g_currentLevel.levelAttribs.blockSize)
-				local startPos = {r = startY, c = startX}
-				local endPos = {r = endY, c = endX}
+	--		if not readyToPath then readyToPath = v:testPathTimer(1) or v:isAtEndOfPath()  end	
+	--		if readyToPath and v:getState() == "attacking_path" then
+	--			local startX, startY = v:findNearest(g_currentLevel.levelAttribs.blockSize)
+	--			local endX, endY = g_thePlayer:findNearest(g_currentLevel.levelAttribs.blockSize)
+	--			local startPos = {r = startY, c = startX}
+	--			local endPos = {r = endY, c = endX}
 
-				local path = jumperFinder:getPath(startX, startY, endX, endY)
+	--			local path = jumperFinder:getPath(startX, startY, endX, endY)
 
-				v:copyPath(path);	
-				
-				currentPath = v:getPath()
-				
-				v:startPath(g_currentLevel.levelAttribs.blockSize)
-			end
-		end
-	end
+	--			v:copyPath(path);	
+	--			
+	--			currentPath = v:getPath()
+	--			
+	--			v:startPath(g_currentLevel.levelAttribs.blockSize)
+	--		end
+	--	end
+	--end
 
 	TEsound.cleanup()
 end
