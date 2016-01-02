@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- textures.lua
@@ -29,6 +29,11 @@ g_textureSets = {
     dormant = "switchoff",
     off = "switchoff",
     on = "switchon"
+  },
+  
+  mover_standard = {
+    dormant = "spikeblock",
+    active  = "spikeblockred"
   }
 }
 
