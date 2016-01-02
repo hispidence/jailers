@@ -51,6 +51,12 @@ function mover:init(objType)
 	self.rayToTarget = {x = 0, y = 0}
 end
 
+function mover:assignFromProperties(prop)
+  
+   
+    return true;
+end
+
 function mover:setDist(d)
 	self.dist = d
 end
