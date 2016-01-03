@@ -86,7 +86,6 @@ end
 -------------------------------------------------------------------------------
 function mover:assignFromProperties(prop)
   -- We've got many properties, some of which are needed by movers.
-  print(prop.speed)
   self.speed = tonumber(prop.speed)
   local extents = jSplitKV(prop.extents)
   
