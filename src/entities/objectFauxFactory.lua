@@ -9,6 +9,7 @@
 
 require("src/gameObject")
 require("src/entities/mover")
+require("src/entities/gun")
 
 
 
@@ -23,7 +24,8 @@ local types = {
   switch    = gameObject,
   door      = gameObject,
   enemy     = gameObject,
-  mover     = mover
+  mover     = mover,
+  gun       = gun
 }
 
 
@@ -36,7 +38,7 @@ local types = {
 function buildByType(theType)
   local constructor = types[theType];
   if not constructor then
-    print("no constructor for " .. theType)
+    print("Warning! No constructor for " .. theType)
     return nil
   else
     return constructor();
