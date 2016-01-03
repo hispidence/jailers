@@ -34,7 +34,13 @@ g_textureSets = {
   mover_standard = {
     dormant = "spikeblock",
     active  = "spikeblockred"
+  },  
+  
+  gun_standard = {
+    dormant = "gun_down_dormant",
+    active = "gun_down_active"
   }
+  
 }
 
 rTextures = {
