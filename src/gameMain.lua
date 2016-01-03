@@ -449,7 +449,7 @@ function addEntityBlock(block)
     end
     
 	else
-    print("Warning! Block \"" .. block.name .. "\" no textureset.")
+    print("Warning! Block \"" .. block.name .. "\" has no textureset.")
   end
 
   registerBehaviours(theBlock, prop)
