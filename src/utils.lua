@@ -25,11 +25,11 @@ end
 -- jSplit
 --
 -- Splits the string into a table of values, using anything other than a
--- letter, number or underscore as a delimiter.
+-- letter, number, underscore, or hyphen as a delimiter.
 -------------------------------------------------------------------------------
 function jSplit(str)
   local vals = {}
-  for s in str:gmatch("[%w_]+") do
+  for s in str:gmatch("[%w_-]+") do
     vals[#vals + 1] = s
   end
   return vals
@@ -41,8 +41,8 @@ end
 -- jSplitKV
 --
 -- Splits the string into a table of values, using anything other than a
--- letter, number or underscore as a delimiter. Additionally, this function
--- returns a key-value table. 
+-- letter, number, underscore, or hyphen as a delimiter. Additionally, this
+-- function returns a key-value table. 
 -------------------------------------------------------------------------------
 function jSplitKV(str)
   local vals = jSplit(str)
