@@ -248,11 +248,11 @@ end
 -------------------------------------------------------------------------------
 function registerBehaviours(object, prop)
   if prop.collision_behaviours then 
-    local behaviourTable = jSplit(prop.collision_behaviours)
+    local behaviourTable = jlSplit(prop.collision_behaviours)
     for k, v in ipairs(behaviourTable) do
       -- Does the level data contain the collision behaviour in question?
       if prop[v] then
-        local b = jSplitKV(prop[v])
+        local b = jlSplitKV(prop[v])
         
         -- If the collision behaviour exists in the script, we can go ahead
         if g_collisionBehaviours[b["type"]] ~= nil then

@@ -87,7 +87,7 @@ end
 function mover:assignFromProperties(prop)
   -- We've got many properties, some of which are needed by movers.
   self.speed = tonumber(prop.speed)
-  local extents = jSplitKV(prop.extents)
+  local extents = jlSplitKV(prop.extents)
   
   if(prop.extents) then
     -- If we've got only these extents then assume the mover will move from
@@ -101,7 +101,7 @@ function mover:assignFromProperties(prop)
     self:calcExtent(1)
   end
   
-  local initDir = jSplitKV(prop.initialdirection)
+  local initDir = jlSplitKV(prop.initialdirection)
   self.dir.x = initDir.x
   self.dir.y = initDir.y
   

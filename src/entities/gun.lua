@@ -66,7 +66,7 @@ end
 function gun:assignFromProperties(prop)
   -- We've got many properties, some of which are needed by movers.
 
-  local dir = jSplitKV(prop.direction)
+  local dir = jlSplitKV(prop.direction)
 
   local dirVec = vector(tonumber(dir.x), tonumber(dir.y))
 
