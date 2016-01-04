@@ -26,40 +26,57 @@ setmetatable(gameObject,
 		end}
 )
 
+
+
 function gameObject.new()
 	local self = setmetatable({}, gameObject)
 	self:init()
 	return self
 end
 
-	function gameObject:init()
-		self.size = vector(1, 1)
-		self.collisionSize = nil
-		self.position = vector(0,0) 
-		self.direction = vector(0,0)
-		self.vel = vector(0,0)
-		self.behaviour = {}
-		self.resetBehaviour = {}
-		self.bData = nil
-		self.invisible = false
-		self.state = "dormant"
-		self.class = "object"
-		self.shapeOffsetX = 0
-		self.shapeOffsetY = 0
-		self.quad = nil
-		self.id = nil
-		self.ignoredBullets = false
-		self.sounds = {}
-		self.collisionBehaviour = {}
-		self.collisionShape = nil
-		self.category = nil
-		self.textures = {}
-		self.anims = {}
-	end
+
+
+-------------------------------------------------------------------------------
+-- init
+--
+-- Sets default values.
+-------------------------------------------------------------------------------
+function gameObject:init()
+	self.size = vector(1, 1)
+	self.collisionSize = nil
+  self.angle = 0
+	self.position = vector(0,0) 
+	self.direction = vector(0,0)
+	self.vel = vector(0,0)
+	self.behaviour = {}
+	self.resetBehaviour = {}
+	self.bData = nil
+	self.invisible = false
+	self.state = "dormant"
+	self.class = "object"
+	self.shapeOffsetX = 0
+	self.shapeOffsetY = 0
+	self.quad = nil
+	self.id = nil
+	self.ignoredBullets = false
+	self.sounds = {}
+	self.collisionBehaviour = {}
+	self.collisionShape = nil
+	self.category = nil
+	self.textures = {}
+	self.anims = {}
+end
   
-  function gameObject:assignFromProperties(prop)
-    return true
-  end
+  
+
+-------------------------------------------------------------------------------
+-- assignFromProperties
+--
+-- Populate the object's members with properties from its Tiled object.
+-------------------------------------------------------------------------------
+function gameObject:assignFromProperties(prop)
+  return true
+end
 
 
 	---------------------------
@@ -290,7 +307,12 @@ function gameObject:drawQuad(debug, pixelLocked)
 	if(debug) then
 		self.collisionShape:draw("line")
 	else
-		love.graphics.draw(self:getTexture(self.state), self.quad, vec.x, vec.y, 0, 1, 1, 0, 0)
+		love.graphics.draw(self:getTexture(self.state),
+      self.quad,
+      vec.x + g_halfBlockSize, vec.y + g_halfBlockSize,
+      self.angle,
+      1, 1,
+      g_halfBlockSize, g_halfBlockSize)
 	end
 end
 
@@ -310,7 +332,7 @@ function gameObject:draw(debug, pixelLocked)
 		if self.anims[self.state] then 
 			self.anims[self.state]:draw(vec.x, vec.y, 0, 1, 1)
 		else
-      love.graphics.draw(self:getTexture(self.state), vec.x * scale, vec.y * scale, 0, scale, scale, 0, 0)
+      love.graphics.draw(self:getTexture(self.state), vec.x * scale, vec.y * scale, 1, 1, 0, 0, 0)
 		end
 	end
 end
