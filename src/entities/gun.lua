@@ -1,10 +1,17 @@
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2016
+--
+--
+-- gun.lua
+--
+-- Base class for guns.
+-------------------------------------------------------------------------------
+
+-- OO stuff
 require("src/gameObject")
 
 gun = {}
-for k,v in pairs(gameObject) do
-	gun[k] = v		
-end 
-gun.__index = gun 
+gun.__index = gun
 
 setmetatable(gun,
 	{__index = gameObject,
@@ -13,9 +20,9 @@ setmetatable(gun,
 		end
 	})
 
-function gun:new(...)
+function gun:new()
 	local self = setmetatable(gameObject(), gun)
-	self:init(...)
+	self:init()
 	return self
 end
 
@@ -26,6 +33,13 @@ function gun:bulletCollisionBehaviour(sender, target, desc, timer)
 	end	
 end	
 
+
+
+-------------------------------------------------------------------------------
+-- init
+--
+-- Sets default values.
+-------------------------------------------------------------------------------
 function gun:init()
 	gameObject.init(self)
 	self.firingBehaviour = nil
@@ -40,6 +54,27 @@ function gun:init()
 	self.bulletOffset = vector(1, 0)
 	self.timeLastBullet = 0
 	self.bulletTextures = {}
+end
+
+
+
+-------------------------------------------------------------------------------
+-- assignFromProperties
+--
+-- Populate the gun's members with properties from its Tiled object.
+-------------------------------------------------------------------------------
+function gun:assignFromProperties(prop)
+  -- We've got many properties, some of which are needed by movers.
+
+  local dir = jSplitKV(prop.direction)
+
+  local dirVec = vector(tonumber(dir.x), tonumber(dir.y))
+
+  local stdVec = vector(0, -1)
+
+  self.angle = stdVec:angleTo(dirVec)
+
+  return true
 end
 
 function gun:revIter(b)
@@ -232,34 +267,48 @@ end
 --	Fires the gun and moves the bullets.
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
-	if self.state == "active" then
-		if self.firingBehaviour ~= nil then self.firingBehaviour:fire(dt, self) else
-			if self.timeLastBullet > self.bulletTime then
-				-- Make up for any "missed time": if the bullet fires late due to low framerate, make up for the intervening
-				-- time by moving the bullet forward
-				local timeDifference = self.timeLastBullet - self.bulletTime
-				extraOffset = self.bulletVel * timeDifference
-				self:addBullet(self.position+self.bulletOffset+extraOffset, self.bulletVel)
-				self.timeLastBullet = self.timeLastBullet - self.bulletTime
-			end
-			self.timeLastBullet = self.timeLastBullet + dt
-		end
-	end
-	for i, v in self:revIter(self.bullets) do
-		if v:getState() ~= "dead" then
-			v:move(v:getVel() * dt)
-		end
-		self.ages[i] = self.ages[i] + dt
-
-		if self.ages[i] > self.bulletLife then self:removeBullet(i) end
-	end
+--	if self.state == "active" then
+--		if self.firingBehaviour ~= nil then self.firingBehaviour:fire(dt, self) else
+--			if self.timeLastBullet > self.bulletTime then
+--				-- Make up for any "missed time": if the bullet fires late due to low framerate, make up for the intervening
+--				-- time by moving the bullet forward
+--				local timeDifference = self.timeLastBullet - self.bulletTime
+--				extraOffset = self.bulletVel * timeDifference
+--				self:addBullet(self.position+self.bulletOffset+extraOffset, self.bulletVel)
+--				self.timeLastBullet = self.timeLastBullet - self.bulletTime
+--			end
+--			self.timeLastBullet = self.timeLastBullet + dt
+--		end
+--	end
+--	for i, v in self:revIter(self.bullets) do
+--		if v:getState() ~= "dead" then
+--		v:move(v:getVel() * dt)
+--		end
+--		self.ages[i] = self.ages[i] + dt
+--
+--		if self.ages[i] > self.bulletLife then self:removeBullet(i) end
+--	end
 end
 
-function gun:draw(debug)
-	gameObject.draw(self, debug)
-	for i, v in self:revIter(self.bullets) do
-		if v:getState() ~= "dead" then
-			v:drawQuad(debug)	
-		end
-	end
+
+
+-------------------------------------------------------------------------------
+-- drawQuad
+--
+-- Arguments
+-- debug -	if true, draws the object's outline instread of the graphic for
+-- the object itself
+--
+-- pixelLocked -  Are the graphics aligned to the 'pixel' grid?
+--
+-- Draws an object
+-------------------------------------------------------------------------------
+function gun:drawQuad(debug, pixelLocked)
+  gameObject.drawQuad(self, debug, pixelLocked)
+
+	--for i, v in self:revIter(self.bullets) do
+	--	if v:getState() ~= "dead" then
+	--		v:drawQuad(debug)	
+	--	end
+	--end
 end
