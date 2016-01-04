@@ -304,6 +304,21 @@ return {
             ["collision_behaviours"] = "behaviour_open_door",
             ["textureset"] = "switch_standard"
           }
+        },
+        {
+          name = "gun_start",
+          type = "gun",
+          shape = "rectangle",
+          x = 90,
+          y = 240,
+          width = 0,
+          height = 0,
+          gid = 21,
+          visible = true,
+          properties = {
+            ["direction"] = "x=-1 y=0",
+            ["textureset"] = "gun_standard"
+          }
         }
       }
     },
