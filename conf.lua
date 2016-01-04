@@ -1,8 +1,18 @@
-local blockSize = 16
+-------------------------------------------------------------------------------
+-- Copyright (C) Brad Ellis 2013-2016
+--
+--
+-- main.lua
+--
+-- Entry point for LÖVE
+-------------------------------------------------------------------------------
+
+g_blockSize     = 16
+g_halfBlockSize = 8
 
 function love.conf(t)
 	t.title = "Jailers"
 	
-	t.window.width = (blockSize * 40)
-	t.window.height = (blockSize * 30)
+	t.window.width = (g_blockSize * 40)
+	t.window.height = (g_blockSize * 30)
 end
