@@ -7,6 +7,8 @@
 -- Base class for guns.
 -------------------------------------------------------------------------------
 
+require("src/entities/bullet")
+
 -- OO stuff
 require("src/gameObject")
 
@@ -47,6 +49,7 @@ function gun:init()
 	self.bulletOffset = vector(1, 0)
 	self.timeLastBullet = 0
 	self.bulletTextures = {}
+  self:getFiringBehaviour()
 end
 
 
@@ -73,33 +76,71 @@ end
 
 
 -------------------------------------------------------------------------------
--- firingBehaviour
+-- getFiringBehaviour
 --
--- Create and return a closure that gets assigned to each bullet it creates.
+-- Create and assign a closure that gets assigned to each bullet it creates.
 -------------------------------------------------------------------------------
-function gun:firingBehaviour()
-	
+function gun:getFiringBehaviour()
   local bulletVelocity = 1
-  local firingRate = 2 -- one every 2 seconds
+  local timeBetween = 2 -- one every 2 seconds
   local firingDirection
   local n
   
   local fb = function(timeSinceLast)
-    if timeSinceLast > firingRate then
+    if self:getState() == active and timeSinceLast > timeBetween then
+      print("Firing bullet!")
       -- fire a new bullet
     end
   end
   
-  return fb
+  self.firingBehaviour = fb
 end
 
 
 
----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- createBullet
+--
+-- Create and return a bullet.
+-------------------------------------------------------------------------------
+function gun:createBullet()
+  local b = bullet()
+  b:setSize(vector(1, 1))
+  --b:setCollisionRectangle()
+  b:setState("dead")
+  b:setPos(self.position)
+  b:setVel(vector(-1, 0))
+  
+  b:setID(self:getID() .. "_bullet")
+  b:setCategory("bullet")
+  
+  -- Hopefully, lua will give each bullet the SAME closure
+  b:setFiringBehaviour(self.theFiringBehaviour)
+  return b
+end
+
+
+-------------------------------------------------------------------------------
+-- createSubObjects
+--
+-- Some objects, when initialised, can create sub objects (eg guns making
+-- bullets). These objects exist should separately from their parent.
+-------------------------------------------------------------------------------
+function gun:createSubObjects()
+  local bullets = {}
+  for i = 1, 100 do
+    bullets[i] = self:createBullet()
+  end
+  return bullets
+end
+
+
+
+-------------------------------------------------------------------------------
 --	updateSound(dt)
 --	
 --
----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 function gun:updateSound(dt)
 	--if self.firingBehaviour ~= nil then if self.firingBehaviour:isSoundReady(dt) then gameObject.playSound(self) end
 	--else
@@ -115,7 +156,9 @@ end
 --
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
-	if self.state == "active" then
+	if "active" == self.state then
     --do stuff
 	end
 end
+
+
