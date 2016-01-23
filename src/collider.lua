@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2016
 --
 --
 -- collider.lua
@@ -30,7 +30,6 @@ function resolveCollision(a, b)
 		a, b = b, a
 	end
 
-  
 
   -- Store object a's old position; i.e. their position in the last update
   -- cycle when they hadn't yet collided with object b.
@@ -100,6 +99,13 @@ function resolveCollision(a, b)
 	a.object:setPos(recentGood)
 end
 
+
+
+-------------------------------------------------------------------------------
+-- onCollide
+--
+-- Function passed to HC
+-------------------------------------------------------------------------------
 function onCollide(dt, objA, objB)
 
 	if (objA.object:getCategory() == "trigger" and objA.object:getState() == "dormant")
