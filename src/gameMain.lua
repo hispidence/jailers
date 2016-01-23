@@ -473,6 +473,14 @@ function addEntityBlock(block)
   
   g_entityBlocks[blockID] = theBlock
   
+  local subObjects = theBlock:createSubObjects()
+  
+  if subObjects then
+    for i, o in ipairs(subObjects) do
+      g_entityBlocks[blockID + i] = o;
+    end
+  end
+  
 end
 
 
@@ -969,8 +977,10 @@ function gameDraw()
 
 	g_thePlayer:draw(g_showBoxes, g_pixelLocked)
 
+  local theState
 	for i, v in ipairs(g_entityBlocks) do
-		if g_entityBlocks[i]:getState() ~= "dead" then
+    theState = g_entityBlocks[i]:getState()
+		if theState ~= "dead" and not g_entityBlocks[i]:getInvisible() then
 			g_entityBlocks[i]:drawQuad(g_showBoxes, g_pixelLocked)
 		end
 	end
@@ -1399,7 +1409,7 @@ function gameUpdate(dt)
     
 	--end
 	for i,v in ipairs(g_entityBlocks) do
-		if v:getState() == "active" then v:update(modifiedDT) end
+		if v:getState() ~= "dead" then v:update(modifiedDT) end
 	end
 	--theCollider:update(modifiedDT)
 
