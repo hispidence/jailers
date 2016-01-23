@@ -37,21 +37,38 @@ end
 
 
 -------------------------------------------------------------------------------
+-- Object states
+--
+-- These possible states and what they mean for the object. They're mostly just
+-- guidelines.
+--
+-- active   This object will do things until something changes its state.
+--
+-- dormant  This object is not "doing things", but another object may activate
+--          it. It cannot activate itself.
+--
+-- dead     This object is removed from the game and its "update" function will
+--          no longer be called.
+--
+-- used     Like "dead", but will persist on the map.
+--
+-------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------
 -- init
 --
 -- Sets default values.
 -------------------------------------------------------------------------------
 function gameObject:init()
 	self.size = vector(1, 1)
-	self.collisionSize = nil
   self.angle = 0
 	self.position = vector(0,0) 
 	self.direction = vector(0,0)
 	self.vel = vector(0,0)
-	self.behaviour = {}
-	self.resetBehaviour = {}
-	self.bData = nil
 	self.invisible = false
+	self.bData = nil
 	self.state = "dormant"
 	self.class = "object"
 	self.shapeOffsetX = 0
@@ -79,21 +96,51 @@ function gameObject:assignFromProperties(prop)
 end
 
 
-	---------------------------
-	--[[ Movement functions]]--
-	---------------------------
 
-	function gameObject:getPos()
-		return self.position
-	end
+-------------------------------------------------------------------------------
+-- createSubObjects
+--
+-- Some objects, when initialised, can create sub objects (eg guns making
+-- bullets). These objects exist should separately from their parent.
+-------------------------------------------------------------------------------
+function gameObject:createSubObjects()
+  return nil
+end
 
-	function gameObject:getDir()
-		return self.direction
-	end
 
-	function gameObject:getVel()
-		return self.vel
-	end
+
+-------------------------------------------------------------------------------
+-- getPos
+--
+-- Return the object's world-space position; a HUMP vector.
+-------------------------------------------------------------------------------
+function gameObject:getPos()
+	return self.position
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getDir
+--
+-- Return the object's direction vector.
+-------------------------------------------------------------------------------
+function gameObject:getDir()
+	return self.direction
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getVel
+--
+-- Return the object's velocity vector. Not used for most objects.
+-------------------------------------------------------------------------------
+function gameObject:getVel()
+	return self.vel
+end
+
+
 
 	function gameObject:getCentre(buf)
 	  buf.x, buf.y = self.collisionShape:center()
@@ -121,11 +168,10 @@ end
 
 	function gameObject:setPos(pos)
     self.position = pos
-
-		if not self.invisible then
-			self.collisionShape:moveTo(	self.position.x + (self.size.x/2) + self.shapeOffsetX,
-						self.position.y + (self.size.y/2) + self.shapeOffsetY)
-		end
+    if "dead" ~= self.state then
+      self.collisionShape:moveTo( self.position.x + (self.size.x/2) + self.shapeOffsetX,
+                                  self.position.y + (self.size.y/2) + self.shapeOffsetY)
+    end
 	end
 
 	function gameObject:setVel(vel)
@@ -259,7 +305,7 @@ end
 ----------------------------
 
 function gameObject:update(dt)
-	if self.state ~= "dead" and self.state ~= "dormant" and self.behaviour then self:behaviour(dt) end
+  -- do nothing, this object is empty
 end
 
 function gameObject:updateAnim(dt)
@@ -296,7 +342,8 @@ function gameObject:resetSounds()
 end
 
 function gameObject:drawQuad(debug, pixelLocked)
-	vec = self:getPos()
+	if self.invisible then return end
+  vec = self:getPos()
   
   if(pixelLocked) then
     vec = vec:clone()
@@ -392,7 +439,7 @@ end
 function gameObject:processEvent(e)
   
 	if e:getDesc() == "switchOn" then
-		self.state = "on"
+		self.state = "used"
     
 	elseif e:getID() == "changestate" then 
 		self.state = e:getDesc()
