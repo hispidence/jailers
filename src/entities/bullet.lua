@@ -29,11 +29,24 @@ end
 
 
 -------------------------------------------------------------------------------
--- init
+-- setFiringBehaviour
 --
--- Sets default values.
+-- Sets firing behaviour.
 -------------------------------------------------------------------------------
-function bullet:init()
-	gameObject.init(self)
-	gameObject.init(self)
+function bullet:setFiringBehaviour(fb)
+	self.firingBehaviour = fb
+end
+
+
+
+---------------------------------------------------------------------------------------------------
+--	update
+--	
+--
+---------------------------------------------------------------------------------------------------
+function bullet:update(dt)
+	--if "active" == self.state then
+    self.firingBehaviour()
+    print("Updating bullet")
+	--end
 end
