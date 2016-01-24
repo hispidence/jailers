@@ -47,6 +47,5 @@ end
 function bullet:update(dt)
 	--if "active" == self.state then
     self.firingBehaviour()
-    print("Updating bullet")
 	--end
 end

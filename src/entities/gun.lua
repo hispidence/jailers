@@ -49,7 +49,7 @@ function gun:init()
 	self.bulletOffset = vector(1, 0)
 	self.timeLastBullet = 0
 	self.bulletTextures = {}
-  self:getFiringBehaviour()
+  self:makeFiringBehaviour()
 end
 
 
@@ -69,6 +69,8 @@ function gun:assignFromProperties(prop)
   local stdVec = vector(0, -1)
 
   self.angle = stdVec:angleTo(dirVec)
+
+  self:makeFiringBehaviour()
 
   return true
 end
@@ -106,8 +108,9 @@ end
 function gun:createBullet()
   local b = bullet()
   b:setSize(vector(1, 1))
-  --b:setCollisionRectangle()
-  b:setState("dead")
+  b:setCollisionRectangle()
+  b:setState("active")
+  b:setInvisible(true)
   b:setPos(self.position)
   b:setVel(vector(-1, 0))
   
@@ -115,7 +118,7 @@ function gun:createBullet()
   b:setCategory("bullet")
   
   -- Hopefully, lua will give each bullet the SAME closure
-  b:setFiringBehaviour(self.theFiringBehaviour)
+  b:setFiringBehaviour(self.firingBehaviour)
   return b
 end
 
