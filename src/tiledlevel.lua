@@ -309,15 +309,16 @@ return {
           name = "gun_start",
           type = "gun",
           shape = "rectangle",
-          x = 90,
-          y = 240,
+          x = 144,
+          y = 112,
           width = 0,
           height = 0,
           gid = 21,
           visible = true,
           properties = {
             ["direction"] = "x=-1 y=0",
-            ["textureset"] = "gun_standard"
+            ["textureset"] = "gun_standard",
+            ["textureset_bullet"] = "bullet_standard"
           }
         }
       }
