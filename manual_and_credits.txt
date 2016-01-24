@@ -28,8 +28,7 @@ Libraries used:
 
 LOVE (love2d.org)
 AnAL
-HUMP
-Large Hardon Collider
+HC
 Quickie
 TESound
 Jumper
