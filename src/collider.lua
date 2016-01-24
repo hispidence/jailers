@@ -7,9 +7,12 @@
 -- Handles collision resolution; fires off events and repositions entities.
 -------------------------------------------------------------------------------
 
-collider = require("src/external/hardoncollider")
+HC = require("src/external/HC")
+
+theCollider = HC.new(128)
 
 local MAX_TESTS = 10
+
 
 
 -------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ function resolveCollision(a, b)
 	function testCollision(nTests, a, b, step, res)
     
     -- Calculate a new movement vector
-		vec = moveVec * step  
+		vec = moveVec * step
     
     -- Set a's new position. This position might be wrong, but since collision
     -- detection is done entirely sequentially, this wrong position will be
@@ -94,9 +97,10 @@ function resolveCollision(a, b)
   
   -- Actually call the function
   testCollision(nTests, a, b, step, res)
-  
+
   -- Set the object's position to the one we've calculated, if any.
 	a.object:setPos(recentGood)
+
 end
 
 
@@ -107,7 +111,7 @@ end
 -- Function passed to HC
 -------------------------------------------------------------------------------
 function onCollide(dt, objA, objB)
-
+  print("Collision 'twixt "..objA.object:getID().." and "..objB.object:getID())
 	if (objA.object:getCategory() == "trigger" and objA.object:getState() == "dormant")
 		or (objB.object:getCategory() == "trigger" and objB.object:getState() == "dormant") then return end
 
@@ -160,7 +164,7 @@ function onCollide(dt, objA, objB)
 	if objA.object:getID() == "player" then playerInvolved = true; player = objA.object; nonPlayer = objB.object elseif
 	objB.object:getID() == "player" then playerInvolved = true; player = objB.object; nonPlayer = objA.object end
 	
-	local slideThresh = 3
+	local slideThresh = 0
 
 	if playerInvolved then
 		local trP = vector()
@@ -217,4 +221,3 @@ function onCollide(dt, objA, objB)
 	end
 end
 
-theCollider = collider(100, onCollide)
