@@ -424,33 +424,7 @@ function addEntityBlock(block)
 	
 	
   -- Does the entity specify a textureset?
-	if prop.textureset then
-
-		local t = g_textureSets[prop.textureset]
-    
-    -- Does the textureset exist?
-    if t then
-      for state, tex in pairs(t) do
-        
-        --do the asked-for textures exist?
-        if rTextures[tex] then
-          theBlock:setTexture(state,
-            rTextures[tex].data,
-            true)
-        else
-          print("Warning! Texture \"" .. tex .. "\" does not exist " ..
-            "in the table of textures")
-        end
-        
-      end
-    else
-      print("Warning! Textureset \"" .. prop.textureset ..
-        "\" doesn't exist.")
-    end
-    
-	else
-    print("Warning! Block \"" .. block.name .. "\" has no textureset.")
-  end
+	theBlock:assignTextureSet(prop.textureset)
 
   registerBehaviours(theBlock, prop)
 
@@ -1159,6 +1133,7 @@ function gameUpdate(dt)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
 	local modifiedDT = g_gm:getModifiedDT(dt)
+
 	if g_usingTiled then
 		tiledMap:update(modifiedDT)
 	end

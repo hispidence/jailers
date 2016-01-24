@@ -162,30 +162,59 @@ end
 	  _, _, buf.x, buf.y = self.collisionShape:bbox()	
 	end
 
-	function gameObject:setDir(dir)
-		self.direction = dir
-	end
 
-	function gameObject:setPos(pos)
-    self.position = pos
-    if "dead" ~= self.state then
-      self.collisionShape:moveTo( self.position.x + (self.size.x/2) + self.shapeOffsetX,
-                                  self.position.y + (self.size.y/2) + self.shapeOffsetY)
-    end
-	end
 
-	function gameObject:setVel(vel)
-		self.vel = vel
-	end
+-------------------------------------------------------------------------------
+-- setDir
+--
+-- Set the object's direction angle (has no bearing on its velocity vector) 
+-------------------------------------------------------------------------------
+function gameObject:setDir(dir)
+	self.direction = dir
+end
 
-	function gameObject:move(vec)
-		self.position.x = self.position.x + vec.x
-		self.position.y = self.position.y + vec.y
-		if not self.invisible then
-			self.collisionShape:moveTo(	self.position.x + (self.size.x/2) + self.shapeOffsetX,
-				self.position.y + (self.size.y/2) + self.shapeOffsetY)
-		end
-	end
+
+
+-------------------------------------------------------------------------------
+-- setPos
+--
+-- Set the object's position as well as its collision shape's position
+-------------------------------------------------------------------------------
+function gameObject:setPos(pos)
+  self.position = pos
+  if "dead" ~= self.state then
+    self.collisionShape:moveTo( self.position.x + (self.size.x/2) + self.shapeOffsetX,
+                                self.position.y + (self.size.y/2) + self.shapeOffsetY)
+  end
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setDir
+--
+-- Set the object's velocity vector (has nothing to do with its direction)
+-------------------------------------------------------------------------------
+function gameObject:setVel(vel)
+	self.vel = vel
+end
+
+
+
+-------------------------------------------------------------------------------
+-- move
+--
+-- Move the object along the provided vector.
+-------------------------------------------------------------------------------
+function gameObject:move(vec)
+  self.position.x = self.position.x + vec.x
+  self.position.y = self.position.y + vec.y
+  if not self.invisible then
+    self.collisionShape:moveTo(	self.position.x + (self.size.x/2) + self.shapeOffsetX,
+      self.position.y + (self.size.y/2) + self.shapeOffsetY)
+  end
+end
+
 
 
 	-----------------------------------
@@ -381,6 +410,52 @@ function gameObject:freeResources(collider)
 	--don't free textures or sounds - they're not unique per instance
 end
 
+
+
+-------------------------------------------------------------------------------
+-- assignTextureSet
+--
+-- Read the texture set and load in the textures it specifies 
+-------------------------------------------------------------------------------
+function gameObject:assignTextureSet(textureSet)
+  
+  if textureSet then
+
+    local t = g_textureSets[textureSet]
+
+    -- Does the textureset exist?
+    if t then
+      for state, tex in pairs(t) do
+          
+        --do the asked-for textures exist?
+        if rTextures[tex] then
+          self:setTexture(state,
+            rTextures[tex].data,
+            true)
+        else
+          print("Warning! Texture \"" .. tex .. "\" does not exist " ..
+            "in the table of textures")
+        end
+          
+      end
+    else
+      print("Warning! Textureset \"" .. textureSet ..
+        "\" doesn't exist.")
+    end
+      
+    else
+      print("Warning! Block \"" .. self:getID() .. "\" has no textureset.")
+    end
+
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setTexture
+--
+-- Give the object its textures and describe how to draw them
+-------------------------------------------------------------------------------
 function gameObject:setTexture(key, value, repeating)
 	if self.textures[key] == nil then
 		 self.textures[key] = {}
@@ -392,10 +467,13 @@ function gameObject:setTexture(key, value, repeating)
 	end 
 end
 
-function gameObject:getTextureFileName(key)
-	return self.textures[key].fileName
-end
 
+
+-------------------------------------------------------------------------------
+-- getTexture
+--
+-- Give the object its textures and describe how to draw them
+-------------------------------------------------------------------------------
 function gameObject:getTexture(key)
 	return self.textures[key].texture
 end
