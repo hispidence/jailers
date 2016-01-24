@@ -200,14 +200,6 @@ end
 		return self.ignoresBullets
 	end
 
-	function gameObject:setBehaviour(behav)
-		self.behaviour = behav
-	end
-
-	function gameObject:setResetBehaviour(br)
-		self.resetBehaviour = br
-	end
-
 	function gameObject:setBehaviourData(bd)
 		self.bData = bd
 	end
@@ -461,17 +453,17 @@ function gameObject:processEvent(e)
 end
 
 function gameObject:setCollisionRectangle()
-	self.collisionShape = theCollider:addRectangle(0,0, self.size.x, self.size.y)
+	self.collisionShape = theCollider:rectangle(0,0, self.size.x, self.size.y)
 	self.collisionShape.object = self
 end
 
 function gameObject:setCollisionCircle()
-	self.collisionShape = theCollider:addCircle(0,0, self.size.x/2)
+	self.collisionShape = theCollider:circle(0,0, self.size.x/2)
 	self.collisionShape.object = self
 end
 
 function gameObject:addToCollisionGroup(group) 
-	theCollider:addToGroup(group, self.collisionShape)
+	--theCollider:addToGroup(group, self.collisionShape)
 end
 
 function gameObject:getCollisionShape()
