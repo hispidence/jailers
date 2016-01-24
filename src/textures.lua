@@ -22,13 +22,11 @@ g_textureSets = {
   
   door_standard = {
     dormant = "door",
-    off = "door"
   },
   
   switch_standard = {
     dormant = "switchoff",
-    off = "switchoff",
-    on = "switchon"
+    used = "switchon"
   },
   
   mover_standard = {
@@ -39,6 +37,10 @@ g_textureSets = {
   gun_standard = {
     dormant = "gun_down_dormant",
     active = "gun_down_active"
+  },
+  
+  bullet_standard = {
+    active = "bullet"
   }
   
 }
@@ -164,7 +166,6 @@ rTextures = {
 	fname = TEXTURES_DIR .. "eastwallendingdown.png",
 	data = nil},
 
- 
   {id = "westwallendingup",
 	fname = TEXTURES_DIR .. "westwallendingup.png",
 	data = nil},
@@ -172,7 +173,6 @@ rTextures = {
   {id = "westwallendingdown",
 	fname = TEXTURES_DIR .. "westwallendingdown.png",
 	data = nil},
-
 
 	{id = "eastwall",
 	fname = TEXTURES_DIR .. "eastwall.png",
@@ -358,10 +358,10 @@ rTextures = {
 	fname = TEXTURES_DIR .. "rangedjailer_death.png",
 	data = nil},
 
-
 	{id = "spikeblock",
 	fname = TEXTURES_DIR .. "spikeblock.png",
 	data = nil},
+
 	{id = "spikeblockred",
 	fname = TEXTURES_DIR .. "spikeblockred.png",
 	data = nil},
