@@ -129,8 +129,8 @@ function character:move(pos)
 	--gameObject.setDir(self, pos)
 	self.oldPos.x, self.oldPos.y = self.position.x, self.position.y
 	gameObject.move(self, pos)
-	self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
-					self.position.y +((self.size.y/2)))
+	--self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
+	--				self.position.y +((self.size.y/2)))
 end
 
 function character:setDeathBehaviour(b)
@@ -143,8 +143,8 @@ end
 
 function character:setPos(pos)
 	gameObject.setPos(self, pos)
-	self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
-					self.position.y +((self.size.y/2)))
+	--self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
+	--				self.position.y +((self.size.y/2)))
 end
 
 function character:getMoveVec()
@@ -303,9 +303,9 @@ end
 -- path box.
 -------------------------------------------------------------------------------
 function character:setPathBox()
-	self.pathBox = theCollider:addRectangle(0, 0, 2, 2)
-	theCollider:setGhost(self.pathBox)
-	self.pathBox.object = self
+	--self.pathBox = theCollider:rectangle(0, 0, 2, 2)
+  --theCollider:remove(self.pathBox)
+	--self.pathBox.object = self
 end
 
 
@@ -350,5 +350,5 @@ end
 -------------------------------------------------------------------------------
 function character:draw(debug, pixelLocked)
 	gameObject.draw(self, debug, pixelLocked)
-	if(debug) then self.pathBox:draw("line") end
+	--if(debug) then self.pathBox:draw("line") end
 end
