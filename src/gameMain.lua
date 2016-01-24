@@ -1387,9 +1387,12 @@ function gameUpdate(dt)
 	--		v:move(moveVecX)
 	--	end
 	--end
-	theCollider:update(modifiedDT)
 	
-
+  local thePlayerShape = g_thePlayer:getCollisionShape()
+  for a, b in pairs(theCollider:collisions(thePlayerShape)) do
+    onCollide(dt, thePlayerShape, a)
+  end
+	
 	--Move player and enemy on Y
 
 	g_thePlayer:move(pIncY)
@@ -1401,7 +1404,10 @@ function gameUpdate(dt)
 	--		v:move(moveVecY)
 	--	end
 	--end
-	theCollider:update(modifiedDT)
+  
+  for a, b in pairs(theCollider:collisions(thePlayerShape)) do
+    onCollide(dt, thePlayerShape, a)
+  end
 
 
 --	for i,v in ipairs(g_entityGuns) do
@@ -1411,7 +1417,6 @@ function gameUpdate(dt)
 	for i,v in ipairs(g_entityBlocks) do
 		if v:getState() ~= "dead" then v:update(modifiedDT) end
 	end
-	--theCollider:update(modifiedDT)
 
 
 	--PATHFINDING: prepare view rays
