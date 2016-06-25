@@ -48,7 +48,7 @@ function gun:init()
 	self.bulletsMade = 0
 	self.bulletOffset = vector(1, 0)
 	self.timeLastBullet = 0
-	self.bulletTextures = {}
+	self.bulletTextureSet = {}
   self:makeFiringBehaviour()
 end
 
@@ -71,6 +71,10 @@ function gun:assignFromProperties(prop)
   self.angle = stdVec:angleTo(dirVec)
 
   self:makeFiringBehaviour()
+  
+  self:setState("active")
+  
+  self.bulletTextureSet = prop.textureset_bullet
 
   return true
 end
@@ -78,21 +82,25 @@ end
 
 
 -------------------------------------------------------------------------------
--- getFiringBehaviour
+-- makeFiringBehaviour
 --
 -- Create and assign a closure that gets assigned to each bullet it creates.
 -------------------------------------------------------------------------------
-function gun:getFiringBehaviour()
+function gun:makeFiringBehaviour()
   local bulletVelocity = 1
   local timeBetween = 2 -- one every 2 seconds
   local firingDirection
   local n
   
-  local fb = function(timeSinceLast)
-    if self:getState() == active and timeSinceLast > timeBetween then
-      print("Firing bullet!")
+  local fb = function(dt)
+    if self:getState() == "active" and self.timeLastBullet > timeBetween then
+      
       -- fire a new bullet
+      print("Firing bullet!", self.timeLastBullet, timeBetween)
+      self.timeLastBullet = self.timeLastBullet - timeBetween
+      
     end
+    self.timeLastBullet = self.timeLastBullet + dt
   end
   
   self.firingBehaviour = fb
@@ -107,15 +115,17 @@ end
 -------------------------------------------------------------------------------
 function gun:createBullet()
   local b = bullet()
-  b:setSize(vector(1, 1))
+  b:setSize(vector(8, 8))
   b:setCollisionRectangle()
   b:setState("active")
   b:setInvisible(true)
-  b:setPos(self.position)
+  b:setPos(self.position:clone())
   b:setVel(vector(-1, 0))
   
   b:setID(self:getID() .. "_bullet")
   b:setCategory("bullet")
+  
+  b:assignTextureSet(self.bulletTextureSet)
   
   -- Hopefully, lua will give each bullet the SAME closure
   b:setFiringBehaviour(self.firingBehaviour)
@@ -131,7 +141,7 @@ end
 -------------------------------------------------------------------------------
 function gun:createSubObjects()
   local bullets = {}
-  for i = 1, 100 do
+  for i = 1, 5 do
     bullets[i] = self:createBullet()
   end
   return bullets
@@ -160,7 +170,7 @@ end
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
 	if "active" == self.state then
-    --do stuff
+
 	end
 end
 
