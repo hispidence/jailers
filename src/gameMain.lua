@@ -1139,6 +1139,7 @@ function gameUpdate(dt)
 	-- Update the game manager, which, among other thigs, will calculate
 	-- a new slowdown factor if it needs
 	g_gm:update(dt)
+  
   if "finishinglevel" == g_gm:getState() then return end
   if "finishinggame" == g_gm:getState() then return end
   if "loading" == g_gm:getState()  then 
@@ -1154,6 +1155,7 @@ function gameUpdate(dt)
       g_gm:setState("running")
 		return
 	end
+
 
 	if g_gm:getState() == "splash" then
 		love.graphics.setFont(g_fonts[1])
@@ -1186,7 +1188,7 @@ function gameUpdate(dt)
 						.. "blah blah Jailers blah blah Brad Ellis\n".. "blah blah Lua blah blah LÖVE blah etc.\n"
 						.. "See the readme for actual details. Thanks for playing."}	
 		return
-	elseif g_gm:getState() == "paused" then 
+	elseif g_gm:getState() == "paused" then
 		--g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
 		--g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 17.5 * scale)
 		--g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
@@ -1232,7 +1234,8 @@ function gameUpdate(dt)
 							.. "For acknoledgements and more, see the readme.\n" }
 		elseif uiData.menuState == "resume" then g_gm:pause() end
 
-	return end
+    return
+  end
 
 	for i, e in g_gm:targets("player") do
 		g_thePlayer:processEvent(e)
@@ -1479,8 +1482,7 @@ end
 
 function gameKeyPressed(key)
 	if g_gm:getState() == "splash" then
-	
-		if key == " " then g_gm:setState("running") end
+		if key == "space" then g_gm:setState("running") end
 		if key == "return" then g_gm:setState("running") end
 		if key == "q" then love.event.push("quit") end
 		if key == "escape" then love.event.push("quit") end
