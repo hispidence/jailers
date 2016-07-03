@@ -97,12 +97,19 @@ function gameManager:getMapping(button)
   return self.padMapping[button]
 end
 
-function gameManager:checkForPad()
+
+-------------------------------------------------------------------------------
+-- acquireGamepad
+--
+--  
+-------------------------------------------------------------------------------
+function gameManager:acquireGamepad()
 	if love.joystick.getJoystickCount() > 0 then
 		if self.hasPad then return end
 		local pads = love.joystick.getJoysticks()
 		self.pad = pads[1]
 		local padID = self.pad:getGUID()
+    
 		_, self.padMapping["leftx"] = self.pad:getGamepadMapping("leftx")
 		_, self.padMapping["lefty"] = self.pad:getGamepadMapping("lefty")
 		_, self.padMapping["rightx"] = self.pad:getGamepadMapping("rightx")
@@ -118,11 +125,13 @@ function gameManager:checkForPad()
 end
 
 function gameManager:getLeftStickAxes()
-	if self.hasPad then	return self.pad:getAxis(self.padMapping["leftx"]), self.pad:getAxis(self.padMapping["lefty"]) else return 0, 0 end
+  return 0, 0
+	--if self.hasPad then	return self.pad:getAxis(self.padMapping["leftx"]), self.pad:getAxis(self.padMapping["lefty"]) else return 0, 0 end
 end
 
 function gameManager:getRightStickAxes()
-	if self.hasPad then	return self.pad:getAxis(self.padMapping["rightx"]), self.pad:getAxis(self.padMapping["righty"]) else return 0, 0 end
+  return 0, 0
+	--if self.hasPad then	return self.pad:getAxis(self.padMapping["rightx"]), self.pad:getAxis(self.padMapping["righty"]) else return 0, 0 end
 end
 
 function gameManager:getBandedAxes(upStages, downStages)
@@ -252,7 +261,7 @@ end
 -- a level
 -------------------------------------------------------------------------------
 function gameManager:update(dt)
-	self:checkForPad()
+	self:acquireGamepad()
 	if self.gameState == "running" then
     self.fadeInTimer = self.fadeInTimer + dt
     self.fadeInTimer = math.min(self.fadeInTimer, self.fadeInMax)
@@ -534,8 +543,8 @@ end
   
 function gameManager:pause()
 	if self.gameState == "paused" then self.gameState = "running"
-	elseif self.gameState == "running" then self.gameState = "paused"
-	end
+	elseif self.gameState == "running" then self.gameState = "paused" end
+  print("new state: " .. self.gameState)
 end
 
 
