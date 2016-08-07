@@ -46,6 +46,11 @@ end
 ---------------------------------------------------------------------------------------------------
 function bullet:update(dt)
 	--if "active" == self.state then
-    self.firingBehaviour()
+    
+    local vec = {}
+    vec.x = self.vel.x * dt
+    vec.y = self.vel.y * dt
+    
+    self:move(vec)
 	--end
 end

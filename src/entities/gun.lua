@@ -38,7 +38,7 @@ end
 function gun:init()
 	gameObject.init(self)
 	self.firingBehaviour = nil
-	self.bulletVel = vector(0, 0)
+	self.bulletVel = vector(-1, 0)
 	self.bullets = {}
 	self.ages = {}
 	self.bulletCollisionBehaviour = nil
@@ -87,9 +87,7 @@ end
 -- Create and assign a closure that gets assigned to each bullet it creates.
 -------------------------------------------------------------------------------
 function gun:makeFiringBehaviour()
-  local bulletVelocity = 1
   local timeBetween = 2 -- one every 2 seconds
-  local firingDirection
   local n
   
   local fb = function(dt)
@@ -118,14 +116,23 @@ function gun:createBullet()
   b:setSize(vector(8, 8))
   b:setCollisionRectangle()
   b:setState("active")
-  b:setInvisible(true)
+  b:setInvisible(false)
   b:setPos(self.position:clone())
-  b:setVel(vector(-1, 0))
+  b:setVel(self.bulletVel)
   
   b:setID(self:getID() .. "_bullet")
   b:setCategory("bullet")
   
   b:assignTextureSet(self.bulletTextureSet)
+  
+  local size = vector(g_blockSize, g_blockSize)
+	b:setQuad(love.graphics.newQuad(0,
+													0,
+													b:getSize().x,
+													b:getSize().y, 
+													b:getSize().x,
+													b:getSize().y))
+	b:setCollisionRectangle()
   
   -- Hopefully, lua will give each bullet the SAME closure
   b:setFiringBehaviour(self.firingBehaviour)
