@@ -387,9 +387,7 @@ end
 -------------------------------------------------------------------------------
 function addEntityBlock(block)
 	local blockID = #g_entityBlocks + 1
-  
-  local prop = block.properties
-  
+
   if not block.name or "" == block.name then
     print("Warning! A block has no name.")
     block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
@@ -399,6 +397,12 @@ function addEntityBlock(block)
 		print("Warning! Block \"" .. block.name .. "\" has no type.")
     block.type = "typeless"
 	end
+  
+  local prop = block.properties
+  
+  if not prop then
+    print("Warning! Block \"" .. block.name .. "\" has no properties.")
+  end
 
   local theBlock = buildByType(block.type)
   if not theBlock then
@@ -422,17 +426,21 @@ function addEntityBlock(block)
 	theBlock:setCollisionRectangle()
 	
 	
-	
-  -- Does the entity specify a textureset?
-	theBlock:assignTextureSet(prop.textureset)
+	if prop then
+    -- Does the entity specify a textureset?
+    theBlock:assignTextureSet(prop.textureset)
 
-  registerBehaviours(theBlock, prop)
+    registerBehaviours(theBlock, prop)
 
-	if prop.state and prop.state ~= "" then	
-		theBlock:setState(prop.state)
-	else
-		theBlock:setState("dormant");
-	end
+    if prop.state and prop.state ~= "" then	
+      theBlock:setState(prop.state)
+    else
+      theBlock:setState("dormant");
+    end
+    -- property assignment should not depend on anything other than the entity
+    -- existing, but movers need to know their position beforehand for now
+    theBlock:assignFromProperties(prop)
+  end
 
 	theBlock:addToCollisionGroup("world")
 
@@ -441,9 +449,7 @@ function addEntityBlock(block)
 	pos.y = pos.y - size.y;
 	theBlock:move(pos)
   
-  -- property assignment should not depend on anything other than the entity
-  -- existing, but movers need to know their position beforehand for now
-  theBlock:assignFromProperties(prop)
+ 
   
   g_entityBlocks[blockID] = theBlock
   
@@ -465,7 +471,7 @@ end
 --  
 -------------------------------------------------------------------------------
 function loadLevel()
-  	if g_usingTiled then
+  if g_usingTiled then
 		tiledMap = sti.new("src/tiledlevel.lua")
 
 		tiledMap:setDrawRange(0, 0, windowWidth, windowHeight)
@@ -568,340 +574,7 @@ function loadLevel()
     end
 	end
 
-	else	
-	-- Initialise camera positions
-	g_gm:setCurrX(g_currentLevel.levelAttribs.initialCamera.x * g_currentLevel.levelAttribs.blockSize)
-  	g_gm:setCurrY(g_currentLevel.levelAttribs.initialCamera.y * g_currentLevel.levelAttribs.blockSize)
-  	g_gm:setToX(g_gm:getCurrX())
-  	g_gm:setToY(g_gm:getCurrY())
-	
-	local levelWidth, levelHeight = g_currentLevel.levelAttribs.width, g_currentLevel.levelAttribs.height
-
-	local blockSize = g_currentLevel.levelAttribs.blockSize
-	pathMap = buildMap(levelWidth, levelHeight)	
-
-	local pSize = vector(10, 10)
-	
-	-- Create player and initialise resources
-	g_thePlayer = character("player")
-	g_thePlayer:setTexture(	"resting",
-				love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
-				false)
-	g_thePlayer:setTexture(	"moving_vertical",
-				love.graphics.newImage(TEXTURES_DIR .. "playermoveup.png"),
-				false)
-	g_thePlayer:setTexture(	"moving_horizontal",
-				love.graphics.newImage(TEXTURES_DIR .. "playermove.png"),
-				false)	
-	g_thePlayer:setTexture(	"dead", 
-				love.graphics.newImage(TEXTURES_DIR .. "playerdeath.png"),
-				false)
-	g_thePlayer:setSize(pSize)
-	g_thePlayer:setShapeOffsets(2, 2)
-	g_thePlayer:setCollisionRectangle()	
-	g_thePlayer:setID("player")
-	g_thePlayer:setCategory("player")
-	g_thePlayer:setState("resting")
-	g_thePlayer:setPathBox()
-	g_thePlayer:setSpeed(g_currentLevel.levelAttribs.playerSpeed)	
-	
-	local anim = newAnimation(g_thePlayer:getTexture("dead"), 14, 14, 0.08, 6)
-	anim:setMode("once")
-	g_thePlayer:setAnim("dead", anim)
-
-	anim = newAnimation(g_thePlayer:getTexture("resting"), 14, 14, 0.15,4)
-	g_thePlayer:setAnim("resting", anim)
-
-	anim = newAnimation(g_thePlayer:getTexture("moving_horizontal"), 14, 14, 0.05, 12)
-	g_thePlayer:setAnim("moving_horizontal", anim)
-
-	anim = newAnimation(g_thePlayer:getTexture("moving_vertical"), 14, 14, 0.05, 12)
-	g_thePlayer:setAnim("moving_vertical", anim)
-
-
-	local sound = g_currentLevel.levelAttribs.playerSounds["dead"]
-	g_thePlayer:setSound(	"dead", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
-
-	sound = g_currentLevel.levelAttribs.playerSounds["moving_horizontal"]
-	g_thePlayer:setSound(	"moving_horizontal", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
-
-	sound = g_currentLevel.levelAttribs.playerSounds["moving_vertical"]
-	g_thePlayer:setSound(	"moving_vertical", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
-
-	local pPos = vector(g_currentLevel.levelAttribs.playerStart.x*blockSize, g_currentLevel.levelAttribs.playerStart.y*blockSize)
-	g_thePlayer:move(pPos)
-
-	-- Initialise guns
-	local g = 1
-	for n, v in ipairs(g_currentLevel.guns) do
-		g_entityGuns[g] = gun()
-	
-		g_entityGuns[g]:setInvisible(v.invisible)
-	
-
-		if not v.invisible then
-		
-			local size = vector(v.size.x*blockSize, v.size.y*blockSize)
-			g_entityGuns[g]:setSize(size)
-			g_entityGuns[g]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-			if nil == v.shape or "quad" == v.shape then
-				g_entityGuns[g]:setCollisionRectangle()
-			else
-				g_entityGuns[g]:setCollisionCircle()
-			end
-			g_entityGuns[g]:addToCollisionGroup("world")
-
-			for s, t in pairs(v.texture) do
-				g_entityGuns[g]:setTexture(s, rTextures[getTextureByID(t)].data, true)
-			end
-
-			local pos = vector(v.pos.x*blockSize, v.pos.y*blockSize)
-	
-			g_entityGuns[g]:move(pos)
-
-
-			g_entityGuns[g]:setInvisible(false)
-			youShallNotPass(pathMap, g_entityGuns[g]:getPos(), g_entityGuns[g]:getSize())
-		else
-			local pos = vector(v.pos.x*blockSize, v.pos.y*blockSize)
-
-			g_entityGuns[g]:move(pos)
-		end
-		if nil ~= v.state then g_entityGuns[g]:setState(v.state) else g_entityGuns[g]:setState("dormant") end
-	
-			
-		g_entityGuns[g]:setFiringBehaviour(v.shootingBehaviour)
-		
-		if v.id then 
-			g_entityGuns[g]:setID(v.id)
-		else
-			g_entityGuns[g]:setID("gun")
-		end
-		g_entityGuns[g]:setBulletOffset(v.bulletOffset * blockSize)
-		g_entityGuns[g]:setCategory("gun")
-
-		for s, t in pairs(v.bulletTexture) do
-			g_entityGuns[g]:setBulletTexture(s, rTextures[getTextureByID(t)].data, false)
-		end
-
-		if v.sound then
-			for i, t in pairs(v.sound) do
-				g_entityGuns[g]:setSound(i, 
-				lSounds[getSoundByID(t.id)].soundData, 
-				t.repeating, t.time)
-			end
-		end
-	
-		if v.ignoresBullets then g_entityGuns[g]:setIgnoresBullets(true) end
-
-		g_entityGuns[g]:setBulletVel(v.bulletVel)
-		g_entityGuns[g]:setBulletLife(v.bulletLife)
-		g_entityGuns[g]:setBulletTime(v.bulletTime)
-		g = g + 1
-	end	
-
-	-- Initialise walls
-	local k = 1
-	for n, v in ipairs(g_currentLevel.walls) do
-		g_entityBlocks[k] = gameObject()
-		local size = vector(v.size.x*blockSize, v.size.y*blockSize)
-		local pos = vector(v.start.x*blockSize, v.start.y*blockSize)
-		g_entityBlocks[k]:setSize(size)
-		if v.state ~= nil then g_entityBlocks[k]:setState(v.state) else g_entityBlocks[k]:setState("dormant") end
-		g_entityBlocks[k]:setCollisionBehaviour(v.behaviour)
-		local qX, qY = 16, 16
-		if v.imageSizeX and v.imageSizeY then qX = v.imageSizeX; qY = v.imageSizeY end
-		g_entityBlocks[k]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, qX, qY))
-		if nil == v.shape or "quad" == v.shape then
-			g_entityBlocks[k]:setCollisionRectangle()
-		else
-			g_entityBlocks[k]:setCollisionCircle()
-		end
-		
-		if v.id then 
-			g_entityBlocks[k]:setID(v.id)
-		else
-			g_entityBlocks[k]:setID("wall")
-		end
-		g_entityBlocks[k]:setCategory("wall")
-		g_entityBlocks[k]:addToCollisionGroup("world")
-		g_entityBlocks[k]:move(pos)
-		for s, t in pairs(v.texture) do
-			g_entityBlocks[k]:setTexture(s, rTextures[getTextureByID(t)].data, true)
-		end
-
-
-		if v.sound then
-			for i, t in pairs(v.sound) do
-				g_entityBlocks[k]:setSound(i, 
-				lSounds[getSoundByID(t.id)].soundData, 
-				t.repeating, t.time)
-			end
-		end
-
-		if v.ignoresBullets then g_entityBlocks[k]:setIgnoresBullets(true) end
-		youShallNotPass(pathMap, g_entityBlocks[k]:getPos(), g_entityBlocks[k]:getSize())
-		k = k + 1
-	end
-
-	-- Initialise triggers
-	k = 1
-	for n, v in ipairs(g_currentLevel.triggers) do
-		g_entityTriggers[k] = gameObject()
-		local size = vector(v.size.x*blockSize, v.size.y*blockSize)
-		local pos = vector(v.pos.x*blockSize, v.pos.y*blockSize)
-		g_entityTriggers[k]:setSize(size)
-		if v.state ~= nil then g_entityTriggers[k]:setState(v.state) else g_entityTriggers[k]:setState("dormant") end
-		g_entityTriggers[k]:setCollisionBehaviour(v.behaviour)
-		g_entityTriggers[k]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-		g_entityTriggers[k]:setCollisionRectangle()
-		
-		if v.id then 
-			g_entityTriggers[k]:setID(v.id)
-		else
-			g_entityTriggers[k]:setID("trigger")
-		end
-		g_entityTriggers[k]:setCategory("trigger")
-		g_entityTriggers[k]:addToCollisionGroup("world")
-		g_entityTriggers[k]:move(pos)
-
-
-		if v.ignoresBullets then g_entityTriggers[k]:setIgnoresBullets(true) end
-
-		k = k + 1
-	end
-
-	
-	jumperGrid = Grid(pathMap)
-	jumperFinder = PathFinder(jumperGrid, 'ASTAR', 0)
-	jumperFinder:setMode("ORTHOGONAL")
-
-
-	-- Initialise floors
-	local i = 1
-	for n, v in ipairs(g_currentLevel.floors) do
-		g_entityScenery[i] = gameObject()
-		local size = vector(v.size.x*blockSize, v.size.y*blockSize)
-		local pos = vector(v.start.x*blockSize, v.start.y*blockSize)
-		g_entityScenery[i]:setSize(size)
-		g_entityScenery[i]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-		g_entityScenery[i]:setCollisionRectangle()
-		g_entityScenery[i]:addToCollisionGroup("world")
-		theCollider:setGhost(g_entityScenery[i]:getCollisionShape())
-
-		g_entityScenery[i]:move(pos)
-		g_entityScenery[i]:setTexture("dormant", rTextures[getTextureByID(v.texture)].data, true)
-		i = i + 1
-	end
-	
-	-- Initialise enemies
-	local j = 1
-	for n, v in ipairs(g_currentLevel.enemies) do
-		g_entityEnemies[j] = character("enemy")
-		local pos = vector(v.pos.x*blockSize, v.pos.y*blockSize)
-		g_entityEnemies[j]:setSize(vector(g_currentLevel.levelAttribs.enemySize, g_currentLevel.levelAttribs.enemySize))
-		g_entityEnemies[j]:setCollisionRectangle(14, 14)
-		g_entityEnemies[j]:setPathBox()
-
-		if v.ignoresBullets then g_entityEnemies[j]:setIgnoresBullets(true) end
-
-		if v.behaviour then g_entityEnemies[j]:setBehaviour(v.behaviour); g_entityEnemies[j]:setBehaviourData(v.bData); g_entityEnemies[j]:setResetBehaviour(v.resetBehaviour) end
-
-		if v.id then 
-			g_entityEnemies[j]:setID(v.id)
-		else
-			g_entityEnemies[j]:setID("character")
-		end
-		if v.category then
-			g_entityEnemies[j]:setCategory(v.category)
-		end
-		g_entityEnemies[j]:move(pos)
-		g_entityEnemies[j]:setSpeed(v.speed)
-		for s, t in pairs(v.texture) do
-			g_entityEnemies[j]:setTexture(s, rTextures[getTextureByID(t)].data, false)
-
-		end
-		for s, t in pairs(g_currentLevel.anims[v.category]) do
-			local anim = newAnimation(g_entityEnemies[j]:getTexture(s), t[1], t[2], t[3], t[4])
-			g_entityEnemies[j]:setAnim(s, anim)
-			g_entityEnemies[j]:setAnimMode(s, t[5])
-		end
-		g_entityEnemies[j]:setState(v.state)
-		g_entityEnemies[j]:setPathTimer(1.1)
-		g_entityEnemies[j]:setDeathBehaviour(v.deathBehaviour)
-		
-		if v.sound then
-			for k, t in pairs(v.sound) do
-				g_entityEnemies[j]:setSound(k, lSounds[getSoundByID(t.id)].soundData, t.repeating, t.time)
-			end
-		end
-
-		g_entityEnemies[j]:setState(v.state)
-
-		j = j + 1
-	end
-
-	-- Initialise movers
-	local m = 1
-	for n, v in ipairs(g_currentLevel.movers) do
-		g_entityMovers[m] = mover()
-		g_entityMovers[m]:setState(v.status)
-		local size = vector(v.size.x*blockSize, v.size.y*blockSize)
-		local pos = vector(v.start.x*blockSize, v.start.y*blockSize)
-		g_entityMovers[m]:setSize(size)
-		g_entityMovers[m]:setCollisionBehaviour(v.behaviour)
-		g_entityMovers[m]:setQuad(love.graphics.newQuad(0, 0, v.size.x*blockSize, v.size.y*blockSize, 16, 16))
-		if nil == v.shape or "quad" == v.shape then
-			g_entityMovers[m]:setCollisionRectangle()
-		else
-			g_entityMovers[m]:setCollisionCircle()
-		end
-
-		if v.id then 
-			g_entityMovers[m]:setID(v.id)
-		else
-			g_entityMovers[m]:setID("wall")
-		end
-		local dir = vector(0,0)
-
-		g_entityMovers[m]:setCategory(v.category)
-		dir.x, dir.y = v.dir.x, v.dir.y
-		g_entityMovers[m]:setDir(dir)
-		g_entityMovers[m]:setSpeed(v.speed)
-		local x1, x2 = vector(0, 0), vector(0, 0)
-		x1.x, x1.y = v.moveExtents[1].x, v.moveExtents[1].y
-		x2.x, x2.y = v.moveExtents[2].x, v.moveExtents[2].y
-
-		g_entityMovers[m]:setFirstExtent(x1)
-		g_entityMovers[m]:setSecondExtent(x2)	
-
-		g_entityMovers[m]:move(pos)
-		g_entityMovers[m]:calcExtent(blockSize)
-		g_entityMovers[m]:addToCollisionGroup("world")
-		for s, t in pairs(v.texture) do
-			g_entityMovers[m]:setTexture(s, rTextures[getTextureByID(t)].data, true)
-		end
-
-		if v.sound then
-			for k, t in pairs(v.sound) do
-				g_entityMovers[m]:setSound(k, lSounds[getSoundByID(t.id)].soundData, t.repeating, t.time)
-			end
-		end
-
-		if v.ignoresBullets then g_entityMovers[m]:setIgnoresBullets(true) end
-
-		m = m + 1
-	end
-	end
+  end
 end
 
 -------------------------------------------------------------------------------
@@ -986,6 +659,7 @@ else
 	for i, v in ipairs(g_entityScenery) do
 		if(not g_showBoxes) then g_entityScenery[i]:drawQuad(g_showBoxes) end
 	end
+  
 	for i, v in ipairs(g_entityBlocks) do
 		if g_entityBlocks[i]:getState() ~= "dead" then
 			g_entityBlocks[i]:drawQuad(g_showBoxes)
@@ -1014,9 +688,6 @@ else
 		g_entityEnemies[i]:draw(g_showBoxes)
 	end
 
-	for i, v in ipairs(g_entityGuns) do
-		v:draw(g_showBoxes)
-	end
 	--
 	love.graphics.setShader()
 	if(g_showGrid) then
