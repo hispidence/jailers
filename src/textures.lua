@@ -11,7 +11,9 @@ TEXTURES_DIR = "textures/"
 
 function getTextureByID(id)
 	for i, v in ipairs(rTextures) do
-		if v.id == id then return i end
+		if v.id == id then
+      return i
+    end
 	end
 	return 0
 end
@@ -40,7 +42,8 @@ g_textureSets = {
   },
   
   bullet_standard = {
-    active = "bullet"
+    active = "bullet",
+    dormant = "bullet"
   }
   
 }
