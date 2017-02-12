@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Brad Ellis 2013-2017
 --
 --
 -- gameManager.lua
@@ -249,6 +249,15 @@ end
 -------------------------------------------------------------------------------
 function gameManager:getModifiedDT(dt)
 	return dt * self.slowFactorCurrent
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getSlowFactor
+-------------------------------------------------------------------------------
+function gameManager:getSlowFactor()
+	return self.slowFactorCurrent
 end
 
 
@@ -544,7 +553,6 @@ end
 function gameManager:pause()
 	if self.gameState == "paused" then self.gameState = "running"
 	elseif self.gameState == "running" then self.gameState = "paused" end
-  print("new state: " .. self.gameState)
 end
 
 
