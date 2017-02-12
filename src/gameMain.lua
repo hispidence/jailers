@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Brad Ellis 2013-2017
 --
 --
 -- gameMain.lua
@@ -31,8 +31,9 @@ local g_usingTiled = true
 local sti
 local tiledMap
 if g_usingTiled then
-sti = require("src/external/sti")
+  sti = require("src/external/sti")
 end
+
 
 
 
@@ -79,6 +80,29 @@ local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 -------------------------------------------------------------------------------
 local g_menuBGtex = nil 
 local g_fonts = {}
+
+
+
+-------------------------------------------------------------------------------
+-- createDebugTablePrint
+--
+-- Creates a function which prints out a table of strings over the game's
+-- actual graphics.
+-------------------------------------------------------------------------------
+function createDebugTablePrint(colour, startX, startY, wrap, alignment)
+  function debugTablePrint(textTable)
+    for i, v in ipairs(textTable) do
+      local text = v
+      local yOffset = ((i - 1) * 20);
+      love.graphics.printf({{0, 0, 0, 255}, text}, startX, startY + yOffset, wrap, alignment)
+      love.graphics.printf({colour, text}, startX + 1.2, startY + yOffset + 1.2, wrap, alignment)
+    end
+  end
+  
+  return debugTablePrint
+end
+
+local sTablePrint = createDebugTablePrint({0, 76, 0, 255}, 0, 0, 1000, "left")
 
 
 
@@ -592,7 +616,7 @@ function gameLoad(levelFileName, config)
 	g_gm:setState("splash")
  	fadeShader = love.graphics.newShader(fadeShaderSource)
  	invisShader = love.graphics.newShader(invisShaderSource)
-	love.graphics.setShader(fadeShader)
+	--love.graphics.setShader(fadeShader)
 	setupUI()
 	loadResources()
 	loadLevel()
@@ -608,11 +632,14 @@ end
 -------------------------------------------------------------------------------
 function gameDraw()
   
+  love.graphics.setShader(fadeShader)
   love.graphics.scale(g_config.scale, g_config.scale)
   
   -- Round the new position so it aligns with a pixel. I'm not convinced about
   -- this. I don't think it looks smooth.
-  love.graphics.translate(jRound(-g_gm:getCurrX()), jRound(-g_gm:getCurrY()))
+  local tX = jRound(-g_gm:getCurrX());
+  local tY = jRound(-g_gm:getCurrY());
+  love.graphics.translate(tX, tY)
 	if not g_showBoxes then
 		tiledMap:draw()
 	else
@@ -630,9 +657,23 @@ function gameDraw()
 			g_entityBlocks[i]:drawQuad(g_showBoxes, g_pixelLocked)
 		end
 	end
-
-if g_usingTiled then
   
+  -- If we're in debug mode, print statistics
+if DEBUG_ENABLED then
+  love.graphics.setShader()
+  love.graphics.translate(-tX, -tY)
+  love.graphics.scale(0.75, 0.75)
+  love.graphics.setFont(g_fonts[3])
+  local debugStrings = {}
+  table.insert(debugStrings, "FPS: " .. love.timer.getFPS())
+  table.insert(debugStrings, "Slowdown factor: " .. string.format("%.2f", g_gm:getSlowFactor()))
+  table.insert(debugStrings, "Player location: " .. string.format("%.2f, %.2f", g_thePlayer:getPos().x, g_thePlayer:getPos().y) )
+  table.insert(debugStrings, "Image scale: " ..  g_config.scale)
+  sTablePrint(debugStrings)
+end
+  
+if g_usingTiled then
+    
 else
 	if g_gm:getState() == "loading" or g_gm:getState() == "splash" or g_gm:getState() == "endsplash" then 
 		love.graphics.setShader()
@@ -726,6 +767,7 @@ else
 		end
 	end
 	love.graphics.setShader(fadeShader)
+
 end
 end
 
@@ -1147,7 +1189,7 @@ function gameUpdate(dt)
 	--		end
 	--	end
 	--end
-
+  
 	TEsound.cleanup()
 end
 
