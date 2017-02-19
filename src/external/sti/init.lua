@@ -983,6 +983,32 @@ function Map:getObjectProperties(layer, object)
 	return o.properties
 end
 
+
+
+--- JAILERS CHANGE
+--- Get Object
+-- @param layer The Layer that the Object belongs to
+-- @param object The index or name of the Object
+-- @return table List of properties
+function Map:getObject(layer, object)
+	local o = self.layers[layer].objects
+
+	if type(object) == "number" then
+		o = o[object]
+	else
+		for _, v in ipairs(o) do
+			if v.name == object then
+				o = v
+				break
+			end
+		end
+	end
+
+	return o
+end
+
+
+
 --- Swap a tile in a spritebatch
 -- @param instance The current Instance object we want to replace
 -- @param tile The Tile object we want to use
