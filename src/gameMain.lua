@@ -496,9 +496,7 @@ end
 -------------------------------------------------------------------------------
 function loadLevel()
   if g_usingTiled then
-		tiledMap = sti.new("src/tiledlevel.lua")
-
-		tiledMap:setDrawRange(0, 0, windowWidth, windowHeight)
+		tiledMap = sti("src/tiledlevel.lua")
 
 		world = love.physics.newWorld(0, 0)
 	
@@ -507,14 +505,16 @@ function loadLevel()
    -- those instead (where applicable).
 	--
 	-- Entities from the objects layer are put into one of the global tables
-	-- defined above.
-	tiledMap.layers["objects"].visible = false;
+	-- defined above
+  tiledMap.layers["objects"].visible = false
+  tiledMap.layers["cameras"].visible = false
+  tiledMap.layers["triggers"].visible = false
 
-  local sLayer = tiledMap.layers["statics"];
+  local sLayer = tiledMap.layers["statics"]
   pathMap = buildMap(sLayer.width, sLayer.height)
 
 	local pSize = vector(10, 10)
-	local playerObj = tiledMap.objects["player"]
+	local playerObj = tiledMap:getObject("objects", "player")
 	local pPos = vector(playerObj.x, playerObj.y - g_blockSize)
 	g_thePlayer = character("player")
 	g_thePlayer:setTexture(	"resting",
@@ -616,7 +616,6 @@ function gameLoad(levelFileName, config)
 	g_gm:setState("splash")
  	fadeShader = love.graphics.newShader(fadeShaderSource)
  	invisShader = love.graphics.newShader(invisShaderSource)
-	--love.graphics.setShader(fadeShader)
 	setupUI()
 	loadResources()
 	loadLevel()
