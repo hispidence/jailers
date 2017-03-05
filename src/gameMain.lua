@@ -496,7 +496,7 @@ end
 -------------------------------------------------------------------------------
 function loadLevel()
   if g_usingTiled then
-		tiledMap = sti("src/tiledlevel.lua")
+		tiledMap = sti("src/levels/tiledlevel.lua")
 
 		world = love.physics.newWorld(0, 0)
 	
@@ -506,9 +506,17 @@ function loadLevel()
 	--
 	-- Entities from the objects layer are put into one of the global tables
 	-- defined above
-  tiledMap.layers["objects"].visible = false
-  tiledMap.layers["cameras"].visible = false
-  tiledMap.layers["triggers"].visible = false
+  if tiledMap.layers["objects"] then
+    tiledMap.layers["objects"].visible = false
+  end
+
+  if tiledMap.layers["cameras"] then
+    tiledMap.layers["cameras"].visible = false
+  end
+
+  if tiledMap.layers["triggers"] then
+    tiledMap.layers["triggers"].visible = false
+  end
 
   local sLayer = tiledMap.layers["statics"]
   pathMap = buildMap(sLayer.width, sLayer.height)
@@ -581,23 +589,28 @@ function loadLevel()
 	end
 
 	-- Initialise triggers
-	for y, trig in ipairs(tiledMap.layers.triggers.objects) do
-    addEntityTrigger(trig)	
-	end
-
+  if tiledMap.layers["triggers"] then
+    for y, trig in ipairs(tiledMap.layers.triggers.objects) do
+      addEntityTrigger(trig)	
+    end
+  end
+  
 	-- Initialise cameras
-	for y, cam in ipairs(tiledMap.layers.cameras.objects) do
-    addCamera(cam)	
-	end
+    if tiledMap.layers["cameras"] then
+    for y, cam in ipairs(tiledMap.layers.cameras.objects) do
+      addCamera(cam)	
+    end
+  end
 
 	-- Initialise block-based objects
-	for i, data in ipairs(tiledMap.layers.objects.objects) do
-    --Skip if the entity is "special" (e.g. the player)
-    if "special" ~= data.type then
-      addEntityBlock(data)
+  if tiledMap.layers["objects"] then
+    for i, data in ipairs(tiledMap.layers.objects.objects) do
+      --Skip if the entity is "special" (e.g. the player)
+      if "special" ~= data.type then
+        addEntityBlock(data)
+      end
     end
-	end
-
+  end
   end
 end
 
@@ -607,7 +620,7 @@ end
 --  
 -------------------------------------------------------------------------------
 function gameLoad(levelFileName, config)
-  g_currentLevel = require("src/" .. levelFileName)
+  g_currentLevel = require("src/levels/" .. levelFileName)
   g_config = config
 	love.window.setMode(g_config.widthInBlocks * g_currentLevel.levelAttribs.blockSize, g_config.heightInBlocks * g_currentLevel.levelAttribs.blockSize)
 	windowWidth, windowHeight, _ = love.window.getMode()
