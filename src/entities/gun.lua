@@ -38,7 +38,7 @@ end
 function gun:init()
 	gameObject.init(self)
 	self.firingBehaviour = nil
-	self.bulletVel = vector(-1, 0)
+	self.bulletVel = vector(-25, 0)
 	self.bullets = {}
 	self.ages = {}
 	self.bulletCollisionBehaviour = nil
@@ -49,7 +49,7 @@ function gun:init()
 	self.bulletOffset = vector(1, 0)
 	self.timeLastBullet = 0
 	self.bulletTextureSet = {}
-  self:makeFiringBehaviour()
+  self.firingBehaviour = nil
 end
 
 
@@ -60,48 +60,31 @@ end
 -- Populate the gun's members with properties from its Tiled object.
 -------------------------------------------------------------------------------
 function gun:assignFromProperties(prop)
-  -- We've got many properties, some of which are needed by movers.
+  -- We've got many properties, some of which are needed by guns and bullets.
 
-  local dir = jlSplitKV(prop.direction)
-
-  local dirVec = vector(tonumber(dir.x), tonumber(dir.y))
+  local dirVec = vector(prop.directionX, prop.directionY)
 
   local stdVec = vector(0, -1)
 
   self.angle = stdVec:angleTo(dirVec)
-
-  self:makeFiringBehaviour()
+  
+  if(prop.behaviourScript) then
+    local scriptFile = "src/levels/scripts/" .. prop.behaviourScript
+    local firingBehaviourFactory = require(scriptFile)
+    
+    self.firingBehaviour = firingBehaviourFactory.makeFiringBehaviour(prop)
+    
+    unrequire(scriptFile)
+  end
   
   self:setState("active")
   
   self.bulletTextureSet = prop.textureset_bullet
 
+  self.bulletOffset.x = prop.bulletOffsetX
+  self.bulletOffset.y = prop.bulletOffsetY
+
   return true
-end
-
-
-
--------------------------------------------------------------------------------
--- makeFiringBehaviour
---
--- Create and assign a closure that gets assigned to each bullet it creates.
--------------------------------------------------------------------------------
-function gun:makeFiringBehaviour()
-  local timeBetween = 2 -- one every 2 seconds
-  local n
-  
-  local fb = function(dt)
-    if self:getState() == "active" and self.timeLastBullet > timeBetween then
-      
-      -- fire a new bullet
-      print("Firing bullet!", self.timeLastBullet, timeBetween)
-      self.timeLastBullet = self.timeLastBullet - timeBetween
-      
-    end
-    self.timeLastBullet = self.timeLastBullet + dt
-  end
-  
-  self.firingBehaviour = fb
 end
 
 
@@ -117,7 +100,7 @@ function gun:createBullet()
   b:setCollisionRectangle()
   b:setState("active")
   b:setInvisible(false)
-  b:setPos(self.position:clone())
+  b:setPos(self.position:clone() + self.bulletOffset)
   b:setVel(self.bulletVel)
   
   b:setID(self:getID() .. "_bullet")
@@ -171,13 +154,13 @@ end
 
 
 ---------------------------------------------------------------------------------------------------
---	gun:update(number dt)
+--	gun:update(dt)
 --	
 --
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
 	if "active" == self.state then
-
+    
 	end
 end
 
