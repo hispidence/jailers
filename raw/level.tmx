@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="17">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="64" columns="8">
+  <image source="../../textures/tileset.png" width="128" height="128"/>
+  <terraintypes>
+   <terrain name="barrel" tile="0"/>
+   <terrain name="door" tile="17"/>
+  </terraintypes>
+  <tile id="0" terrain="0,0,0,0"/>
+  <tile id="17" terrain="1,1,1,1"/>
+ </tileset>
+ <layer name="floor" width="50" height="50">
+  <properties>
+   <property name="collidable" value="false"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt1UEOgjAQBdDZiLvqQjdq1J1bj8BROApH4SgchaM4BCaZVEoLSmn0v2QiBojzM20l8jv0lRHdDVHZFl+XAa9GtXHU0Xpuxzm46i1RzlmauF36heZ4EhVcDc8i56r1Pf5OpvusFm/Y4UzDOcSjrz33KNdam4FndOeqs5Xn5JpJCO694AyFWXEWNlceqRt185MSpjsDqqjNjvDlsPeMSCGHr/eQHEN7P6b2f0HvA71+rvS+pnxC99S3SQ697rVLf/+knrfNORuWIOtlqMfQ91PJ8cnvp5BB/EOOKefZ2qb0mlLftrnzSM2v5BiDHAAAAAAAAAAAAAAAAPG9APr4E7M=
+  </data>
+ </layer>
+ <layer name="statics" width="50" height="50">
+  <properties>
+   <property name="collidable" value="true"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztl0uOgzAMhj3TCmZDyrJLdq3US3AUjsJROApHyVHGxlhjhcekEgQq+ZMsWiDo/+VHIAMAtxAZQAcfAuptvvA4FzlA+ymetA+AiQ+P13sK9NGHa/FchdEmE7sC6mhQb63P6Xws5SHj6xV69HtrjEH0hOfnaksHrck5Tz6d2mUoH1I7YV5CRl90b01BHjJ+RptC6xpU4wXqwJjNiyD5oToq8XjHeGDguqY4QU7cinZB9z75IP1PYB839HE7kY+c66qRuaX/q14Z+oH0/wD7cDwnOsd91B5VY+LDca3XQe3X4kU8jLO2eygfAH9ej6oxlY9O+kT2vZKP2hfNKLo++Ch5f2mO0B2i+0NmUc61Muwd2Aceb/B31kw+yE8f5kM4qlekdui39HCYA6l9ykW4n+gZJ3MguYkRXVuiWWv/xriouM48Q8+zNKqnxMzeJfS+KDncTtl76NmrNTlVcytrfQKJUejZK/2r+rj6Z63fWV402fR9iWZuG+vjlURlPPLuSzMJ5+cwQ1P4eI2xFeG7b7jHU6C3uti4r7f2oSFPc9+Ae3C2ujQMwzAMwzAMwzAMwzAMwzCMd/kFCalaBg==
+  </data>
+ </layer>
+ <objectgroup name="objects">
+  <properties>
+   <property name="collidable" value="false"/>
+  </properties>
+  <object id="1" name="door_startroom" type="door" gid="10" x="48" y="128" width="16" height="16">
+   <properties>
+    <property name="category" value="door"/>
+    <property name="textureset" value="door_standard"/>
+   </properties>
+  </object>
+  <object id="2" name="door_hall" type="door" gid="10" x="128" y="240" width="16" height="16">
+   <properties>
+    <property name="category" value="door"/>
+    <property name="state" value=""/>
+    <property name="textureset" value="door_standard"/>
+   </properties>
+  </object>
+  <object id="3" name="switch_startroom" type="switch" gid="11" x="80" y="144" width="16" height="16">
+   <properties>
+    <property name="behaviour_open_door" value="target=door_startroom  type=doorswitch_open timer=0"/>
+    <property name="behaviour_start_mover" value="target=mover_test type=activate_something timer=0"/>
+    <property name="category" value="switch"/>
+    <property name="collision_behaviours" value="behaviour_open_door behaviour_start_mover"/>
+    <property name="textureset" value="switch_standard"/>
+   </properties>
+  </object>
+  <object id="4" name="mover_test" type="mover" gid="22" x="32" y="64" width="16" height="16">
+   <properties>
+    <property name="extents" value="x=2 y=0"/>
+    <property name="initialdirection" value="x=1 y=0"/>
+    <property name="speed" value="2"/>
+    <property name="textureset" value="mover_standard"/>
+   </properties>
+  </object>
+  <object id="5" name="the_jailer" type="enemy" gid="23" x="240" y="224" width="16" height="16">
+   <properties>
+    <property name="textureset" value="switch_standard"/>
+   </properties>
+  </object>
+  <object id="6" name="door_final_room" type="door" gid="10" x="256" y="224" width="16" height="16">
+   <properties>
+    <property name="textureset" value="door_standard"/>
+   </properties>
+  </object>
+  <object id="7" name="danger_switch" type="switch" gid="11" x="240" y="304" width="16" height="16">
+   <properties>
+    <property name="behaviours" value="collisionbehaviour0, collisionbehaviour1, collisionbehaviour2"/>
+    <property name="collisionbehaviour0" value="danger_switch, danger_jailer, jailerswitch, 0"/>
+    <property name="collisionbehaviour1" value="danger_switch, danger_mover, moverswitch_on, 0"/>
+    <property name="collisionbehaviour2" value="danger_switch, danger_door, doorswitch_close, 0"/>
+    <property name="textureset" value="switch_standard"/>
+   </properties>
+  </object>
+  <object id="8" name="player" type="special" gid="9" x="70" y="98" width="16" height="16"/>
+  <object id="9" name="switch_hall" type="switch" gid="11" x="32" y="272" width="16" height="16">
+   <properties>
+    <property name="behaviour_open_door" value="type=doorswitch_open target=door_hall  timer=0"/>
+    <property name="category" value="switch"/>
+    <property name="collision_behaviours" value="behaviour_open_door"/>
+    <property name="textureset" value="switch_standard"/>
+   </properties>
+  </object>
+  <object id="10" name="gun_start" type="gun" gid="21" x="144" y="112" width="16" height="16">
+   <properties>
+    <property name="direction" value="x=-1 y=0"/>
+    <property name="textureset" value="gun_standard"/>
+    <property name="textureset_bullet" value="bullet_standard"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="cameras">
+  <object id="11" name="camera_hall" type="camera" x="32" y="176" width="16" height="16"/>
+  <object id="12" name="camera_start" type="camera" x="96" y="96" width="16" height="16"/>
+  <object id="15" name="camera_hall2" type="camera" x="184.333" y="259.333" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="triggers">
+  <object id="13" name="cameraTrigger_hall" type="trigger" x="20" y="160" width="8" height="8">
+   <properties>
+    <property name="behaviour_move_camera" value="timer=3 type=move_camera target=camera_hall"/>
+    <property name="collision_behaviours" value="behaviour_move_camera"/>
+   </properties>
+  </object>
+  <object id="14" name="cameraTrigger_start" type="trigger" x="20" y="128" width="8" height="8">
+   <properties>
+    <property name="behaviour_move_camera" value="type=move_camera target=camera_start timer=3"/>
+    <property name="collision_behaviours" value="behaviour_move_camera"/>
+   </properties>
+  </object>
+  <object id="16" name="cameraTrigger_hall2" type="trigger" x="67.6667" y="228" width="8" height="8">
+   <properties>
+    <property name="behaviour_move_camera" value="timer=3 type=move_camera target=camera_hall2"/>
+    <property name="collision_behaviours" value="behaviour_move_camera"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
