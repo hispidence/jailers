@@ -363,7 +363,6 @@ function gameObject:resetSounds()
 end
 
 function gameObject:drawQuad(debug, pixelLocked)
-	if self.invisible then return end
   vec = self:getPos()
   
   if(pixelLocked) then
