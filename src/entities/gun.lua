@@ -37,7 +37,8 @@ end
 -------------------------------------------------------------------------------
 function gun:init()
 	gameObject.init(self)
-	self.firingBehaviour = nil
+	self.firingBehaviourBullet = nil
+	self.firingBehaviourGun = nil
 	self.bulletVel = vector(-25, 0)
 	self.bullets = {}
 	self.ages = {}
@@ -98,8 +99,8 @@ function gun:createBullet()
   local b = bullet()
   b:setSize(vector(8, 8))
   b:setCollisionRectangle()
-  b:setState("active")
-  b:setInvisible(false)
+  b:setState("dormant")
+  b:setInvisible(true)
   b:setPos(self.position:clone() + self.bulletOffset)
   b:setVel(self.bulletVel)
   
@@ -160,7 +161,7 @@ end
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
 	if "active" == self.state then
-    
+    self.firingBehaviour:updateGun(dt)
 	end
 end
 
