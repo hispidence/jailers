@@ -45,12 +45,21 @@ end
 --
 ---------------------------------------------------------------------------------------------------
 function bullet:update(dt)
-	--if "active" == self.state then
+	if "dormant" == self.state then
+    local ready = self.firingBehaviour:updateBullet(dt)
+    
+    if(ready) then
+      self.pos, self.vel = self.firingBehaviour:calcInitials(dt, vector(0,0), vector(0,0))
+      self.state = "active"
+      self.invisible = false
+    end
+  end
+  if "active" == self.state then
     
     local vec = {}
     vec.x = self.vel.x * dt
     vec.y = self.vel.y * dt
     
     self:move(vec)
-	--end
+	end
 end
