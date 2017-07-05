@@ -843,6 +843,7 @@ end
 
 
 
+
 -------------------------------------------------------------------------------
 -- gameUpdate
 --
@@ -857,8 +858,8 @@ function gameUpdate(dt)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
 	local modifiedDT = g_gm:getModifiedDT(dt)
-
-	if g_usingTiled then
+  
+  if g_usingTiled then
 		tiledMap:update(modifiedDT)
 	end
 	-- Update the game manager, which, among other thigs, will calculate
@@ -921,42 +922,6 @@ function gameUpdate(dt)
 		g_gui.group.default.spacing = scale	
 		love.graphics.setFont(g_fonts[1])
 		if uiData.menuState == "paused" then
---			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_resume", text = "Back to Game (P)"} then uiData.menuState = "resume" end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_settings", text = "Settings (S)"} then uiData.menuState = "settings" end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_levels", text = "Level Select (L)"} then uiData.menuState = "levels" end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_about", text = "About Jailers (J)"} then uiData.menuState = "about" end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_quit", text = "Quit (Q)"} then uiData.menuState = "exit" end
-		elseif uiData.menuState == "settings" then
-			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
-			g_gui.Label{size = {"tight", "tight"}, text="Set Graphical Scale"}
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_1", text = "1 (key 1)"} then scale = 1; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_1p5", text = "1.5 (key 2)"} then scale = 1.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_2", text = "2 (key 3) - default"} then scale = 2; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale)  end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_2p5", text = "2.5 (key 4)"} then scale = 2.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-		elseif uiData.menuState == "exit" then
-			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
-			g_gui.Label{size = {"tight", "tight"}, text="Are you sure?"}
-			g_gui.group.push{grow = "right", pos = {0, (scale * 0.5 * uiData.btnMenuHeight/2)}}
-			if g_gui.Button{size = {"tight", "tight"}, text = "", size = {[1] = 1, [2] = 1}} then end	
-			if g_gui.Button{size = {"tight", "tight"}, text = "Yes (Y)", size = {[1] = scale * 0.5 * uiData.btnMenuWidth/2, [2] = scale * 0.5 * uiData.btnMenuHeight}} then love.event.push("quit") end	
-			if g_gui.Button{size = {"tight", "tight"}, text = "No (N)",  size = {[1] = scale * 0.5 * uiData.btnMenuWidth/2, [2] = scale * 0.5 * uiData.btnMenuHeight}} then uiData.menuState="paused" end	
-		elseif uiData.menuState == "levels" then
-			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2.5)},}
-			g_gui.Label{size = {"tight", "tight"}, text="Choose a level"}
-			if g_gui.Button{size = {"tight", "tight"}, text = "", size = {[1] = 1, [2] = 1}} then end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_settings", text = "Library I (1)"} then g_nextLevel = "level1"; g_gm:setState("finishinglevel") end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_levels", text = "Library II (2)"} then  g_nextLevel = "level2"; g_gm:setState("finishinglevel") end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_about", text = "Depths I (3)"} then g_nextLevel = "level3"; g_gm:setState("finishinglevel") end	
-			if g_gui.Button{size = {"tight", "tight"}, id = "btn_quit", text = "Depths II (4)"} then  g_nextLevel = "level4"; g_gm:setState("finishinglevel") end
-		elseif uiData.menuState == "about" then
-			love.graphics.setFont(fonts[3])
-			g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - ((scale * uiData.btnMenuWidth)/3)), (love.graphics.getHeight()/2 - (scale * 0.5 * uiData.btnMenuHeight)*2)},}
-
-			g_gui.Label{size = {"tight", "tight"}, text="Oh dear! You've only gone and trapped yourself\n" .. "in your own interdimensional prison.\n"
-							.. "Avoid your traps and your jailers. After all,\n" .. "you're just another prisoner to them. \n\n"
-							.. "Jailers was made by Brad Ellis.\n".. "It uses Lua and the awesome LÖVE engine.\n"
-							.. "For acknoledgements and more, see the readme.\n" }
 		elseif uiData.menuState == "resume" then g_gm:pause() end
 
     return
