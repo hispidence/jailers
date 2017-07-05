@@ -32,6 +32,22 @@ end
 -- Sets default values.
 -------------------------------------------------------------------------------
 function firingBehaviour:init()
+  self.playerPos = vector(0.0, 0.0)
+  self.gunPos = vector(0.0, 0.0)
+  self.updateBullet = nil
+  self.updateGun = nil
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setPositions
+--
+-- Set the positions of the player and the gun, since these may change.
+-------------------------------------------------------------------------------
+function firingBehaviour:setPositions()
+  self.playerPos = vector(0.0, 0.0)
+  self.gunPos = vector(0.0, 0.0)
 end
 
 
@@ -59,11 +75,33 @@ end
 
 
 -------------------------------------------------------------------------------
--- setFireFunc
+-- setUpdateBulletFunc
 --
--- Sets the firing function - i.e. what should get called when we call "fire"?
+-- Sets the function for updating bullets
 -------------------------------------------------------------------------------
-function firingBehaviour:setFireFunc(fireFunc)
-	self.fire = fireFunc
+function firingBehaviour:setUpdateBulletFunc(updateBulletFunc)
+	self.updateBullet = updateBulletFunc
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setUpdateGunFunc
+--
+-- Sets the function for updating the gun
+-------------------------------------------------------------------------------
+function firingBehaviour:setUpdateGunFunc(setUpdateGunFunc)
+	self.updateGun = setUpdateGunFunc
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setCalcInitialsFunc
+--
+-- Sets the function which determines the velocity and starting position of a
+-- bullet when it has been fired.
+-------------------------------------------------------------------------------
+function firingBehaviour:setCalcInitialsFunc(calcInitialsFunc)
+	self.calcInitials = calcInitialsFunc
+end
