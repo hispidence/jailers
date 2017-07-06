@@ -117,7 +117,6 @@ function gameManager:acquireGamepad()
 		
 		_, self.padMapping["b"] = self.pad:getGamepadMapping("b");
 		_, self.padMapping["back"] = self.pad:getGamepadMapping("back");
-    print(self.pad:getGamepadMapping("leftx"))
 		self.hasPad = true
 	else
 		self.pad = nil
