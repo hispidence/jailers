@@ -32,22 +32,21 @@ end
 -- Sets default values.
 -------------------------------------------------------------------------------
 function firingBehaviour:init()
-  self.playerPos = vector(0.0, 0.0)
   self.gunPos = vector(0.0, 0.0)
   self.updateBullet = nil
   self.updateGun = nil
+  self.bulletCollide = nil
 end
 
 
 
 -------------------------------------------------------------------------------
--- setPositions
+-- setGunPosition
 --
 -- Set the positions of the player and the gun, since these may change.
 -------------------------------------------------------------------------------
-function firingBehaviour:setPositions()
-  self.playerPos = vector(0.0, 0.0)
-  self.gunPos = vector(0.0, 0.0)
+function firingBehaviour:setGunPosition(gunPos)
+  self.gunPos = gunPos
 end
 
 
@@ -81,6 +80,17 @@ end
 -------------------------------------------------------------------------------
 function firingBehaviour:setUpdateBulletFunc(updateBulletFunc)
 	self.updateBullet = updateBulletFunc
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setBulletCollideFunc
+--
+-- Sets the function for what happens when a bullet hits a solid object
+-------------------------------------------------------------------------------
+function firingBehaviour:setBulletCollideFunc(bulletCollideFunc)
+	self.bulletCollide = bulletCollideFunc
 end
 
 
