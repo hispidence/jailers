@@ -48,6 +48,11 @@ end
 function bullet:reset()
 	self.state = "dormant"
   self.invisible = true
+  -- Bullets need to stop when they collide with a solid object.
+  -- However, the gun that fires them is a solid object itself, so these two
+  -- bools are used to determine whether the bullet is currently colliding
+  -- with its own gun (wasColliding), and whether it is ready to have its
+  -- collision resolution switched on (readyToCollide)
   self.wasColliding = true
   self.readyToCollide = false
 end
@@ -66,6 +71,7 @@ function bullet:processEvent(e)
       if(not self.readyToCollide) then
         self.wasColliding = true
       else
+        -- optionally kill the bullet (and do collision behaviour)
         local killBullet = self.firingBehaviour:bulletCollide(self.vel, self.pos)
         if killBullet then
           self:reset()
@@ -74,7 +80,6 @@ function bullet:processEvent(e)
     end
   end
 end
-
 
 
 
