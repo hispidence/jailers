@@ -1059,6 +1059,13 @@ function gameUpdate(dt)
   for a, b in pairs(theCollider:collisions(thePlayerShape)) do
     onCollide(dt, thePlayerShape, a)
   end
+  
+  for _, v in ipairs(g_entityBlocks) do
+    local theShape = v:getCollisionShape()
+		for a, b in pairs(theCollider:collisions(theShape)) do
+      onCollide(dt, theShape, a)
+    end
+  end
 	
 	--Move player and enemy on Y
 
