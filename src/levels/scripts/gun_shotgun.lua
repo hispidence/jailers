@@ -21,10 +21,11 @@ local firingBehaviourFactory = {}
 -------------------------------------------------------------------------------
 function firingBehaviourFactory:makeFiringBehaviour(data)
   -- Make a generic gun
-  local timeBetween = 2 -- one every 2 seconds
+  local timeBetween = 0.2 -- one every 2 seconds
   local timeLastBullet = 0 -- time since gun last fired
 
-  local updateGun = function(behaviour, dt)
+  local updateGun = function(behaviour, dt, gunPos)
+    self.gunPos = gunPos
     timeLastBullet = timeLastBullet + dt
   end
 
@@ -40,12 +41,21 @@ function firingBehaviourFactory:makeFiringBehaviour(data)
     return ready
   end
   
-  local defaultVelocity = vector(15.0, 15.0)
+  local collideBullet = function(behaviour, velVec, posVec)
+    local killBullet = false
+    if behaviour.state == "active" then
+      killBullet = true
+    end
+    
+    return killBullet
+  end
+  
+  local defaultVelocity = vector(50.0, 0.0)
   
   -- set initial position and velocity for the bullet
-  local calcInitialsFunc = function(behaviour, dt, gunPos, playerPos)
+  local calcInitialsFunc = function(behaviour, dt)
     local velocity = defaultVelocity:clone()
-    local position = gunPos:clone()
+    local position = self.gunPos:clone()
     
     return position, velocity
   end
@@ -55,6 +65,7 @@ function firingBehaviourFactory:makeFiringBehaviour(data)
   
   fbObject:setUpdateBulletFunc(updateBullet)
   fbObject:setUpdateGunFunc(updateGun)
+  fbObject:setBulletCollideFunc(collideBullet)
   fbObject:setCalcInitialsFunc(calcInitialsFunc)
   fbObject:setState("active")
   
