@@ -29,6 +29,56 @@ end
 
 
 -------------------------------------------------------------------------------
+-- init
+--
+-- Sets default values.
+-------------------------------------------------------------------------------
+function bullet:init()
+	gameObject.init(self)
+  self:reset()
+end
+
+
+
+-------------------------------------------------------------------------------
+-- reset
+--
+-- Sets default values.
+-------------------------------------------------------------------------------
+function bullet:reset()
+	self.state = "dormant"
+  self.invisible = true
+  self.wasColliding = true
+  self.readyToCollide = false
+end
+
+
+
+-------------------------------------------------------------------------------
+-- processEvent
+--
+-- Sets default values.
+-------------------------------------------------------------------------------
+function bullet:processEvent(e)
+	gameObject.processEvent(self, e)
+	if e:getID() == "collision" then
+		if e:getDesc() == "dormant_wall" then
+      if(not self.readyToCollide) then
+        self.wasColliding = true
+      else
+        local killBullet = self.firingBehaviour:bulletCollide(self.vel, self.pos)
+        if killBullet then
+          self:reset()
+        end
+      end
+    end
+  end
+end
+
+
+
+
+-------------------------------------------------------------------------------
 -- setFiringBehaviour
 --
 -- Sets firing behaviour.
@@ -49,13 +99,17 @@ function bullet:update(dt)
     local ready = self.firingBehaviour:updateBullet(dt)
     
     if(ready) then
-      self.pos, self.vel = self.firingBehaviour:calcInitials(dt, vector(0,0), vector(0,0))
+      self.position, self.vel = self.firingBehaviour:calcInitials(dt, vector(0,0), vector(0,0))
       self.state = "active"
       self.invisible = false
     end
   end
   if "active" == self.state then
-    
+    if(not self.wasColliding) then
+      self.readyToCollide = true
+    else
+      self.wasColliding = false
+    end
     local vec = {}
     vec.x = self.vel.x * dt
     vec.y = self.vel.y * dt
