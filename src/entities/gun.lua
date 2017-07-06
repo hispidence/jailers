@@ -41,7 +41,6 @@ function gun:init()
 	self.firingBehaviourGun = nil
 	self.bulletVel = vector(-25, 0)
 	self.bullets = {}
-	self.ages = {}
 	self.bulletCollisionBehaviour = nil
 	self.bulletLife = 0
 	self.bulletTime = 1
@@ -104,8 +103,10 @@ function gun:createBullet()
   b:setPos(self.position:clone() + self.bulletOffset)
   b:setVel(self.bulletVel)
   
-  b:setID(self:getID() .. "_bullet")
+  b:setID(self:getID() .. "_bullet" .. self.bulletsMade)
   b:setCategory("bullet")
+  
+  self.bulletsMade = self.bulletsMade + 1
   
   b:assignTextureSet(self.bulletTextureSet)
   
@@ -161,7 +162,7 @@ end
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
 	if "active" == self.state then
-    self.firingBehaviour:updateGun(dt)
+    self.firingBehaviour:updateGun(dt, self.position)
 	end
 end
 
