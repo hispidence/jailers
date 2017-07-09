@@ -41,7 +41,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- setGunPosition
+-- setGunPositionfunc
 --
 -- Set the positions of the player and the gun, since these may change.
 -------------------------------------------------------------------------------
