@@ -36,6 +36,19 @@ end
 function bullet:init()
 	gameObject.init(self)
   self:reset()
+  self.gunID = nil
+  self.firingBehaviour = nil
+end
+
+
+
+-------------------------------------------------------------------------------
+-- self.gunID
+--
+-- ID of the gun that fired it
+-------------------------------------------------------------------------------
+function bullet:setGunID(id)
+	self.gunID = id
 end
 
 
@@ -48,6 +61,12 @@ end
 function bullet:reset()
 	self.state = "dormant"
   self.invisible = true
+  self.canCollide = false
+  
+  if self.collisionShape then
+    theCollider:remove(self.collisionShape)
+  end
+  
   -- Bullets need to stop when they collide with a solid object.
   -- However, the gun that fires them is a solid object itself, so these two
   -- bools are used to determine whether the bullet is currently colliding
@@ -67,15 +86,13 @@ end
 function bullet:processEvent(e)
 	gameObject.processEvent(self, e)
 	if e:getID() == "collision" then
-		if e:getDesc() == "dormant_wall" then
-      if(not self.readyToCollide) then
-        self.wasColliding = true
-      else
-        -- optionally kill the bullet (and do collision behaviour)
-        local killBullet = self.firingBehaviour:bulletCollide(self.vel, self.pos)
-        if killBullet then
-          self:reset()
-        end
+    if e:getSender() == self.gunID and not self.readyToCollide then
+      self.wasColliding = true
+    elseif e:getDesc() ~= "active_bullet" then
+      -- optionally kill the bullet (and do collision behaviour)
+      local killBullet = self.firingBehaviour:bulletCollide(self.vel, self.pos)
+      if killBullet then
+        self:reset()
       end
     end
   end
@@ -104,8 +121,10 @@ function bullet:update(dt)
     local ready = self.firingBehaviour:updateBullet(dt)
     
     if(ready) then
-      self.position, self.vel = self.firingBehaviour:calcInitials(dt, vector(0,0), vector(0,0))
+      self.position, self.vel = self.firingBehaviour:calcInitials(dt)
       self.state = "active"
+      self:setCollisionCircle()
+      self.canCollide = true
       self.invisible = false
     end
   end
