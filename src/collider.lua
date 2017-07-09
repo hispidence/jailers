@@ -8,6 +8,7 @@
 -------------------------------------------------------------------------------
 
 HC = require("src/external/HC")
+gm = require("src/gameManager")
 
 theCollider = HC.new(128)
 
@@ -111,7 +112,6 @@ end
 -- Function passed to HC
 -------------------------------------------------------------------------------
 function onCollide(dt, objA, objB)
-  print("Collision 'twixt "..objA.object:getID().." and "..objB.object:getID())
 	if (objA.object:getCategory() == "trigger" and objA.object:getState() == "dormant")
 		or (objB.object:getCategory() == "trigger" and objB.object:getState() == "dormant") then return end
 
