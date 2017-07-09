@@ -11,6 +11,7 @@
 
 
 require("src/jlEvent")
+vector = require("src/external/hump.vector")
 
 local ston = nil
 
