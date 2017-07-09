@@ -27,11 +27,11 @@ function love.load(args)
   
   -- Launch level based on commandline args; eg, to load level0
   -- you would launch the game with love . level0
-  local levelName = "level1"
+  local levelName
   if (#args > 2 and isDebugging) or (#args == 2 and not isDebugging) then
     levelName = args[2]
   else
-    levelName = "level1"
+    levelName = "guntest"
   end
   
 	gameLoad(levelName, config)
