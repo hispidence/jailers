@@ -71,6 +71,7 @@ function gameObject:init()
 	self.bData = nil
 	self.state = "dormant"
 	self.class = "object"
+  self.canCollide = false
 	self.shapeOffsetX = 0
 	self.shapeOffsetY = 0
 	self.quad = nil
@@ -79,6 +80,7 @@ function gameObject:init()
 	self.sounds = {}
 	self.collisionBehaviour = {}
 	self.collisionShape = nil
+  self.collisionShapeType = nil
 	self.category = nil
 	self.textures = {}
 	self.anims = {}
@@ -142,6 +144,17 @@ end
 
 
 
+-------------------------------------------------------------------------------
+-- getCanCollide
+--
+-- Return whether or not the object can collide with anything
+-------------------------------------------------------------------------------
+function gameObject:getCanCollide()
+	return self.canCollide
+end
+
+
+
 	function gameObject:getCentre(buf)
 	  buf.x, buf.y = self.collisionShape:center()
 	end
@@ -182,16 +195,21 @@ end
 -------------------------------------------------------------------------------
 function gameObject:setPos(pos)
   self.position = pos
-  if "dead" ~= self.state then
-    self.collisionShape:moveTo( self.position.x + (self.size.x/2) + self.shapeOffsetX,
-                                self.position.y + (self.size.y/2) + self.shapeOffsetY)
+  if "dead" ~= self.state and self.canCollide then
+    if "rectangle" == self.collisionShapeType then
+      self.collisionShape:moveTo( self.position.x + (self.size.x/2) + self.shapeOffsetX,
+                                  self.position.y + (self.size.y/2) + self.shapeOffsetY)
+    else
+      self.collisionShape:moveTo( self.position.x + (self.size.x/2.8) + self.shapeOffsetX,
+                                  self.position.y + (self.size.y/2.8) + self.shapeOffsetY)
+    end
   end
 end
 
 
 
 -------------------------------------------------------------------------------
--- setDir
+-- setVel
 --
 -- Set the object's velocity vector (has nothing to do with its direction)
 -------------------------------------------------------------------------------
@@ -202,17 +220,23 @@ end
 
 
 -------------------------------------------------------------------------------
+-- setCanCollide
+--
+-- Tell the object whether or not it should take part in collision resolution
+-------------------------------------------------------------------------------
+function gameObject:setCanCollide(c)
+	self.canCollide = c
+end
+
+
+
+-------------------------------------------------------------------------------
 -- move
 --
 -- Move the object along the provided vector.
 -------------------------------------------------------------------------------
 function gameObject:move(vec)
-  self.position.x = self.position.x + vec.x
-  self.position.y = self.position.y + vec.y
-  if not self.invisible then
-    self.collisionShape:moveTo(	self.position.x + (self.size.x/2) + self.shapeOffsetX,
-      self.position.y + (self.size.y/2) + self.shapeOffsetY)
-  end
+  self:setPos(self.position + vec)
 end
 
 
@@ -362,47 +386,40 @@ function gameObject:resetSounds()
 	end
 end
 
-function gameObject:drawQuad(debug, pixelLocked)
-  vec = self:getPos()
+
+
+-------------------------------------------------------------------------------
+-- draw
+--
+-- Draws the object 
+-------------------------------------------------------------------------------
+function gameObject:draw(pixelLocked)
+	if self.invisible then return end
+	local drawPos = self:getPos():clone()
   
   if(pixelLocked) then
-    vec = vec:clone()
-    vec.x = jRound(vec.x)
-    vec.y = jRound(vec.y)
+    drawPos.x = jRound(drawPos.x)
+    drawPos.y = jRound(drawPos.y)
   end
   
-	if(debug) then
-		self.collisionShape:draw("line")
-	else
-		love.graphics.draw(self:getTexture(self.state),
-      self.quad,
-      vec.x + g_halfBlockSize, vec.y + g_halfBlockSize,
-      self.angle,
-      1, 1,
-      g_halfBlockSize, g_halfBlockSize)
-	end
+  if self.anims[self.state] then 
+    self.anims[self.state]:draw(drawPos.x, drawPos.y, 0, 1, 1)
+  else
+    love.graphics.draw(self:getTexture(self.state), drawPos.x + g_halfBlockSize, drawPos.y + g_halfBlockSize, self.angle, 1, 1, g_halfBlockSize, g_halfBlockSize)
+  end
 end
 
-function gameObject:draw(debug, pixelLocked)
-	if self.invisible then return end
-	vec = self:getPos()
-  
-  if(pixelLocked) then
-    vec = vec:clone()
-    vec.x = jRound(vec.x)
-    vec.y = jRound(vec.y)
-  end
-  
-	if(debug) then
-		if self.id == "player" then self.collisionShape:draw("fill") else self.collisionShape:draw("line") end
-	else
-		if self.anims[self.state] then 
-			self.anims[self.state]:draw(vec.x, vec.y, 0, 1, 1)
-		else
-      love.graphics.draw(self:getTexture(self.state), vec.x * scale, vec.y * scale, 1, 1, 0, 0, 0)
-		end
-	end
+
+
+-------------------------------------------------------------------------------
+-- drawDebug
+--
+-- Draws the object's debug shape 
+-------------------------------------------------------------------------------
+function gameObject:drawDebug()
+  if self.canCollide then self.collisionShape:draw("line") end
 end
+
 
 function gameObject:freeResources(collider)
 	collider:remove(self.collisionShape)
@@ -471,7 +488,7 @@ end
 -------------------------------------------------------------------------------
 -- getTexture
 --
--- Give the object its textures and describe how to draw them
+-- 
 -------------------------------------------------------------------------------
 function gameObject:getTexture(key)
 	return self.textures[key].texture
@@ -529,23 +546,43 @@ function gameObject:processEvent(e)
   
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setCollisionRectangle
+--
+-- Create collision shape
+-------------------------------------------------------------------------------
 function gameObject:setCollisionRectangle()
 	self.collisionShape = theCollider:rectangle(0,0, self.size.x, self.size.y)
+  self.collisionShapeType = "rectangle"
 	self.collisionShape.object = self
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setCollisionCircle
+--
+-- Create collision shape
+-------------------------------------------------------------------------------
 function gameObject:setCollisionCircle()
-	self.collisionShape = theCollider:circle(0,0, self.size.x/2)
+	self.collisionShape = theCollider:circle(0, 0, self.size.x/2.8)
+  self.collisionShapeType = "circle"
 	self.collisionShape.object = self
 end
 
-function gameObject:addToCollisionGroup(group) 
-	--theCollider:addToGroup(group, self.collisionShape)
-end
 
+
+-------------------------------------------------------------------------------
+-- getCollisionShape
+--
+-- Get collision shape
+-------------------------------------------------------------------------------
 function gameObject:getCollisionShape()
 	return self.collisionShape
 end
+
 
 function gameObject:intersectsRay(sx, sy, dx, dy)
 	return self.collisionShape:intersectsRay(sx, sy, dx, dy)
