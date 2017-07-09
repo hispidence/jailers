@@ -52,7 +52,7 @@ local jumperFinder
 -------------------------------------------------------------------------------
 local DEBUG_ENABLED = true
 local g_showGrid = false
-local g_showBoxes = false
+local g_debugDraw = false
 
 
 
@@ -62,15 +62,15 @@ local g_showBoxes = false
 local g_gui = require("src/external/Quickie")
 local g_gm = require("src/gameManager")
 if g_usingTiled then
-	local g_currentLevel = "tiledLevel"
+	local g_levelFileName = "guntest"
 else
-	local g_currentLevel = nil
+	local g_levelFileName = nil
 end
 local g_nextLevel = "level2"
 local g_menuRefreshed = false
 local g_blockSize = 16
 local g_config = nil
-local g_pixelLocked = true
+local g_pixelLocked = false
 local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
@@ -102,7 +102,7 @@ function createDebugTablePrint(colour, startX, startY, wrap, alignment)
   return debugTablePrint
 end
 
-local sTablePrint = createDebugTablePrint({0, 76, 0, 255}, 0, 0, 1000, "left")
+local sTablePrint = createDebugTablePrint({0, 85, 0, 255}, 0, 0, 1000, "left")
 
 
 
@@ -383,14 +383,13 @@ function addEntityWall(block, x, y)
 	local size = vector(g_blockSize, g_blockSize)
 	theBlock:setSize(size)
 	
+  theBlock:setCanCollide(true)
 	theBlock:setCollisionRectangle()
 	
 	theBlock:setID("wall")
 	
 	theBlock:setCategory("wall")
 	
-	theBlock:addToCollisionGroup("world")
-
 	local pos = vector(x * g_blockSize, y * g_blockSize)
 	pos.x = pos.x - size.x
 	pos.y = pos.y - size.y
@@ -437,8 +436,6 @@ function addEntityBlock(block)
   theBlock:setID(block.name)
   theBlock:setCategory(block.type)
 
-	
-
 	local size = vector(g_blockSize, g_blockSize)
 	theBlock:setSize(size)
 	theBlock:setQuad(love.graphics.newQuad(0,
@@ -447,9 +444,10 @@ function addEntityBlock(block)
 													size.y, 
 													size.x,
 													size.y))
+
+  theBlock:setCanCollide(true)
 	theBlock:setCollisionRectangle()
-	
-	
+		
 	if prop then
     -- Does the entity specify a textureset?
     theBlock:assignTextureSet(prop.textureset)
@@ -466,14 +464,10 @@ function addEntityBlock(block)
     theBlock:assignFromProperties(prop)
   end
 
-	theBlock:addToCollisionGroup("world")
-
 	local pos = vector(block.x, block.y)
 
 	pos.y = pos.y - size.y;
 	theBlock:move(pos)
-  
- 
   
   g_entityBlocks[blockID] = theBlock
   
@@ -494,15 +488,14 @@ end
 --
 --  
 -------------------------------------------------------------------------------
-function loadLevel()
-  if g_usingTiled then
-		tiledMap = sti("src/levels/tiledlevel.lua")
+function loadLevel(levelFileName)
+  tiledMap = sti("src/levels/" .. levelFileName .. ".lua")
 
-		world = love.physics.newWorld(0, 0)
+  world = love.physics.newWorld(0, 0)
 	
 	-- No entities from the "objects" layer get drawn through the STI Tiled
 	-- library. Instead, we create entities based on them, and where draw
-   -- those instead (where applicable).
+  -- those instead (where applicable).
 	--
 	-- Entities from the objects layer are put into one of the global tables
 	-- defined above
@@ -544,8 +537,9 @@ function loadLevel()
 	g_thePlayer:setCategory("player")
 	g_thePlayer:setState("resting")
 	g_thePlayer:setPathBox()
-	g_thePlayer:setSpeed(g_currentLevel.levelAttribs.playerSpeed)	
+	g_thePlayer:setSpeed(150)	
 	g_thePlayer:setPos(pPos)
+  g_thePlayer:setCanCollide(true)
 
 
 	local anim = newAnimation(g_thePlayer:getTexture("dead"), 14, 14, 0.08, 6)
@@ -560,25 +554,6 @@ function loadLevel()
 
 	anim = newAnimation(g_thePlayer:getTexture("moving_vertical"), 14, 14, 0.05, 12)
 	g_thePlayer:setAnim("moving_vertical", anim)
-
-
-	local sound = g_currentLevel.levelAttribs.playerSounds["dead"]
-	g_thePlayer:setSound(	"dead", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
-
-	sound = g_currentLevel.levelAttribs.playerSounds["moving_horizontal"]
-	g_thePlayer:setSound(	"moving_horizontal", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
-
-	sound = g_currentLevel.levelAttribs.playerSounds["moving_vertical"]
-	g_thePlayer:setSound(	"moving_vertical", 
-				lSounds[getSoundByID(sound.id)].soundData,
-				sound.repeating, 
-				sound.time)
 
 
   -- Initialise walls
@@ -611,7 +586,6 @@ function loadLevel()
       end
     end
   end
-  end
 end
 
 -------------------------------------------------------------------------------
@@ -620,18 +594,18 @@ end
 --  
 -------------------------------------------------------------------------------
 function gameLoad(levelFileName, config)
-  g_currentLevel = require("src/levels/" .. levelFileName)
   g_config = config
-	love.window.setMode(g_config.widthInBlocks * g_currentLevel.levelAttribs.blockSize, g_config.heightInBlocks * g_currentLevel.levelAttribs.blockSize)
+	love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
 	windowWidth, windowHeight, _ = love.window.getMode()
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
 	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
-	g_gm:setState("splash")
  	fadeShader = love.graphics.newShader(fadeShaderSource)
  	invisShader = love.graphics.newShader(invisShaderSource)
+  debugWorldShader = love.graphics.newShader(debugShaderWorldSource)
+  debugDebugShader = love.graphics.newShader(debugShaderDebugSource)
 	setupUI()
 	loadResources()
-	loadLevel()
+	loadLevel(levelFileName)
 	g_gm:saveState()
 end
 
@@ -652,135 +626,49 @@ function gameDraw()
   local tX = jRound(-g_gm:getCurrX());
   local tY = jRound(-g_gm:getCurrY());
   love.graphics.translate(tX, tY)
-	if not g_showBoxes then
-		tiledMap:draw()
-	else
-		for i, v in ipairs(g_entityWalls) do
-			g_entityWalls[i]:drawQuad(g_showBoxes, g_pixelLocked)
-		end
-	end	
 
-	g_thePlayer:draw(g_showBoxes, g_pixelLocked)
-
+  if(g_debugDraw) then
+    love.graphics.setShader(debugWorldShader)
+  end
+  tiledMap:draw()
+  g_thePlayer:draw(g_pixelLocked)
+  
   local theState
 	for i, v in ipairs(g_entityBlocks) do
     theState = g_entityBlocks[i]:getState()
 		if theState ~= "dead" and not g_entityBlocks[i]:getInvisible() then
-			g_entityBlocks[i]:drawQuad(g_showBoxes, g_pixelLocked)
+			g_entityBlocks[i]:draw(g_pixelLocked)
 		end
 	end
   
+  if(g_debugDraw) then
+    love.graphics.setShader(debugDebugShader)
+  end
+  
+  if g_debugDraw then
+		for i, v in ipairs(g_entityWalls) do
+			g_entityWalls[i]:drawDebug()
+		end
+    g_thePlayer:drawDebug()
+    for i, v in ipairs(g_entityBlocks) do
+      g_entityBlocks[i]:drawDebug()
+    end
+	end	
+
   -- If we're in debug mode, print statistics
-if DEBUG_ENABLED then
-  love.graphics.setShader()
-  love.graphics.translate(-tX, -tY)
-  love.graphics.scale(0.75, 0.75)
-  love.graphics.setFont(g_fonts[3])
-  local debugStrings = {}
-  table.insert(debugStrings, "FPS: " .. love.timer.getFPS())
-  table.insert(debugStrings, "Slowdown factor: " .. string.format("%.2f", g_gm:getSlowFactor()))
-  table.insert(debugStrings, "Player location: " .. string.format("%.2f, %.2f", g_thePlayer:getPos().x, g_thePlayer:getPos().y) )
-  table.insert(debugStrings, "Image scale: " ..  g_config.scale)
-  sTablePrint(debugStrings)
-end
+  if DEBUG_ENABLED then
+    love.graphics.setShader()
+    love.graphics.translate(-tX, -tY)
+    love.graphics.scale(0.75, 0.75)
+    love.graphics.setFont(g_fonts[3])
+    local debugStrings = {}
+    table.insert(debugStrings, "FPS: " .. love.timer.getFPS())
+    table.insert(debugStrings, "Slowdown factor: " .. string.format("%.2f", g_gm:getSlowFactor()))
+    table.insert(debugStrings, "Player location: " .. string.format("%.2f, %.2f", g_thePlayer:getPos().x, g_thePlayer:getPos().y) )
+    table.insert(debugStrings, "Image scale: " ..  g_config.scale)
+    sTablePrint(debugStrings)
+  end
   
-if g_usingTiled then
-    
-else
-	if g_gm:getState() == "loading" or g_gm:getState() == "splash" or g_gm:getState() == "endsplash" then 
-		love.graphics.setShader()
-		if g_gm:getState() == "splash" then
-			love.graphics.draw(gameLogo, love.graphics.getWidth()/2-(gameLogo:getWidth() * scale/2), love.graphics.getHeight()/4 - (gameLogo:getHeight()*scale/2), 0, scale, scale, 0, 0)
-		end
-		g_gui.core.draw()	
-		return
-	end
-	love.graphics.setShader(fadeShader)
-	fadeShader:send("fadeFactor", 1-(g_gm:getFadeInTimer()/g_gm:getFadeInMax()))
-	love.graphics.translate(g_gm:getCurrX() * scale, g_gm:getCurrY() * scale)
-	if g_gm:getState() == "dead" then
-	   fadeShader:send("fadeTo", {0.0, 0.0, 0.0})
-	   fadeShader:send("fadeFactor", 1-g_gm:getDeathTimer())
-	elseif g_gm:getState() == "finishinglevel" or g_gm:getState() == "finishinggame" then
-		g_gui.core.draw()	
-	   fadeShader:send("fadeTo", {0.0, 0.0, 0.0})
-	   fadeShader:send("fadeFactor", 1-g_gm:getFadeTimer())
-	end
-	--local alpha = 0 + ((g_gm:getDeathTimer()/1) * 255)
-	--love.graphics.setDefaultFilter("nearest", "nearest")
-	--love.graphics.setColor(255, 255, 255, alpha)
-	for i, v in ipairs(g_entityScenery) do
-		if(not g_showBoxes) then g_entityScenery[i]:drawQuad(g_showBoxes) end
-	end
-  
-	for i, v in ipairs(g_entityBlocks) do
-		if g_entityBlocks[i]:getState() ~= "dead" then
-			g_entityBlocks[i]:drawQuad(g_showBoxes)
-		end
-	end
-	
-	g_thePlayer:draw(g_showBoxes)
-	
-	for i, v in ipairs(g_entityTriggers) do
-		if v:getState() ~= "dead" and g_showBoxes then
-			v:getCollisionShape():draw("line")
-		end
-	end
-
-	for i, v in ipairs(g_entityMovers) do
-		if v:getState() ~= "dead" then
-			v:drawQuad(g_showBoxes)
-		end
-	end
-	
-	for i, v in ipairs(g_entityGuns) do
-		v:draw(g_showBoxes)
-	end
-	
-	for i, v in ipairs(g_entityEnemies) do
-		g_entityEnemies[i]:draw(g_showBoxes)
-	end
-
-	--
-	love.graphics.setShader()
-	if(g_showGrid) then
-		love.graphics.setColor(128, 128, 128)
-		love.graphics.setFont(g_fonts[3])
-		local xPos, yPos
-		for i = 0, 60 do
-			xPos = i * g_currentLevel.levelAttribs.blockSize * scale
-			love.graphics.print(i, xPos, 0)
-			love.graphics.line(xPos, 0, xPos, 1000)
-		end
-		for i = 0, 60 do
-			yPos = i * g_currentLevel.levelAttribs.blockSize * scale
-			love.graphics.print(i, 0, yPos)
-			love.graphics.line(0, yPos, 1000, yPos)
-		end
-	end
-	
-	if "paused" == g_gm:getState()  then
- 		love.graphics.translate(-g_gm:getCurrX() * scale, -g_gm:getCurrY() * scale)
- 		love.graphics.translate(0, 0)
-		love.graphics.draw(g_menuBGtex, love.graphics.getWidth()/2-(g_menuBGtex:getWidth() * scale/2), love.graphics.getHeight()/2 - (g_menuBGtex:getHeight()*scale/2), 0, scale, scale, 0, 0)
-
-		if not g_menuRefreshed then love.graphics.setShader(invisShader); g_menuRefreshed = true end
-		g_gui.core.draw()		
-	end
-
-	--If we're in debug mode, draw the current path
-	if currentPath and g_showBoxes then
-		bullet = love.graphics.newImage(TEXTURES_DIR .. "bullet_alt.png")
-		for a, b in pairs(currentPath) do
-			love.graphics.draw(bullet,
-			b.col * g_currentLevel.levelAttribs.blockSize,
-			b.row * g_currentLevel.levelAttribs.blockSize,
-			0, 2, 2, 0, 0, 0, 0)
-		end
-	end
-	love.graphics.setShader(fadeShader)
-
-end
 end
 
 
@@ -850,7 +738,7 @@ end
 --  
 -------------------------------------------------------------------------------
 function gameUpdate(dt)
-	if (not love.window.hasFocus())and g_gm:getState() ~= "paused" and g_gm:getState() ~= "splash" and g_gm:getState() ~= "endsplash" then return end
+	if (not love.window.hasFocus()) or g_gm:getState() == "paused" then return end
   -- Cap the delta time at 0.07. This should prevent players from accidentally
   -- or deliberately running through walls if the game is running extremely
   -- slowly.
@@ -859,73 +747,11 @@ function gameUpdate(dt)
 	-- isn't slowed down
 	local modifiedDT = g_gm:getModifiedDT(dt)
   
-  if g_usingTiled then
-		tiledMap:update(modifiedDT)
-	end
+  tiledMap:update(modifiedDT)
+
 	-- Update the game manager, which, among other thigs, will calculate
 	-- a new slowdown factor if it needs
 	g_gm:update(dt)
-  
-  if "finishinglevel" == g_gm:getState() then return end
-  if "finishinggame" == g_gm:getState() then return end
-  if "loading" == g_gm:getState()  then 
-		love.graphics.setFont(g_fonts[1])
-			g_gui.group.push{grow = "down", pos = {love.graphics.getWidth()/2 - uiData.btnMenuWidth/2, love.graphics.getHeight()/2 - uiData.btnMenuHeight*0.75}}
-			g_gui.Label{size = {"tight", "tight"}, text = "Loading..."}
-      unloadLevel()
-      g_currentLevel = nil
-      g_gm:unload()
-      g_currentLevel = require("src/" .. g_nextLevel)
-      loadLevel()
-      g_gm:saveState()
-      g_gm:setState("running")
-		return
-	end
-
-
-	if g_gm:getState() == "splash" then
-		love.graphics.setFont(g_fonts[1])
-		--g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/2 - uiData.btnMenuWidth), (love.graphics.getHeight()/2 - uiData.btnMenuHeight*0.5)}, spacing = scale/2}
-		if g_gui.Button{size = {"tight", "tight"}, id = "btn_start", text = "Press space or push any button to begin"} then g_gm:setState("running") end		
-		
-		love.graphics.setFont(g_fonts[3])
-    		g_gui.Label{size = {"tight", "tight"}, pos= {1, 200}, text="Copyright (C) Brad Ellis"}
-
-		return
-	elseif g_gm:getState() == "endsplash" then
-		love.graphics.setFont(g_fonts[1])
-		--g_gui.group.push{grow = "down", pos = {(love.graphics.getWidth()/3 - ((scale * uiData.btnMenuWidth)/4)), (love.graphics.getHeight()/3 - (scale * 0.5 * uiData.btnMenuHeight)*3)},}
-		g_gui.Label{size = {"tight", "tight"}, text="THE END"}
-		love.graphics.setFont(g_fonts[3])
-		g_gui.Label{size = {"tight", "tight"}, text="You've escaped!\n\n" ..
-							"Or perhaps you haven't. Perhaps the polished-wood door at the end of the tunnel only\n"
-						.. "looks familiar because you remember the chamber beyond. You've been there before.\n"
-						.. "There'll be nothing there. No exits, no weak bricks, no loose floorboards. And you'll\n"
-						.. "turn around to go back the way you came, but that polished-wood door won't be there\n"
-						.. "any longer. And you'll be left there, left with nothing but the sense of satisfaction\n"
-						.. "at having avoided the jailers - and let's not forget all those bullets you dodged.\n\n"
-						.. "Hold tightly onto this feeling, because before long the whole thing will start to feel\n"
-						.. "like a distant dream. \n\n"
-						.. "Perhaps this whole experience has been a metaphor; but if it is, you can't think of\n"
-						.. "what it might represent.\n\n"
-						.. "...\n\n"
-						.. "(I'm just being dramatic. You've escaped. Give yourself a pat on the back and make\n"
-						.. "yourself a cup of tea.)\n\n\n"
-						.. "blah blah Jailers blah blah Brad Ellis\n".. "blah blah Lua blah blah LÖVE blah etc.\n"
-						.. "See the readme for actual details. Thanks for playing."}	
-		return
-	elseif g_gm:getState() == "paused" then
-		--g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * scale)
-		--g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 17.5 * scale)
-		--g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * scale)
-		--g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * scale)
-		g_gui.group.default.spacing = scale	
-		love.graphics.setFont(g_fonts[1])
-		if uiData.menuState == "paused" then
-		elseif uiData.menuState == "resume" then g_gm:pause() end
-
-    return
-  end
 
 	for i, e in g_gm:targets("player") do
 		g_thePlayer:processEvent(e)
@@ -1003,95 +829,42 @@ function gameUpdate(dt)
 		pIncY.y = playerInc.y
 
     g_thePlayer:setDir(vector(pIncX.x, pIncY.y))
-	--Prepare to move enemy
-	--for i,v in ipairs(g_entityEnemies) do
---		if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-	--		local moveVec = v:getMoveVec()
-	--		local enemyPos = v:getPos()
-	--		v:testPathCollision(g_currentLevel.levelAttribs.blockSize)
-	--		local target = v:getTarget()
-	--		local size = v:getSize()
-	---		moveVec.x = target.x - (enemyPos.x + (size.x/2))
-	--		moveVec.y = target.y - (enemyPos.y + (size.y/2))
-		
-	--		moveVec = moveVec:normalized()
-	--		moveVec = modifiedDT * v:getSpeed() * moveVec
-			
-	--		v:setMoveVec(moveVec)	
-	--	end
-	--end		
+
 
 	g_thePlayer:updateAnim(modifiedDT)
 
 	g_thePlayer:updateSound(modifiedDT)
 
-	--for i,v in ipairs(g_entityEnemies) do
-	--	v:update(modifiedDT)
-	--	v:updateAnim(modifiedDT)
-	--	v:updateSound(modifiedDT)
-	--end
-
 	for i, v in ipairs(g_entityBlocks) do
 		v:updateSound(modifiedDT)
 	end
 
-	--for i,v in ipairs(g_entityMovers) do
-	--	v:updateSound(modifiedDT)
-	--end
-
-	--for i,v in ipairs(g_entityGuns) do
-	--	v:updateSound(modifiedDT)
-	--end
-
-	--Move player and enemy on X
-
 	g_thePlayer:move(pIncX)
-	
-	--for i,v in ipairs(g_entityEnemies) do
-	--	if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-	--		local moveVec = v:getMoveVec()
-	--		local moveVecX = vector(moveVec.x, 0)
-	--		v:move(moveVecX)
-	--	end
-	--end
 	
   local thePlayerShape = g_thePlayer:getCollisionShape()
   for a, b in pairs(theCollider:collisions(thePlayerShape)) do
     onCollide(dt, thePlayerShape, a)
   end
   
-  for _, v in ipairs(g_entityBlocks) do
-    local theShape = v:getCollisionShape()
-		for a, b in pairs(theCollider:collisions(theShape)) do
-      onCollide(dt, theShape, a)
-    end
-  end
-	
-	--Move player and enemy on Y
-
 	g_thePlayer:move(pIncY)
 	
-	--for i,v in ipairs(g_entityEnemies) do
-	--	if v:getState() == "attacking_direct" or v:getState() == "attacking_path" then
-	--		local moveVec = v:getMoveVec()
-	--		local moveVecY = vector(0, moveVec.y)
-	--		v:move(moveVecY)
-	--	end
-	--end
   
   for a, b in pairs(theCollider:collisions(thePlayerShape)) do
     onCollide(dt, thePlayerShape, a)
   end
 
-
---	for i,v in ipairs(g_entityGuns) do
-	--	v:update(modifiedDT)
-    
-	--end
 	for i,v in ipairs(g_entityBlocks) do
 		if v:getState() ~= "dead" then v:update(modifiedDT) end
 	end
 
+  for _, v in ipairs(g_entityBlocks) do
+    local theShape = v:getCollisionShape()
+      if v:getCanCollide() then
+      for a, b in pairs(theCollider:collisions(theShape)) do
+        onCollide(dt, theShape, a)
+      end
+    end
+  end
 
 	--PATHFINDING: prepare view rays
 
@@ -1119,114 +892,35 @@ function gameUpdate(dt)
 	g_thePlayer:getBottomLeft(rayStarts[3])
 	g_thePlayer:getBottomRight(rayStarts[4])
 
-	--for i,v in ipairs(g_entityEnemies) do
-	--	if v:getState() ~= "dead" and v:getState() ~= "dormant" then 
-	--		v:getTopLeft(rayStarts[5])
-	--		v:getTopRight(rayStarts[6])
-	--		v:getBottomLeft(rayStarts[7])
-	--		v:getBottomRight(rayStarts[8])
-	--		for k, r in ipairs(rayDirs) do
-	--			if k < 5 then
-	--				r.x = rayStarts[k+4].x - rayStarts[k].x
-	--				r.y = rayStarts[k+4].y - rayStarts[k].y
-	--			else
-	--				r.x = -rayDirs[k-4].x
-	--				r.y = -rayDirs[k-4].y
-	--			end
-	--		end
-
-			--Is there a direct line of sight to the player? If so forget the path and go straight there
-	--		local readyToPath = false
-	--		local directRoute = true
-	--		for j,o in ipairs(g_entityBlocks) do
-	--			if o:getState() ~= "dead" then
-	--				
-	--				if o:collidesRays(rayStarts, rayDirs) then
-	--						if v:getState() == "attacking_direct" then readyToPath = true end
-	--						directRoute = false
-	--						v:setState("attacking_path")
-	--				end
-	--			end
-	---		end
-	--		if directRoute then
-	--			v:setState("attacking_direct")
-	--			v:setTarget(pPos)
-	--		end	
-	--		v:incPathTimer(modifiedDT)
-			
-			--Enemy generates a new path if player goes or out of line of sight,
-			--or if enemy is at end of current path or has been following it for more than 1 second
-	--		if not readyToPath then readyToPath = v:testPathTimer(1) or v:isAtEndOfPath()  end	
-	--		if readyToPath and v:getState() == "attacking_path" then
-	--			local startX, startY = v:findNearest(g_currentLevel.levelAttribs.blockSize)
-	--			local endX, endY = g_thePlayer:findNearest(g_currentLevel.levelAttribs.blockSize)
-	--			local startPos = {r = startY, c = startX}
-	--			local endPos = {r = endY, c = endX}
-
-	--			local path = jumperFinder:getPath(startX, startY, endX, endY)
-
-	--			v:copyPath(path);	
-	--			
-	--			currentPath = v:getPath()
-	--			
-	--			v:startPath(g_currentLevel.levelAttribs.blockSize)
-	--		end
-	--	end
-	--end
   
 	TEsound.cleanup()
 end
 
 function gameKeyPressed(key)
-	if g_gm:getState() == "splash" then
-		if key == "space" then g_gm:setState("running") end
-		if key == "return" then g_gm:setState("running") end
-		if key == "q" then love.event.push("quit") end
-		if key == "escape" then love.event.push("quit") end
-		return
-	end
 	if g_gm:getState() == "paused" then
-		if uiData.menuState == "paused" then
-			if key == "q" then love.event.push("quit") end--uiData.menuState = "exit" end
-			if key == "l" then uiData.menuState = "levels" end
-			if key == "s" then uiData.menuState = "settings" end
-			if key == "j" then uiData.menuState = "about" end
-	    if key == "escape" or key == "p" then g_gm:pause(); uiData.menuState = "paused" end
-		elseif uiData.menuState == "exit" then
-			if key == "y" then love.event.push("quit")--[[exit]] else uiData.menuState = "paused" end
-			if key == "p" or key == "escape" then uiData.menuState = "paused" end
-		elseif uiData.menuState == "levels" then
-			if key == "1" then g_nextLevel = "level1" g_gm:setState("finishinglevel") end
-			if key == "2" then g_nextLevel = "level2" g_gm:setState("finishinglevel") end
-			if key == "3" then g_nextLevel = "level3" g_gm:setState("finishinglevel") end
-			if key == "4" then g_nextLevel = "level4" g_gm:setState("finishinglevel") end
-			if key == "p" or key == "escape" then uiData.menuState = "paused" end
-		elseif uiData.menuState == "about" then
-			if key == "p" or key == "escape" then uiData.menuState = "paused" end
-		elseif uiData.menuState == "settings" then
+			if key == "q" then love.event.push("quit") end
+	    if key == "escape" or key == "p" then g_gm:pause() end
 			if key == "1" then scale = 1; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
 			if key == "2" then scale = 1.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
 			if key == "3" then scale = 2; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
 			if key == "4" then scale = 2.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-			if key == "p" or key == "escape" then uiData.menuState = "paused" end
-		end
 	elseif g_gm:getState() == "running" then
-		  if key == "escape" or key == "p" then g_gm:pause(); uiData.menuState = "paused" end
+		  if key == "escape" or key == "p" then g_gm:pause() end
 	end
 	if DEBUG_ENABLED then
-		if key == "`" then g_showBoxes = not g_showBoxes end
+		if key == "`" then g_debugDraw = not g_debugDraw end
 		if key == "m" then g_showGrid = not g_showGrid end
 		if key == "f5" then g_gm:saveState() end
 		if key == "f9" then g_gm:loadState() end
 		if key == "t" then g_gm:startSlowing(0.1, 5, 0.5) end
 		if key == "f1" then
 			if g_gm:getState() == "loading" then
-				g_currentLevel = require "level1"
-				loadLevel()
+				--g_currentLevel = require "level1"
+				--loadLevel()
 				g_gm:setState("running")
 			else
 			 	g_gm:setState("loading")
-			end--unloadLevel() end
+			end
 		end
 	end
 

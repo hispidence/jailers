@@ -5,6 +5,14 @@ vec4 effect(vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords)
   }
 ]]
 
+
+
+---------------------------------------------------------------------------------------------------
+--	fadeShaderSource
+--	
+--  Used when the player character dies. It fades the game to black, and then fades the game
+--  back in once the game has reset its state to the last checkpoint
+---------------------------------------------------------------------------------------------------
 fadeShaderSource = [[
   uniform vec3 fadeTo;
   uniform float fadeFactor;
@@ -17,3 +25,37 @@ fadeShaderSource = [[
     return result;
   }
 ]]
+
+
+
+---------------------------------------------------------------------------------------------------
+--	debugShaderWorldSource
+--	
+--  Used to make the game darker when debugging, so the collision shape lines show up more
+--  prominently
+---------------------------------------------------------------------------------------------------
+debugShaderWorldSource = [[
+  vec4 effect(vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords) {
+    vec4 result = Texel(texture, texture_coords);
+    result.xyz = result.xyz * 0.75;
+    return result;
+  }
+]]
+
+
+
+---------------------------------------------------------------------------------------------------
+--	debugShaderDebugSource
+--	
+--  Used to make the game darker when debugging, so the collision shape lines show up more
+--  prominently
+---------------------------------------------------------------------------------------------------
+debugShaderDebugSource = [[
+  vec4 effect(vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords) {
+    vec4 result = Texel(texture, texture_coords);
+    result.w = result.w * 0.5;
+    return result;
+  }
+]]
+
+
