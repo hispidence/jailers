@@ -39,15 +39,9 @@ function gun:init()
 	gameObject.init(self)
 	self.firingBehaviourBullet = nil
 	self.firingBehaviourGun = nil
-	self.bulletVel = vector(-25, 0)
-	self.bullets = {}
 	self.bulletCollisionBehaviour = nil
-	self.bulletLife = 0
-	self.bulletTime = 1
-	self.mostRecentDead = "bullet1"
 	self.bulletsMade = 0
 	self.bulletOffset = vector(1, 0)
-	self.timeLastBullet = 0
 	self.bulletTextureSet = {}
   self.firingBehaviour = nil
 end
@@ -72,7 +66,12 @@ function gun:assignFromProperties(prop)
     local scriptFile = "src/levels/scripts/" .. prop.behaviourScript
     local firingBehaviourFactory = require(scriptFile)
     
-    self.firingBehaviour = firingBehaviourFactory.makeFiringBehaviour(prop)
+    self.firingBehaviour = firingBehaviourFactory:makeFiringBehaviour(prop)
+    
+    self.numBullets = prop.numBullets
+    if 0 == self.numBullets then
+      self.numBullets = 10
+    end
     
     unrequire(scriptFile)
   end
@@ -97,14 +96,14 @@ end
 function gun:createBullet()
   local b = bullet()
   b:setSize(vector(8, 8))
-  b:setCollisionRectangle()
+  
   b:setState("dormant")
   b:setInvisible(true)
   b:setPos(self.position:clone() + self.bulletOffset)
-  b:setVel(self.bulletVel)
   
   b:setID(self:getID() .. "_bullet" .. self.bulletsMade)
   b:setCategory("bullet")
+  b:setGunID(self:getID())
   
   self.bulletsMade = self.bulletsMade + 1
   
@@ -117,12 +116,12 @@ function gun:createBullet()
 													b:getSize().y, 
 													b:getSize().x,
 													b:getSize().y))
-	b:setCollisionRectangle()
   
   -- Hopefully, lua will give each bullet the SAME closure
   b:setFiringBehaviour(self.firingBehaviour)
   return b
 end
+
 
 
 -------------------------------------------------------------------------------
@@ -133,7 +132,7 @@ end
 -------------------------------------------------------------------------------
 function gun:createSubObjects()
   local bullets = {}
-  for i = 1, 5 do
+  for i = 1, self.numBullets do
     bullets[i] = self:createBullet()
   end
   return bullets
