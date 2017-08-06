@@ -61,11 +61,6 @@ local g_debugDraw = false
 -------------------------------------------------------------------------------
 local g_gui = require("src/external/Quickie")
 local g_gm = require("src/gameManager")
-if g_usingTiled then
-	local g_levelFileName = "guntest"
-else
-	local g_levelFileName = nil
-end
 local g_nextLevel = "level2"
 local g_menuRefreshed = false
 local g_blockSize = 16
@@ -386,7 +381,7 @@ function addEntityWall(block, x, y)
   theBlock:setCanCollide(true)
 	theBlock:setCollisionRectangle()
 	
-	theBlock:setID("wall")
+	theBlock:setID("wall"..x..y)
 	
 	theBlock:setCategory("wall")
 	
@@ -484,11 +479,36 @@ end
 
 
 -------------------------------------------------------------------------------
+-- hasDuplicates
+--
+--  
+-------------------------------------------------------------------------------
+function hasDuplicates(t)
+  local hash = {}
+  local foundDuplicate = false
+  local id
+  local duplicates = {}
+  for _, v in ipairs(t) do
+    id = v:getID()
+    if hash[id] then
+      duplicates[#duplicates + 1] = id
+      foundDuplicate = true
+    else
+      hash[id] = true
+    end
+  end
+  return foundDuplicate, duplicates
+end
+
+
+
+-------------------------------------------------------------------------------
 -- loadLevel
 --
 --  
 -------------------------------------------------------------------------------
 function loadLevel(levelFileName)
+  
   tiledMap = sti("src/levels/" .. levelFileName .. ".lua")
 
   world = love.physics.newWorld(0, 0)
@@ -570,13 +590,27 @@ function loadLevel(levelFileName)
     end
   end
   
+  local duplicates
+  local dupsPresent = false
+  local dupErrStr = "Level " .. levelFileName .. " has duplicates: "
+  dupsPresent, duplicates = hasDuplicates(g_entityTriggers)
+  
+  if dupsPresent then 
+    return false, dupErrStr .. table.concat(duplicates, ", ")
+  end
+  
 	-- Initialise cameras
-    if tiledMap.layers["cameras"] then
+  if tiledMap.layers["cameras"] then
     for y, cam in ipairs(tiledMap.layers.cameras.objects) do
       addCamera(cam)	
     end
   end
-
+  dupsPresent, duplicates = hasDuplicates(g_cameras)
+  
+  if dupsPresent then 
+    return false, dupErrStr .. table.concat(duplicates, ", ")
+  end
+  
 	-- Initialise block-based objects
   if tiledMap.layers["objects"] then
     for i, data in ipairs(tiledMap.layers.objects.objects) do
@@ -586,6 +620,13 @@ function loadLevel(levelFileName)
       end
     end
   end
+  dupsPresent, duplicates = hasDuplicates(g_entityBlocks)
+ 
+  if dupsPresent then 
+    return false, dupErrStr .. table.concat(duplicates, ", ")
+  end
+  
+  return true
 end
 
 -------------------------------------------------------------------------------
@@ -605,8 +646,10 @@ function gameLoad(levelFileName, config)
   debugDebugShader = love.graphics.newShader(debugShaderDebugSource)
 	setupUI()
 	loadResources()
-	loadLevel(levelFileName)
+	local loaded, errStr = loadLevel(levelFileName)
+  if not loaded then return false, errStr end
 	g_gm:saveState()
+  return true
 end
 
 
@@ -668,7 +711,6 @@ function gameDraw()
     table.insert(debugStrings, "Image scale: " ..  g_config.scale)
     sTablePrint(debugStrings)
   end
-  
 end
 
 
@@ -742,11 +784,12 @@ function gameUpdate(dt)
   -- Cap the delta time at 0.07. This should prevent players from accidentally
   -- or deliberately running through walls if the game is running extremely
   -- slowly.
-	dt = math.min(dt, 0.07)
+
+  dt = math.min(dt, 0.07)
 	-- Get the moodified delta time (the same as regular DT if action
 	-- isn't slowed down
-	local modifiedDT = g_gm:getModifiedDT(dt)
-  
+
+  local modifiedDT = g_gm:getModifiedDT(dt)
   tiledMap:update(modifiedDT)
 
 	-- Update the game manager, which, among other thigs, will calculate
@@ -894,6 +937,7 @@ function gameUpdate(dt)
 
   
 	TEsound.cleanup()
+  
 end
 
 function gameKeyPressed(key)

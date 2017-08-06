@@ -34,7 +34,12 @@ function love.load(args)
     levelName = "guntest"
   end
   
-	gameLoad(levelName, config)
+	local loaded, errStr = gameLoad(levelName, config)
+  
+  if not loaded then
+    love.errhand(errStr)
+    love.event.quit()
+  end
   
 end
 
