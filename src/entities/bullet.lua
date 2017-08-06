@@ -117,17 +117,6 @@ end
 --
 ---------------------------------------------------------------------------------------------------
 function bullet:update(dt)
-	if "dormant" == self.state then
-    local ready = self.firingBehaviour:updateBullet(dt)
-    
-    if(ready) then
-      self.position, self.vel = self.firingBehaviour:calcInitials(dt)
-      self.state = "active"
-      self:setCollisionCircle()
-      self.canCollide = true
-      self.invisible = false
-    end
-  end
   if "active" == self.state then
     if(not self.wasColliding) then
       self.readyToCollide = true
@@ -140,4 +129,16 @@ function bullet:update(dt)
     
     self:move(vec)
 	end
+	if "dormant" == self.state then
+    local ready = self.firingBehaviour:updateBullet(dt)
+    if(ready) then
+      self.position, self.vel = self.firingBehaviour:calcInitials()
+      self.state = "active"
+      self:setCollisionCircle()
+      self.canCollide = true
+      self:setPos(self.position)
+      
+      self.invisible = false
+    end
+  end
 end
