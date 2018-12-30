@@ -38,7 +38,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- Classes from Jumper 
+-- Classes from Jumper
 -------------------------------------------------------------------------------
 local Grid = require("src/external/jumper.grid")
 local PathFinder = require("src/external/jumper.pathfinder")
@@ -57,7 +57,7 @@ local g_debugDraw = false
 
 
 -------------------------------------------------------------------------------
--- Set game manager, GUI, and gamestate variables 
+-- Set game manager, GUI, and gamestate variables
 -------------------------------------------------------------------------------
 local g_gui = require("src/external/Quickie")
 local g_gm = require("src/gameManager")
@@ -71,7 +71,7 @@ local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
 
 -------------------------------------------------------------------------------
--- Make variables to hold GUI resources 
+-- Make variables to hold GUI resources
 -------------------------------------------------------------------------------
 local g_menuBGtex = nil 
 local g_fonts = {}
@@ -102,7 +102,7 @@ local sTablePrint = createDebugTablePrint({0, 85, 0, 255}, 0, 0, 1000, "left")
 
 
 -------------------------------------------------------------------------------
--- Create tables to hold game entities 
+-- Create tables to hold game entities
 -------------------------------------------------------------------------------
 local g_entityWalls = {}
 local g_entityBlocks = {}
@@ -112,7 +112,7 @@ g_thePlayer = nil
 
 
 -------------------------------------------------------------------------------
--- Build the map. 
+-- Build the map.
 -------------------------------------------------------------------------------
 function buildMap(width, height)
 	local map = {}
@@ -177,7 +177,7 @@ end
 -------------------------------------------------------------------------------
 -- setupUI
 --
--- Set menu texture and font sizes 
+-- Set menu texture and font sizes
 -------------------------------------------------------------------------------
 function setupUI()
 	g_menuBGtex = love.graphics.newImage(uiData.menuBackGround)
@@ -225,7 +225,7 @@ end
 -------------------------------------------------------------------------------
 -- unloadLevel
 --
--- Clear all of the level's entities 
+-- Clear all of the level's entities
 --
 -- This needs to be looked over.
 -------------------------------------------------------------------------------
@@ -369,7 +369,7 @@ end
 -------------------------------------------------------------------------------
 -- addEntityWall
 --
--- Add walls to the g_entityWalls table. 
+-- Add walls to the g_entityWalls table.
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
 	local blockID = #g_entityWalls+ 1
@@ -401,7 +401,7 @@ end
 -------------------------------------------------------------------------------
 -- addEntityBlock
 --
--- Add block-based objects (e.g. switches, doors) to the g_entityBlocks table. 
+-- Add block-based objects (e.g. switches, doors) to the g_entityBlocks table.
 -------------------------------------------------------------------------------
 function addEntityBlock(block)
 	local blockID = #g_entityBlocks + 1
@@ -481,7 +481,7 @@ end
 -------------------------------------------------------------------------------
 -- hasDuplicates
 --
---  
+--
 -------------------------------------------------------------------------------
 function hasDuplicates(t)
   local hash = {}
@@ -505,7 +505,7 @@ end
 -------------------------------------------------------------------------------
 -- loadLevel
 --
---  
+--
 -------------------------------------------------------------------------------
 function loadLevel(levelFileName)
   
@@ -632,7 +632,7 @@ end
 -------------------------------------------------------------------------------
 -- gameLoad
 --
---  
+--
 -------------------------------------------------------------------------------
 function gameLoad(levelFileName, config)
   g_config = config
@@ -657,7 +657,7 @@ end
 -------------------------------------------------------------------------------
 -- gameDraw
 --
---  
+--
 -------------------------------------------------------------------------------
 function gameDraw()
   
@@ -777,7 +777,7 @@ end
 -------------------------------------------------------------------------------
 -- gameUpdate
 --
---  
+--
 -------------------------------------------------------------------------------
 function gameUpdate(dt)
 	if (not love.window.hasFocus()) or g_gm:getState() == "paused" then return end
