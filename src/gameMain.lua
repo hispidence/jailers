@@ -36,7 +36,6 @@ end
 
 
 
-
 -------------------------------------------------------------------------------
 -- Classes from Jumper
 -------------------------------------------------------------------------------
@@ -73,7 +72,7 @@ local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 -------------------------------------------------------------------------------
 -- Make variables to hold GUI resources
 -------------------------------------------------------------------------------
-local g_menuBGtex = nil 
+local g_menuBGtex = nil
 local g_fonts = {}
 
 
@@ -85,6 +84,7 @@ local g_fonts = {}
 -- actual graphics.
 -------------------------------------------------------------------------------
 function createDebugTablePrint(colour, startX, startY, wrap, alignment)
+
   function debugTablePrint(textTable)
     for i, v in ipairs(textTable) do
       local text = v
@@ -93,7 +93,7 @@ function createDebugTablePrint(colour, startX, startY, wrap, alignment)
       love.graphics.printf({colour, text}, startX + 1.2, startY + yOffset + 1.2, wrap, alignment)
     end
   end
-  
+
   return debugTablePrint
 end
 
@@ -127,7 +127,7 @@ end
 
 function youShallNotPass(theMap, wallPos, wallSize)
 	local tempSize = vector(0,0)--wallSize:clone()
-	local blockSize = g_currentLevel.levelAttribs.blockSize 
+	local blockSize = g_currentLevel.levelAttribs.blockSize
 	local tablePosX, tablePosY
 	while tempSize.y < wallSize.y do
 		tempSize.x = 0
@@ -144,7 +144,7 @@ end
 
 function youCanPass(theMap, wallPos, wallSize)
 	local tempSize = vector(0,0)
-	local blockSize = g_currentLevel.levelAttribs.blockSize 
+	local blockSize = g_currentLevel.levelAttribs.blockSize
 	local tablePosX, tablePosY
 	while tempSize.y < wallSize.y do
 		tempSize.x = 0
@@ -155,7 +155,7 @@ function youCanPass(theMap, wallPos, wallSize)
 			theMap[tablePosY][tablePosX] = 0
 			tempSize.x = tempSize.x + blockSize
 		end
-   		tempSize.y = tempSize.y + blockSize
+		tempSize.y = tempSize.y + blockSize
 	end
 end
 
@@ -234,25 +234,25 @@ function unloadLevel()
 	g_gm:unload()
 
 	pathMap = nil
-  
+
 	g_thePlayer:freeResources(theCollider)
 	g_thePlayer = nil
 
 	for k, v in ipairs(g_entityBlocks) do
 		v:freeResources(theCollider)
-		g_entityBlocks[k] = nil	
+		g_entityBlocks[k] = nil
 	end
-  
+
   for k, v in ipairs(g_entityWalls) do
 		v:freeResources(theCollider)
-		g_entityWalls[k] = nil	
-	end	
+		g_entityWalls[k] = nil
+	end
 
 	for k, v in ipairs(g_entityTriggers) do
 		v:freeResources(theCollider)
 		g_entityTriggers[k] = nil
 	end
-  
+
   for k, v in pairs(g_cameras) do
     g_cameras[k] = nil
   end
@@ -266,19 +266,19 @@ end
 -- Populate object behaviours.
 -------------------------------------------------------------------------------
 function registerBehaviours(object, prop)
-  if prop.collision_behaviours then 
+  if prop.collision_behaviours then
     local behaviourTable = jlSplit(prop.collision_behaviours)
     for k, v in ipairs(behaviourTable) do
       -- Does the level data contain the collision behaviour in question?
       if prop[v] then
         local b = jlSplitKV(prop[v])
-        
+
         -- If the collision behaviour exists in the script, we can go ahead
         if g_collisionBehaviours[b["type"]] ~= nil then
           local args =  b
           args.timer = args.timer and tonumber(args.timer) or 0
           args["sender"] = object:getID()
-          
+
           object:addCollisionBehaviour(
             g_collisionBehaviours[b["type"]](args)
           )
@@ -286,12 +286,12 @@ function registerBehaviours(object, prop)
           print("Warning! Collison behaviour tables " ..
             "hold no data for \"" .. v .. "\"")
         end
-        
+
       else
-        print("Warning! Object contains no behaviour for \"" .. 
+        print("Warning! Object contains no behaviour for \"" ..
           behaviourType .."\"")
       end
-      
+
     end
   end
 end
@@ -307,21 +307,21 @@ end
 -------------------------------------------------------------------------------
 function addCamera(camera)
   local newCamera = gameObject()
-  
+
   if not camera.name or "" == camera.name then
     camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
 	end
   local theName = camera.name;
-  
- 
-  
+
+
+
   newCamera:setID(theName)
-  
+
   newCamera:setInvisible(true)
   local pos = vector(camera.x, camera.y)
   newCamera:move(pos)
   newCamera:setState("active")
-  
+
   g_cameras[theName] = newCamera
 end
 
@@ -335,32 +335,32 @@ end
 function addEntityTrigger(trig)
   local trigID = #g_entityTriggers + 1
   local theTrigger = gameObject()
-  
-  
+
+
   if trig.name and trig.name ~= "" then
 		theTrigger:setID(trig.name)
 	else
 		print("Warning! A trigger has no name.")
     block.name = "nameless_trigger_FIX_THIS_NOW_" .. trigID
 	end
-  
+
   theTrigger:setCategory("trigger")
   theTrigger:setState("active")
-  
+
   -- Happily, the data from tiled is already aligned to the game size
   local size = vector(trig.width, trig.height)
   theTrigger:setSize(size)
   theTrigger:setCollisionRectangle()
-  
+
   registerBehaviours(theTrigger,
                      trig.properties)
-  
+
 
   local pos = vector(trig.x, trig.y)
 	pos.x = pos.x
 	pos.y = pos.y
 	theTrigger:move(pos)
-  
+
   g_entityTriggers[trigID] = theTrigger
 end
 
@@ -377,21 +377,21 @@ function addEntityWall(block, x, y)
 
 	local size = vector(g_blockSize, g_blockSize)
 	theBlock:setSize(size)
-	
+
   theBlock:setCanCollide(true)
 	theBlock:setCollisionRectangle()
-	
+
 	theBlock:setID("wall"..x..y)
-	
+
 	theBlock:setCategory("wall")
-	
+
 	local pos = vector(x * g_blockSize, y * g_blockSize)
 	pos.x = pos.x - size.x
 	pos.y = pos.y - size.y
 	theBlock:move(pos)
 
   g_entityWalls[blockID] = theBlock
-  
+
 	--	if v.ignoresBullets then g_entityWalls[blockID]:setIgnoresBullets(true) end
 	-- youShallNotPass(pathMap, g_entityWalls[blockID]:getPos(), g_entityWalls[blockID]:getSize())
 end
@@ -411,13 +411,13 @@ function addEntityBlock(block)
     block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
 	end
 
-	if not block.type or "" == block.type then	
+	if not block.type or "" == block.type then
 		print("Warning! Block \"" .. block.name .. "\" has no type.")
     block.type = "typeless"
 	end
-  
+
   local prop = block.properties
-  
+
   if not prop then
     print("Warning! Block \"" .. block.name .. "\" has no properties.")
   end
@@ -429,27 +429,27 @@ function addEntityBlock(block)
     theBlock = gameObject()
   end
   theBlock:setID(block.name)
-  theBlock:setCategory(block.type)
+	theBlock:setCategory(block.type)
 
 	local size = vector(g_blockSize, g_blockSize)
 	theBlock:setSize(size)
 	theBlock:setQuad(love.graphics.newQuad(0,
 													0,
 													size.x,
-													size.y, 
+													size.y,
 													size.x,
 													size.y))
 
   theBlock:setCanCollide(true)
 	theBlock:setCollisionRectangle()
-		
+
 	if prop then
     -- Does the entity specify a textureset?
     theBlock:assignTextureSet(prop.textureset)
 
     registerBehaviours(theBlock, prop)
 
-    if prop.state and prop.state ~= "" then	
+    if prop.state and prop.state ~= "" then
       theBlock:setState(prop.state)
     else
       theBlock:setState("dormant");
@@ -463,17 +463,17 @@ function addEntityBlock(block)
 
 	pos.y = pos.y - size.y;
 	theBlock:move(pos)
-  
+
   g_entityBlocks[blockID] = theBlock
-  
+
   local subObjects = theBlock:createSubObjects()
-  
+
   if subObjects then
     for i, o in ipairs(subObjects) do
       g_entityBlocks[blockID + i] = o;
     end
   end
-  
+
 end
 
 
@@ -508,14 +508,14 @@ end
 --
 -------------------------------------------------------------------------------
 function loadLevel(levelFileName)
-  
+
   tiledMap = sti("src/levels/" .. levelFileName .. ".lua")
 
   world = love.physics.newWorld(0, 0)
-	
+
 	-- No entities from the "objects" layer get drawn through the STI Tiled
 	-- library. Instead, we create entities based on them, and where draw
-  -- those instead (where applicable).
+	-- those instead (where applicable).
 	--
 	-- Entities from the objects layer are put into one of the global tables
 	-- defined above
@@ -546,18 +546,18 @@ function loadLevel(levelFileName)
 				false)
 	g_thePlayer:setTexture(	"moving_horizontal",
 				love.graphics.newImage(TEXTURES_DIR .. "playermove.png"),
-				false)	
-	g_thePlayer:setTexture(	"dead", 
+				false)
+	g_thePlayer:setTexture(	"dead",
 				love.graphics.newImage(TEXTURES_DIR .. "playerdeath.png"),
 				false)
 	g_thePlayer:setSize(pSize)
 	g_thePlayer:setShapeOffsets(2, 2)
-	g_thePlayer:setCollisionRectangle()	
+	g_thePlayer:setCollisionRectangle()
 	g_thePlayer:setID("player")
 	g_thePlayer:setCategory("player")
 	g_thePlayer:setState("resting")
 	g_thePlayer:setPathBox()
-	g_thePlayer:setSpeed(150)	
+	g_thePlayer:setSpeed(150)
 	g_thePlayer:setPos(pPos)
   g_thePlayer:setCanCollide(true)
 
@@ -579,38 +579,38 @@ function loadLevel(levelFileName)
   -- Initialise walls
 	for y, tile in ipairs(tiledMap.layers.statics.data) do
 		for x, data in pairs(tile) do
-			addEntityWall(data, x, y)	
+			addEntityWall(data, x, y)
 		end
 	end
 
 	-- Initialise triggers
   if tiledMap.layers["triggers"] then
     for y, trig in ipairs(tiledMap.layers.triggers.objects) do
-      addEntityTrigger(trig)	
+      addEntityTrigger(trig)
     end
   end
-  
+
   local duplicates
   local dupsPresent = false
   local dupErrStr = "Level " .. levelFileName .. " has duplicates: "
   dupsPresent, duplicates = hasDuplicates(g_entityTriggers)
-  
-  if dupsPresent then 
+
+  if dupsPresent then
     return false, dupErrStr .. table.concat(duplicates, ", ")
   end
-  
+
 	-- Initialise cameras
   if tiledMap.layers["cameras"] then
     for y, cam in ipairs(tiledMap.layers.cameras.objects) do
-      addCamera(cam)	
+      addCamera(cam)
     end
   end
   dupsPresent, duplicates = hasDuplicates(g_cameras)
-  
-  if dupsPresent then 
+
+  if dupsPresent then
     return false, dupErrStr .. table.concat(duplicates, ", ")
   end
-  
+
 	-- Initialise block-based objects
   if tiledMap.layers["objects"] then
     for i, data in ipairs(tiledMap.layers.objects.objects) do
@@ -621,11 +621,11 @@ function loadLevel(levelFileName)
     end
   end
   dupsPresent, duplicates = hasDuplicates(g_entityBlocks)
- 
-  if dupsPresent then 
+
+  if dupsPresent then
     return false, dupErrStr .. table.concat(duplicates, ", ")
   end
-  
+
   return true
 end
 
@@ -635,21 +635,21 @@ end
 --
 -------------------------------------------------------------------------------
 function gameLoad(levelFileName, config)
-  g_config = config
+	g_config = config
 	love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
 	windowWidth, windowHeight, _ = love.window.getMode()
 	gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
 	love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
- 	fadeShader = love.graphics.newShader(fadeShaderSource)
- 	invisShader = love.graphics.newShader(invisShaderSource)
-  debugWorldShader = love.graphics.newShader(debugShaderWorldSource)
-  debugDebugShader = love.graphics.newShader(debugShaderDebugSource)
+	fadeShader = love.graphics.newShader(fadeShaderSource)
+	invisShader = love.graphics.newShader(invisShaderSource)
+	debugWorldShader = love.graphics.newShader(debugShaderWorldSource)
+	debugDebugShader = love.graphics.newShader(debugShaderDebugSource)
 	setupUI()
 	loadResources()
 	local loaded, errStr = loadLevel(levelFileName)
-  if not loaded then return false, errStr end
-	g_gm:saveState()
-  return true
+	if not loaded then return false, errStr end
+		g_gm:saveState()
+	return true
 end
 
 
@@ -660,10 +660,10 @@ end
 --
 -------------------------------------------------------------------------------
 function gameDraw()
-  
+
   love.graphics.setShader(fadeShader)
   love.graphics.scale(g_config.scale, g_config.scale)
-  
+
   -- Round the new position so it aligns with a pixel. I'm not convinced about
   -- this. I don't think it looks smooth.
   local tX = jRound(-g_gm:getCurrX());
@@ -675,7 +675,7 @@ function gameDraw()
   end
   tiledMap:draw()
   g_thePlayer:draw(g_pixelLocked)
-  
+
   local theState
 	for i, v in ipairs(g_entityBlocks) do
     theState = g_entityBlocks[i]:getState()
@@ -683,11 +683,11 @@ function gameDraw()
 			g_entityBlocks[i]:draw(g_pixelLocked)
 		end
 	end
-  
+
   if(g_debugDraw) then
     love.graphics.setShader(debugDebugShader)
   end
-  
+
   if g_debugDraw then
 		for i, v in ipairs(g_entityWalls) do
 			g_entityWalls[i]:drawDebug()
@@ -696,7 +696,7 @@ function gameDraw()
     for i, v in ipairs(g_entityBlocks) do
       g_entityBlocks[i]:drawDebug()
     end
-	end	
+	end
 
   -- If we're in debug mode, print statistics
   if DEBUG_ENABLED then
@@ -747,7 +747,7 @@ function processEvent(e)
     local cameraTimer = e:getData()[2]
     local theCamera = g_cameras[cameraName]
     -- Calculate the new position to move the camera to.
-      
+
     -- Since camera logic is difficult to separate from graphics logic, we
     -- have to apply the scale here (only for now, hopefully)
     local newPosX = theCamera:getPos().x -
@@ -759,7 +759,7 @@ function processEvent(e)
       newPosX,
       newPosY,
       cameraTimer)
-    
+
 	elseif "endlevel" == eID then
 		g_nextLevel = e:getDesc();
     	g_gm:setState("finishinglevel");
@@ -770,7 +770,6 @@ function processEvent(e)
 		g_gm:saveState();
 	end
 end
-
 
 
 
@@ -813,7 +812,7 @@ function gameUpdate(dt)
       g_gm:removeEvent(v:getID(), i)
 		end
 	end
-	
+
 	for _, v in ipairs(g_entityBlocks) do
 		for i, e in g_gm:targets(v:getID()) do
       result = v:processEvent(e)
@@ -832,7 +831,7 @@ function gameUpdate(dt)
 	local stickX, stickY = g_gm:getBandedAxes(upStages, downStages)
 	playerInc.x, playerInc.y = 0, 0
 	if  "dead" ~= g_thePlayer:getState() then
-		
+
 		if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
 			playerInc.y = -0.9
 		elseif love.keyboard.isDown("s") or love.keyboard.isDown("down") then
@@ -883,15 +882,15 @@ function gameUpdate(dt)
 	end
 
 	g_thePlayer:move(pIncX)
-	
+
   local thePlayerShape = g_thePlayer:getCollisionShape()
   for a, b in pairs(theCollider:collisions(thePlayerShape)) do
     onCollide(dt, thePlayerShape, a)
   end
-  
+
 	g_thePlayer:move(pIncY)
-	
-  
+
+
   for a, b in pairs(theCollider:collisions(thePlayerShape)) do
     onCollide(dt, thePlayerShape, a)
   end
@@ -912,7 +911,7 @@ function gameUpdate(dt)
 	--PATHFINDING: prepare view rays
 
 	g_thePlayer:getCentre(pPos)
-	
+
 	local rayStarts = {	vector(0,0),
 						vector(0,0),
 						vector(0,0),
@@ -935,19 +934,19 @@ function gameUpdate(dt)
 	g_thePlayer:getBottomLeft(rayStarts[3])
 	g_thePlayer:getBottomRight(rayStarts[4])
 
-  
+
 	TEsound.cleanup()
-  
+
 end
 
 function gameKeyPressed(key)
 	if g_gm:getState() == "paused" then
 			if key == "q" then love.event.push("quit") end
 	    if key == "escape" or key == "p" then g_gm:pause() end
-			if key == "1" then scale = 1; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-			if key == "2" then scale = 1.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-			if key == "3" then scale = 2; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
-			if key == "4" then scale = 2.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end	
+			if key == "1" then scale = 1; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end
+			if key == "2" then scale = 1.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end
+			if key == "3" then scale = 2; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end
+			if key == "4" then scale = 2.5; love.window.setMode(40 * g_currentLevel.levelAttribs.blockSize * scale, 30 * g_currentLevel.levelAttribs.blockSize * scale) end
 	elseif g_gm:getState() == "running" then
 		  if key == "escape" or key == "p" then g_gm:pause() end
 	end
