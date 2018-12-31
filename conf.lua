@@ -12,6 +12,7 @@ g_halfBlockSize = 8
 
 function love.conf(t)
 	t.title = "Jailers"
+  t.console = true
 	
 	t.window.width = (g_blockSize * 40)
 	t.window.height = (g_blockSize * 30)
