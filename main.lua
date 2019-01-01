@@ -10,13 +10,6 @@
 require("src/gameMain")
 
 function love.load(args)
-  -- Level scale
-  local config = {
-    widthInBlocks = 40,
-    heightInBlocks = 30,
-    scale = 2,
-  }
-
   -- Launch level based on commandline args; eg, to load level0
   -- you would launch the game with love . level0
   local levelName
@@ -27,7 +20,7 @@ function love.load(args)
     levelName = "guntest"
   end
 
-  local loaded, errStr = gameLoad(levelName, config)
+  local loaded, errStr = gameLoad(levelName)
 
   if not loaded then
     love.errhand(errStr)
