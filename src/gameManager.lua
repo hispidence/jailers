@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2017
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- gameManager.lua
@@ -11,14 +11,14 @@
 
 
 require("src/jlEvent")
-vector = require("src/external/hump.vector")
+local vector = require("src/external/hump.vector")
 
 local ston = nil
 
-gameManager = {}
+local gameManager = {}
 
 gameManager.__index = gameManager
---[[MAKE INTO A SINGLETON!!!]]--
+--[[TODO: MAKE INTO SOMETHING THAT ISN'T A SINGLETON!!!]]--
 setmetatable(gameManager,
 		{__call = function(cls, ...)
 			return cls.new(...)
@@ -43,9 +43,9 @@ function gameManager:init()
 	self.slowFactorInitial = 0.2		-- how slow are we?
 	self.slowFactorCurrent = 1
 	self.deathTimer = 1.2
-	
+
   self.fadeTimer = 1.2
- 	self.fadeInTimer = 0
+  self.fadeInTimer = 0
   self.fadeInMax = 0.4
 
 	self.hasPad = false
@@ -68,7 +68,7 @@ function gameManager:init()
 	self.storedMoversState = {}
 	self.storedMoversDir = {}
 	self.storedMoversDist = {}
-	self.storedTranslateX = 0 
+	self.storedTranslateX = 0
 	self.storedTranslateY = 0
 
 	self.storedMoversCurrentExtent = {}
@@ -102,7 +102,7 @@ end
 -------------------------------------------------------------------------------
 -- acquireGamepad
 --
---  
+--
 -------------------------------------------------------------------------------
 function gameManager:acquireGamepad()
 	if love.joystick.getJoystickCount() > 0 then
@@ -110,12 +110,12 @@ function gameManager:acquireGamepad()
 		local pads = love.joystick.getJoysticks()
 		self.pad = pads[1]
 		local padID = self.pad:getGUID()
-    
+
 		_, self.padMapping["leftx"] = self.pad:getGamepadMapping("leftx")
 		_, self.padMapping["lefty"] = self.pad:getGamepadMapping("lefty")
 		_, self.padMapping["rightx"] = self.pad:getGamepadMapping("rightx")
-		_, self.padMapping["righty"] = self.pad:getGamepadMapping("righty")		
-		
+		_, self.padMapping["righty"] = self.pad:getGamepadMapping("righty")
+
 		_, self.padMapping["b"] = self.pad:getGamepadMapping("b");
 		_, self.padMapping["back"] = self.pad:getGamepadMapping("back");
 		self.hasPad = true
@@ -147,7 +147,7 @@ function gameManager:getBandedAxes(upStages, downStages)
 		if x <= s then bx = s end
 		if y <= s then by = s end
 	end
-	
+
 	for _, s in ipairs(upStages) do
 		if x >= s then bx = s end
 		if y >= s then by = s end
@@ -167,7 +167,7 @@ function gameManager:moveCameraGradual(dt)
 		self.currY = self.toY
 		self.moving = false
 		self.elapsed = 0
-	end 
+	end
 
 end
 
@@ -300,7 +300,7 @@ function gameManager:update(dt)
 	if self.moving then
 		self:moveCameraGradual(dt)
 	end
-	
+
 	if self.slowed then
 		self.slowTimeElapsed = self.slowTimeElapsed + dt
 		local speedUpSeconds = self.slowTimeTotal * self.speedUpPoint
@@ -371,14 +371,14 @@ function gameManager:loadState()
 	self.slowFactorCurrent = 1
 	g_thePlayer:setState("resting")
 	g_thePlayer:resetAnim("dead")
-	g_thePlayer:resetSounds()	
+	g_thePlayer:resetSounds()
 	g_thePlayer:setPos(self.storedPlayerPos:clone())
 	self.currX = self.storedTranslateX
 	self.currY = self.storedTranslateY
 	self.toX = self.storedTranslateX
 	self.toY = self.storedTranslateY
   self.lastCamera = nil
-	
+
 	self.moving = false
 	for i, v in ipairs(g_entityScenery) do
 		v:setPos(self.storedFloorsPos[i]:clone())
@@ -391,7 +391,7 @@ function gameManager:loadState()
 		v:copyPath(nil)
 		if v:getState() ~= "dead" then
 			v:resetAnims()--("dead")
-			v:resetSounds()	
+			v:resetSounds()
 		end
 		v:setPathTimer(1.1)
 		--v:setFlatMap(nil)
@@ -445,17 +445,17 @@ function gameManager:unload()
 
 	self.moving = false
 
-	self.storedPlayerPos = nil 
-	
-	self.storedTranslateX = {} 
+	self.storedPlayerPos = nil
+
+	self.storedTranslateX = {}
 	self.storedTranslateY = {}
 
 	self.storedFloorsPos = {}
 
 	self.storedEnemiesPos = {}
 	self.storedEnemiesState = {}
-	
-	self.storedMoversPos = {} 
+
+	self.storedMoversPos = {}
 	self.storedMoversState = {}
 	self.storedMoversDir = {}
 	self.storedMoversDist = {}
@@ -465,7 +465,7 @@ function gameManager:unload()
 	self.storedWallsPos = {}
 	self.storedWallsState = {}
 
-	self.storedGunsPos = {} 
+	self.storedGunsPos = {}
 	self.storedGunsState = {}
 	self.storedGunsBulletsMade = {}
 end
@@ -480,13 +480,13 @@ end
 -------------------------------------------------------------------------------
 function gameManager:targets(a)
 	local i = 0
-  
+
 	if self.events[a] then
     -- Set the index to the final element in the table. Note the "i = i - 1"
     -- in the iterator proper.
 		i = #self.events[a] + 1
 	end
-  
+
   -- return the iterator itself
 	return function()
 		i = i - 1
@@ -494,7 +494,7 @@ function gameManager:targets(a)
 			return i, self.events[a][i]
 		end
 	end
-  
+
 end
 
 function gameManager:setCurrentLevel(l)
@@ -537,7 +537,7 @@ function gameManager:sendEvent(e)
 	end
 end
 
-function gameManager:removeEvent(k, i) 
+function gameManager:removeEvent(k, i)
 	table.remove(self.events[k], i)
 end
 
@@ -549,8 +549,8 @@ function gameManager:showEvents()
 			end
 	end
 end
-  
-  
+
+
 function gameManager:pause()
 	if self.gameState == "paused" then self.gameState = "running"
 	elseif self.gameState == "running" then self.gameState = "paused" end
