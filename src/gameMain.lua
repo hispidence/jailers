@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2017
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- gameMain.lua
@@ -7,9 +7,7 @@
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
 
-
-local windowWidth = 0
-local windowHeight = 0
+local gameConf = require("src/gameConf")
 
 require("src/entities/objectFauxFactory")
 require("src/character")
@@ -37,16 +35,6 @@ end
 
 
 -------------------------------------------------------------------------------
--- Classes from Jumper
--------------------------------------------------------------------------------
-local Grid = require("src/external/jumper.grid")
-local PathFinder = require("src/external/jumper.pathfinder")
-local jumperGrid
-local jumperFinder
-
-
-
--------------------------------------------------------------------------------
 -- Set debugging variables
 -------------------------------------------------------------------------------
 local DEBUG_ENABLED = true
@@ -58,12 +46,11 @@ local g_debugDraw = false
 -------------------------------------------------------------------------------
 -- Set game manager, GUI, and gamestate variables
 -------------------------------------------------------------------------------
-local g_gui = require("src/external/Quickie")
 local g_gm = require("src/gameManager")
-local g_nextLevel = "level2"
-local g_menuRefreshed = false
-local g_blockSize = 16
-local g_config = nil
+local g_config = gameConf
+for k, v in pairs(g_config) do
+  print(k, v)
+end
 local g_pixelLocked = false
 local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
@@ -72,7 +59,6 @@ local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 -------------------------------------------------------------------------------
 -- Make variables to hold GUI resources
 -------------------------------------------------------------------------------
-local g_menuBGtex = nil
 local g_fonts = {}
 
 
@@ -180,26 +166,11 @@ end
 -- Set menu texture and font sizes
 -------------------------------------------------------------------------------
 function setupUI()
-  g_menuBGtex = love.graphics.newImage(uiData.menuBackGround)
   g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 20 * g_config.scale)
   g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * g_config.scale)
   g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * g_config.scale)
   g_fonts[4] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 4 * g_config.scale)
   love.graphics.setFont(g_fonts[1])
-  g_gui.keyboard.disable()
-  g_gui.group.default.size[1] = uiData.btnMenuWidth * g_config.scale
-  g_gui.group.default.size[2] = uiData.btnMenuHeight * g_config.scale
-  g_gui.group.default.spacing = 0
-
-  g_gui.core.style.color.normal.bg = {0, 0, 0}
-  g_gui.core.style.color.normal.fg = {140, 140, 140}
-  g_gui.core.style.color.normal.border = {0, 0, 0}
-  g_gui.core.style.color.hot.bg = {0, 0, 0}
-  g_gui.core.style.color.hot.fg = {37, 184, 233}
-  g_gui.core.style.color.hot.border = {0, 0, 0}
-  g_gui.core.style.color.active.bg = {0, 0, 0}
-  g_gui.core.style.color.active.fg = {255, 255, 255}
-  g_gui.core.style.color.active.border = {0, 0, 0}
 end
 
 
@@ -375,7 +346,7 @@ function addEntityWall(block, x, y)
   local blockID = #g_entityWalls+ 1
   local theBlock = gameObject()
 
-  local size = vector(g_blockSize, g_blockSize)
+  local size = vector(gameConf.blockSize, gameConf.blockSize)
   theBlock:setSize(size)
 
   theBlock:setCanCollide(true)
@@ -385,7 +356,7 @@ function addEntityWall(block, x, y)
 
   theBlock:setCategory("wall")
 
-  local pos = vector(x * g_blockSize, y * g_blockSize)
+  local pos = vector(x * gameConf.blockSize, y * gameConf.blockSize)
   pos.x = pos.x - size.x
   pos.y = pos.y - size.y
   theBlock:move(pos)
@@ -431,7 +402,7 @@ function addEntityBlock(block)
   theBlock:setID(block.name)
   theBlock:setCategory(block.type)
 
-  local size = vector(g_blockSize, g_blockSize)
+  local size = vector(gameConf.blockSize, gameConf.blockSize)
   theBlock:setSize(size)
   theBlock:setQuad(love.graphics.newQuad(0,
                           0,
@@ -536,7 +507,7 @@ function loadLevel(levelFileName)
 
   local pSize = vector(10, 10)
   local playerObj = tiledMap:getObject("objects", "player")
-  local pPos = vector(playerObj.x, playerObj.y - g_blockSize)
+  local pPos = vector(playerObj.x, playerObj.y - gameConf.blockSize)
   g_thePlayer = character("player")
   g_thePlayer:setTexture("resting",
         love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
@@ -634,8 +605,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function gameLoad(levelFileName, config)
-  g_config = config
+function gameLoad(levelFileName)
   love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
   windowWidth, windowHeight, _ = love.window.getMode()
   gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
@@ -751,9 +721,9 @@ function processEvent(e)
     -- Since camera logic is difficult to separate from graphics logic, we
     -- have to apply the scale here (only for now, hopefully)
     local newPosX = theCamera:getPos().x -
-                    ((g_config.widthInBlocks/(2 * g_config.scale)) * g_blockSize)
+                    ((g_config.widthInBlocks/(2 * g_config.scale)) * gameConf.blockSize)
     local newPosY = theCamera:getPos().y -
-                    ((g_config.heightInBlocks/(2 * g_config.scale)) * g_blockSize)
+                    ((g_config.heightInBlocks/(2 * g_config.scale)) * gameConf.blockSize)
     g_gm:moveCamera(
       cameraName,
       newPosX,
