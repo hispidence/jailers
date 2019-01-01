@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- gameObject.lua
@@ -10,6 +10,7 @@
 require("src/utils")
 require("src/collider")
 vector = require("src/external/hump.vector")
+local gameConf = require("src/gameConf")
 
 
 
@@ -64,7 +65,7 @@ end
 function gameObject:init()
 	self.size = vector(1, 1)
   self.angle = 0
-	self.position = vector(0,0) 
+	self.position = vector(0,0)
 	self.direction = vector(0,0)
 	self.vel = vector(0,0)
 	self.invisible = false
@@ -85,8 +86,8 @@ function gameObject:init()
 	self.textures = {}
 	self.anims = {}
 end
-  
-  
+
+
 
 -------------------------------------------------------------------------------
 -- assignFromProperties
@@ -160,7 +161,7 @@ end
 	end
 
 	function gameObject:getTopLeft(buf)
-	  buf.x, buf.y, _, _ = self.collisionShape:bbox()	
+	  buf.x, buf.y, _, _ = self.collisionShape:bbox()
 	end
 
 	function gameObject:getTopRight(buf)
@@ -168,11 +169,11 @@ end
 	end
 
 	function gameObject:getBottomLeft(buf)
-	  buf.x, _, _, buf.y = self.collisionShape:bbox()	
+	  buf.x, _, _, buf.y = self.collisionShape:bbox()
 	end
 
 	function gameObject:getBottomRight(buf)
-	  _, _, buf.x, buf.y = self.collisionShape:bbox()	
+	  _, _, buf.x, buf.y = self.collisionShape:bbox()
 	end
 
 
@@ -180,7 +181,7 @@ end
 -------------------------------------------------------------------------------
 -- setDir
 --
--- Set the object's direction angle (has no bearing on its velocity vector) 
+-- Set the object's direction angle (has no bearing on its velocity vector)
 -------------------------------------------------------------------------------
 function gameObject:setDir(dir)
 	self.direction = dir
@@ -306,7 +307,7 @@ end
 	function gameObject:setCollisionBehaviour(c)
 		self.collisionBehaviour = c
 	end
-  
+
   function gameObject:addCollisionBehaviour(c)
 		self.collisionBehaviour[#self.collisionBehaviour+1] = c
 	end
@@ -391,21 +392,28 @@ end
 -------------------------------------------------------------------------------
 -- draw
 --
--- Draws the object 
+-- Draws the object
 -------------------------------------------------------------------------------
 function gameObject:draw(pixelLocked)
 	if self.invisible then return end
 	local drawPos = self:getPos():clone()
-  
+
   if(pixelLocked) then
     drawPos.x = jRound(drawPos.x)
     drawPos.y = jRound(drawPos.y)
   end
-  
-  if self.anims[self.state] then 
+
+  if self.anims[self.state] then
     self.anims[self.state]:draw(drawPos.x, drawPos.y, 0, 1, 1)
   else
-    love.graphics.draw(self:getTexture(self.state), drawPos.x + g_halfBlockSize, drawPos.y + g_halfBlockSize, self.angle, 1, 1, g_halfBlockSize, g_halfBlockSize)
+    love.graphics.draw(self:getTexture(self.state),
+                       drawPos.x + gameConf.blockSize/2,
+                       drawPos.y + gameConf.blockSize/2,
+                       self.angle,
+                       1,
+                       1,
+                       gameConf.blockSize/2,
+                       gameConf.blockSize/2)
   end
 end
 
@@ -414,7 +422,7 @@ end
 -------------------------------------------------------------------------------
 -- drawDebug
 --
--- Draws the object's debug shape 
+-- Draws the object's debug shape
 -------------------------------------------------------------------------------
 function gameObject:drawDebug()
   if self.canCollide then self.collisionShape:draw("line") end
@@ -431,10 +439,10 @@ end
 -------------------------------------------------------------------------------
 -- assignTextureSet
 --
--- Read the texture set and load in the textures it specifies 
+-- Read the texture set and load in the textures it specifies
 -------------------------------------------------------------------------------
 function gameObject:assignTextureSet(textureSet)
-  
+
   if textureSet then
 
     local t = g_textureSets[textureSet]
@@ -442,7 +450,7 @@ function gameObject:assignTextureSet(textureSet)
     -- Does the textureset exist?
     if t then
       for state, tex in pairs(t) do
-          
+
         --do the asked-for textures exist?
         if rTextures[tex] then
           self:setTexture(state,
@@ -452,13 +460,13 @@ function gameObject:assignTextureSet(textureSet)
           print("Warning! Texture \"" .. tex .. "\" does not exist " ..
             "in the table of textures")
         end
-          
+
       end
     else
       print("Warning! Textureset \"" .. textureSet ..
         "\" doesn't exist.")
     end
-      
+
     else
       print("Warning! Block \"" .. self:getID() .. "\" has no textureset.")
     end
@@ -479,8 +487,8 @@ function gameObject:setTexture(key, value, repeating)
 	value:setFilter("nearest")
 	self.textures[key].texture = value
 	if repeating then
-		self.textures[key].texture:setWrap("repeat", "repeat")	
-	end 
+		self.textures[key].texture:setWrap("repeat", "repeat")
+	end
 end
 
 
@@ -488,7 +496,7 @@ end
 -------------------------------------------------------------------------------
 -- getTexture
 --
--- 
+--
 -------------------------------------------------------------------------------
 function gameObject:getTexture(key)
 	return self.textures[key].texture
@@ -523,27 +531,27 @@ end
 --------------------------------------
 
 function gameObject:processEvent(e)
-  
+
 	if e:getDesc() == "switchOn" then
 		self.state = "used"
-    
-	elseif e:getID() == "changestate" then 
+
+	elseif e:getID() == "changestate" then
 		self.state = e:getDesc()
 
-	elseif e:getID() == "move" then 
+	elseif e:getID() == "move" then
 		self:setPos(e:getData())
-    
+
 	elseif e:getID() == "removeblock" then
 		self.state = "dead"
 		local e = jlEvent(self.id, "main", "removeblock", "none")
 		gm:sendEvent(e)
-    
+
 	elseif e:getID() == "addblock" then
 		self.state = "dormant"
 		local e = jlEvent(self.id, "main", "addblock", "none")
 		gm:sendEvent(e)
 	end
-  
+
 end
 
 
