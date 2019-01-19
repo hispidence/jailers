@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- bullet.lua
@@ -7,20 +7,20 @@
 -- Base class for bullets.
 -------------------------------------------------------------------------------
 
--- OO stuff
-local gameObject = require("src/gameObject")
+-- get the base class
+local gameObject = require("src/entities/gameObject")
 
 local bullet = {}
 bullet.__index = bullet
 
 setmetatable(bullet,
 	{__index = gameObject,
-	__call = function(cls, ...) 
-		return cls.new(...)	
+	__call = function(cls, ...)
+		return cls.new(...)
 		end
 	})
 
-function bullet:new()
+function bullet.new()
 	local self = setmetatable(gameObject(), bullet)
 	self:init()
 	return self
@@ -31,7 +31,7 @@ end
 -------------------------------------------------------------------------------
 -- init
 --
--- Sets default values.
+--
 -------------------------------------------------------------------------------
 function bullet:init()
 	gameObject.init(self)
@@ -43,9 +43,9 @@ end
 
 
 -------------------------------------------------------------------------------
--- self.gunID
+-- setGunID
 --
--- ID of the gun that fired it
+--
 -------------------------------------------------------------------------------
 function bullet:setGunID(id)
 	self.gunID = id
@@ -56,17 +56,17 @@ end
 -------------------------------------------------------------------------------
 -- reset
 --
--- Sets default values.
+--
 -------------------------------------------------------------------------------
 function bullet:reset()
 	self.state = "dormant"
   self.invisible = true
   self.canCollide = false
-  
+
   if self.collisionShape then
     theCollider:remove(self.collisionShape)
   end
-  
+
   -- Bullets need to stop when they collide with a solid object.
   -- However, the gun that fires them is a solid object itself, so these two
   -- bools are used to determine whether the bullet is currently colliding
@@ -81,7 +81,7 @@ end
 -------------------------------------------------------------------------------
 -- processEvent
 --
--- Sets default values.
+--
 -------------------------------------------------------------------------------
 function bullet:processEvent(e)
 	gameObject.processEvent(self, e)
@@ -103,7 +103,7 @@ end
 -------------------------------------------------------------------------------
 -- setFiringBehaviour
 --
--- Sets firing behaviour.
+--
 -------------------------------------------------------------------------------
 function bullet:setFiringBehaviour(fb)
 	self.firingBehaviour = fb
@@ -113,7 +113,7 @@ end
 
 ---------------------------------------------------------------------------------------------------
 --	update
---	
+--
 --
 ---------------------------------------------------------------------------------------------------
 function bullet:update(dt)
@@ -126,7 +126,7 @@ function bullet:update(dt)
     local vec = {}
     vec.x = self.vel.x * dt
     vec.y = self.vel.y * dt
-    
+
     self:move(vec)
 	end
 	if "dormant" == self.state then
@@ -137,7 +137,7 @@ function bullet:update(dt)
       self:setCollisionCircle()
       self.canCollide = true
       self:setPos(self.position)
-      
+
       self.invisible = false
     end
   end

@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2015
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- character.lua
 --
--- Game objects which can move (player and enemies)
+-- Game objects which can move
 -------------------------------------------------------------------------------
 
-local gameObject = require("src/gameObject")
+local gameObject = require("src/entities/gameObject")
 local vector = require("src/external/hump/vector")
 
 -- OO inheritance, after a fashion: fill character with gameObject's functions
@@ -188,7 +188,7 @@ end
 -- Arguments
 -- p - the Jumper path
 --
--- Copies the nodes from a Jumper path to the character's internal path 
+-- Copies the nodes from a Jumper path to the character's internal path
 -------------------------------------------------------------------------------
 function character:copyPath(p)
 	if p == nil then

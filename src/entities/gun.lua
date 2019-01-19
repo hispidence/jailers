@@ -13,15 +13,15 @@ local vector = require("src/external/hump/vector")
 local bullet = require("src/entities/bullet")
 
 -- OO stuff
-local gameObject = require("src/gameObject")
+local gameObject = require("src/entities/gameObject")
 
 local gun = {}
 gun.__index = gun
 
 setmetatable(gun,
 	{__index = gameObject,
-	__call = function(cls, ...) 
-		return cls.new(...)	
+	__call = function(cls, ...)
+		return cls.new(...)
 		end
 	})
 
@@ -36,7 +36,7 @@ end
 -------------------------------------------------------------------------------
 -- init
 --
--- Sets default values.
+--
 -------------------------------------------------------------------------------
 function gun:init()
 	gameObject.init(self)
@@ -94,7 +94,7 @@ end
 -------------------------------------------------------------------------------
 -- createBullet
 --
--- Create and return a bullet.
+--
 -------------------------------------------------------------------------------
 function gun:createBullet()
   local b = bullet()
@@ -145,7 +145,7 @@ end
 
 -------------------------------------------------------------------------------
 --	updateSound(dt)
---	
+--
 --
 -------------------------------------------------------------------------------
 function gun:updateSound(dt)
@@ -159,7 +159,7 @@ end
 
 ---------------------------------------------------------------------------------------------------
 --	gun:update(dt)
---	
+--
 --
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)

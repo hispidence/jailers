@@ -8,7 +8,7 @@
 -------------------------------------------------------------------------------
 
 -- The base class
-require("src/gameObject")
+require("src/entities/gameObject")
 
 
 
