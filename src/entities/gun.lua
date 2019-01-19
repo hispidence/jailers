@@ -7,12 +7,15 @@
 -- Base class for guns.
 -------------------------------------------------------------------------------
 
-require("src/entities/bullet")
+
+local vector = require("src/external/hump/vector")
+
+local bullet = require("src/entities/bullet")
 
 -- OO stuff
-require("src/gameObject")
+local gameObject = require("src/gameObject")
 
-gun = {}
+local gun = {}
 gun.__index = gun
 
 setmetatable(gun,
@@ -22,7 +25,7 @@ setmetatable(gun,
 		end
 	})
 
-function gun:new()
+function gun.new()
 	local self = setmetatable(gameObject(), gun)
 	self:init()
 	return self
@@ -165,4 +168,4 @@ function gun:update(dt)
 	end
 end
 
-
+return gun

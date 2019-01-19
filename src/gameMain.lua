@@ -9,8 +9,9 @@
 
 local gameConf = require("src/gameConf")
 
+local vector = require("src/external/hump/vector")
+
 require("src/entities/objectFauxFactory")
-require("src/character")
 require("src/uiData")
 require("src/collider")
 require("src/sounds")
@@ -48,9 +49,7 @@ local g_debugDraw = false
 -------------------------------------------------------------------------------
 local g_gm = require("src/gameManager")
 local g_config = gameConf
-for k, v in pairs(g_config) do
-  print(k, v)
-end
+
 local g_pixelLocked = false
 local FONT_PROCIONO_REGULAR = "resources/Prociono-Regular.ttf"
 
@@ -277,7 +276,7 @@ end
 -- A camera comprises only a position, a name, and a state.
 -------------------------------------------------------------------------------
 function addCamera(camera)
-  local newCamera = gameObject()
+  local newCamera = buildByType("camera")
 
   if not camera.name or "" == camera.name then
     camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
@@ -305,14 +304,14 @@ end
 -------------------------------------------------------------------------------
 function addEntityTrigger(trig)
   local trigID = #g_entityTriggers + 1
-  local theTrigger = gameObject()
+  local theTrigger = buildByType("trigger")
 
 
   if trig.name and trig.name ~= "" then
     theTrigger:setID(trig.name)
   else
     print("Warning! A trigger has no name.")
-    block.name = "nameless_trigger_FIX_THIS_NOW_" .. trigID
+    theTrigger.name = "nameless_trigger_FIX_THIS_NOW_" .. trigID
   end
 
   theTrigger:setCategory("trigger")
@@ -344,7 +343,7 @@ end
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
   local blockID = #g_entityWalls+ 1
-  local theBlock = gameObject()
+  local theBlock = buildByType("scenery")
 
   local size = vector(gameConf.blockSize, gameConf.blockSize)
   theBlock:setSize(size)
@@ -396,8 +395,8 @@ function addEntityBlock(block)
   local theBlock = buildByType(block.type)
   if not theBlock then
     print("Warning! Block \"" .. block.name .. "\" has an invalid type; " ..
-      "reverting to gameObject")
-    theBlock = gameObject()
+      "reverting to scenery")
+    theBlock = buildByType("scenery")
   end
   theBlock:setID(block.name)
   theBlock:setCategory(block.type)
@@ -508,7 +507,8 @@ function loadLevel(levelFileName)
   local pSize = vector(10, 10)
   local playerObj = tiledMap:getObject("objects", "player")
   local pPos = vector(playerObj.x, playerObj.y - gameConf.blockSize)
-  g_thePlayer = character("player")
+  g_thePlayer = buildByType("character")
+  g_thePlayer:setClass("player")
   g_thePlayer:setTexture("resting",
         love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
         false)

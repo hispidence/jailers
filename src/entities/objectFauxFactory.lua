@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- objectFauxFactory.lua
@@ -7,9 +7,10 @@
 -- Which tiled object types map to which objects?
 -------------------------------------------------------------------------------
 
-require("src/gameObject")
-require("src/entities/mover")
-require("src/entities/gun")
+local gameObject = require("src/gameObject")
+local mover      = require("src/entities/mover")
+local gun        = require("src/entities/gun")
+local character  = require("src/entities/character")
 
 
 
@@ -24,8 +25,12 @@ local types = {
   switch    = gameObject,
   door      = gameObject,
   enemy     = gameObject,
+  camera    = gameObject,
+  scenery   = gameObject, --stuff that won't move
+  trigger   = gameObject,
   mover     = mover,
-  gun       = gun
+  gun       = gun,
+  character = character
 }
 
 

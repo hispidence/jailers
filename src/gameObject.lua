@@ -9,13 +9,13 @@
 
 require("src/utils")
 require("src/collider")
-vector = require("src/external/hump.vector")
+local vector = require("src/external/hump.vector")
 local gameConf = require("src/gameConf")
 
 
 
 -- A cheeky bit of object orientation.
-gameObject = {}
+local gameObject = {}
 
 -- When looking for a gameObject "instance"'s members, look in gameObject.
 gameObject.__index = gameObject
@@ -610,3 +610,5 @@ end
 function gameObject:findNearest(blockSize)
 	return jRound(self.position.x/blockSize) + 1, jRound(self.position.y/blockSize)+1
 end
+
+return gameObject

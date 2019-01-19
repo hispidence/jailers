@@ -9,6 +9,8 @@
 
 require("src/firingBehaviour")
 
+local vector = require("src/external/hump/vector")
+
 local firingBehaviourFactory = {}
 
 

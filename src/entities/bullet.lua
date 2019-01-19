@@ -8,9 +8,9 @@
 -------------------------------------------------------------------------------
 
 -- OO stuff
-require("src/gameObject")
+local gameObject = require("src/gameObject")
 
-bullet = {}
+local bullet = {}
 bullet.__index = bullet
 
 setmetatable(bullet,
@@ -142,3 +142,5 @@ function bullet:update(dt)
     end
   end
 end
+
+return bullet

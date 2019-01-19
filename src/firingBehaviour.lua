@@ -7,6 +7,8 @@
 -- Object to contain gun behaviour.
 -------------------------------------------------------------------------------
 
+local vector = require("src/external/hump/vector")
+
 firingBehaviour = {}
 
 firingBehaviour.__index = firingBehaviour

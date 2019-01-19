@@ -7,10 +7,11 @@
 -- Game objects which can move (player and enemies)
 -------------------------------------------------------------------------------
 
-require("src/gameObject")
+local gameObject = require("src/gameObject")
+local vector = require("src/external/hump/vector")
 
 -- OO inheritance, after a fashion: fill character with gameObject's functions
-character = {}
+local character = {}
 for k,v in pairs(gameObject) do
 	character[k]=v
 end
@@ -352,3 +353,5 @@ function character:draw(debug, pixelLocked)
 	gameObject.draw(self, debug, pixelLocked)
 	--if(debug) then self.pathBox:draw("line") end
 end
+
+return character
