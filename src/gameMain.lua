@@ -11,7 +11,7 @@ local gameConf = require("src/gameConf")
 
 local vector = require("src/external/hump/vector")
 
-require("src/entities/objectFauxFactory")
+local createObject = require("src/entities/objectFauxFactory")
 require("src/uiData")
 require("src/collider")
 require("src/sounds")
@@ -276,7 +276,7 @@ end
 -- A camera comprises only a position, a name, and a state.
 -------------------------------------------------------------------------------
 function addCamera(camera)
-  local newCamera = buildByType("camera")
+  local newCamera = createObject("camera")
 
   if not camera.name or "" == camera.name then
     camera.name = "nameless_camera_FIX_THIS_NOW_" .. camID
@@ -304,7 +304,7 @@ end
 -------------------------------------------------------------------------------
 function addEntityTrigger(trig)
   local trigID = #g_entityTriggers + 1
-  local theTrigger = buildByType("trigger")
+  local theTrigger = createObject("trigger")
 
 
   if trig.name and trig.name ~= "" then
@@ -343,7 +343,7 @@ end
 -------------------------------------------------------------------------------
 function addEntityWall(block, x, y)
   local blockID = #g_entityWalls+ 1
-  local theBlock = buildByType("scenery")
+  local theBlock = createObject("scenery")
 
   local size = vector(gameConf.blockSize, gameConf.blockSize)
   theBlock:setSize(size)
@@ -392,11 +392,11 @@ function addEntityBlock(block)
     print("Warning! Block \"" .. block.name .. "\" has no properties.")
   end
 
-  local theBlock = buildByType(block.type)
+  local theBlock = createObject(block.type)
   if not theBlock then
     print("Warning! Block \"" .. block.name .. "\" has an invalid type; " ..
       "reverting to scenery")
-    theBlock = buildByType("scenery")
+    theBlock = createObject("scenery")
   end
   theBlock:setID(block.name)
   theBlock:setCategory(block.type)
@@ -507,7 +507,7 @@ function loadLevel(levelFileName)
   local pSize = vector(10, 10)
   local playerObj = tiledMap:getObject("objects", "player")
   local pPos = vector(playerObj.x, playerObj.y - gameConf.blockSize)
-  g_thePlayer = buildByType("character")
+  g_thePlayer = createObject("character")
   g_thePlayer:setClass("player")
   g_thePlayer:setTexture("resting",
         love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),

@@ -16,9 +16,6 @@ local character  = require("src/entities/character")
 
 -------------------------------------------------------------------------------
 -- types
---
--- Chooses which type of object should be constructed based on the argument
--- given to buildByType.
 -------------------------------------------------------------------------------
 local types = {
   typeless  = gameObject,
@@ -36,11 +33,9 @@ local types = {
 
 
 -------------------------------------------------------------------------------
--- buildByType
---
--- Invokes constructor and returns object.
+-- createObject
 -------------------------------------------------------------------------------
-function buildByType(theType)
+local function createObject(theType)
   local constructor = types[theType];
   if not constructor then
     print("Warning! No constructor for " .. theType)
@@ -49,3 +44,5 @@ function buildByType(theType)
     return constructor();
   end
 end
+
+return createObject
