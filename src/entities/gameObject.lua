@@ -90,29 +90,6 @@ end
 
 
 -------------------------------------------------------------------------------
--- assignFromProperties
---
--- Populate the object's members with properties from its Tiled object.
--------------------------------------------------------------------------------
-function gameObject:assignFromProperties(prop)
-  return true
-end
-
-
-
--------------------------------------------------------------------------------
--- createSubObjects
---
--- Some objects, when initialised, can create sub objects (eg guns making
--- bullets). These objects exist should separately from their parent.
--------------------------------------------------------------------------------
-function gameObject:createSubObjects()
-  return nil
-end
-
-
-
--------------------------------------------------------------------------------
 -- getPos
 --
 -- Return the object's world-space position; a HUMP vector.
