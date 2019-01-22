@@ -9,6 +9,7 @@
 
 
 local vector = require("src/external/hump/vector")
+local jlutil = require("src/utils")
 
 local bullet = require("src/entities/bullet")
 
@@ -25,6 +26,13 @@ setmetatable(gun,
 		end
 	})
 
+
+
+-------------------------------------------------------------------------------
+-- new
+--
+--
+-------------------------------------------------------------------------------
 function gun.new()
 	local self = setmetatable(gameObject(), gun)
 	self:init()
@@ -44,6 +52,7 @@ function gun:init()
 	self.firingBehaviourGun = nil
 	self.bulletCollisionBehaviour = nil
 	self.bulletsMade = 0
+  self.bullets = nil
 	self.bulletOffset = vector(1, 0)
 	self.bulletTextureSet = {}
   self.firingBehaviour = nil
@@ -64,27 +73,32 @@ function gun:assignFromProperties(prop)
   local stdVec = vector(0, -1)
 
   self.angle = stdVec:angleTo(dirVec)
-  
+
   if(prop.behaviourScript) then
     local scriptFile = "src/levels/scripts/" .. prop.behaviourScript
     local firingBehaviourFactory = require(scriptFile)
-    
+
     self.firingBehaviour = firingBehaviourFactory:makeFiringBehaviour(prop)
-    
+
     self.numBullets = prop.numBullets
     if 0 == self.numBullets then
       self.numBullets = 10
     end
-    
-    unrequire(scriptFile)
+
+    jlutil.unrequire(scriptFile)
   end
-  
+
   self:setState("active")
-  
+
   self.bulletTextureSet = prop.textureset_bullet
 
   self.bulletOffset.x = prop.bulletOffsetX
   self.bulletOffset.y = prop.bulletOffsetY
+
+  self.bullets = {}
+  for i = 1, self.numBullets do
+    self.bullets[i] = self:createBullet()
+  end
 
   return true
 end
@@ -99,60 +113,28 @@ end
 function gun:createBullet()
   local b = bullet()
   b:setSize(vector(8, 8))
-  
   b:setState("dormant")
   b:setInvisible(true)
   b:setPos(self.position:clone() + self.bulletOffset)
-  
+
   b:setID(self:getID() .. "_bullet" .. self.bulletsMade)
   b:setCategory("bullet")
   b:setGunID(self:getID())
-  
+
   self.bulletsMade = self.bulletsMade + 1
-  
+
   b:assignTextureSet(self.bulletTextureSet)
-  
-  local size = vector(g_blockSize, g_blockSize)
+
 	b:setQuad(love.graphics.newQuad(0,
 													0,
 													b:getSize().x,
-													b:getSize().y, 
+													b:getSize().y,
 													b:getSize().x,
 													b:getSize().y))
-  
+
   -- Hopefully, lua will give each bullet the SAME closure
   b:setFiringBehaviour(self.firingBehaviour)
   return b
-end
-
-
-
--------------------------------------------------------------------------------
--- createSubObjects
---
--- Some objects, when initialised, can create sub objects (eg guns making
--- bullets). These objects exist should separately from their parent.
--------------------------------------------------------------------------------
-function gun:createSubObjects()
-  local bullets = {}
-  for i = 1, self.numBullets do
-    bullets[i] = self:createBullet()
-  end
-  return bullets
-end
-
-
-
--------------------------------------------------------------------------------
---	updateSound(dt)
---
---
--------------------------------------------------------------------------------
-function gun:updateSound(dt)
-	--if self.firingBehaviour ~= nil then if self.firingBehaviour:isSoundReady(dt) then gameObject.playSound(self) end
-	--else
-	--	gameObject.updateSound(self, dt)
-	--end
 end
 
 
@@ -165,7 +147,26 @@ end
 function gun:update(dt)
 	if "active" == self.state then
     self.firingBehaviour:updateGun(dt, self.position)
-	end
+    for _, v in ipairs(self.bullets) do
+      v:update(dt)
+    end
+  end
+end
+
+
+
+---------------------------------------------------------------------------------------------------
+--  gun:draw(dt)
+--
+--
+---------------------------------------------------------------------------------------------------
+function gun:draw()
+  gameObject.draw(self)
+  if "active" == self.state then
+    for _, v in ipairs(self.bullets) do
+      v:draw()
+    end
+  end
 end
 
 return gun
