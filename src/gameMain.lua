@@ -9,6 +9,8 @@
 
 local gameConf = require("src/gameConf")
 
+local jlutil = require("src/utils")
+
 local vector = require("src/external/hump/vector")
 
 local createObject = require("src/entities/objectFauxFactory")
@@ -376,28 +378,13 @@ end
 function addEntityBlock(block)
   local blockID = #g_entityBlocks + 1
 
-  if not block.name or "" == block.name then
-    print("Warning! A block has no name.")
-    block.name = "nameless_block_FIX_THIS_NOW_" .. blockID
-  end
+  assert(block.name and "" ~= block.name)
+  assert(block.type and "" ~= block.type)
 
-  if not block.type or "" == block.type then
-    print("Warning! Block \"" .. block.name .. "\" has no type.")
-    block.type = "typeless"
-  end
-
-  local prop = block.properties
-
-  if not prop then
-    print("Warning! Block \"" .. block.name .. "\" has no properties.")
-  end
 
   local theBlock = createObject(block.type)
-  if not theBlock then
-    print("Warning! Block \"" .. block.name .. "\" has an invalid type; " ..
-      "reverting to scenery")
-    theBlock = createObject("scenery")
-  end
+  assert(theBlock)
+
   theBlock:setID(block.name)
   theBlock:setCategory(block.type)
 
@@ -413,8 +400,8 @@ function addEntityBlock(block)
   theBlock:setCanCollide(true)
   theBlock:setCollisionRectangle()
 
+  local prop = block.properties
   if prop then
-    -- Does the entity specify a textureset?
     theBlock:assignTextureSet(prop.textureset)
 
     registerBehaviours(theBlock, prop)
@@ -435,14 +422,6 @@ function addEntityBlock(block)
   theBlock:move(pos)
 
   g_entityBlocks[blockID] = theBlock
-
-  local subObjects = theBlock:createSubObjects()
-
-  if subObjects then
-    for i, o in ipairs(subObjects) do
-      g_entityBlocks[blockID + i] = o;
-    end
-  end
 
 end
 
@@ -636,8 +615,8 @@ function gameDraw()
 
   -- Round the new position so it aligns with a pixel. I'm not convinced about
   -- this. I don't think it looks smooth.
-  local tX = jRound(-g_gm:getCurrX());
-  local tY = jRound(-g_gm:getCurrY());
+  local tX = jlutil.jRound(-g_gm:getCurrX());
+  local tY = jlutil.jRound(-g_gm:getCurrY());
   love.graphics.translate(tX, tY)
 
   if(g_debugDraw) then
