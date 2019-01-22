@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="17">
+<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
  <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="64" columns="8">
-  <image source="../../textures/tileset.png" width="128" height="128"/>
+  <image source="../textures/tileset.png" width="128" height="128"/>
   <terraintypes>
    <terrain name="barrel" tile="0"/>
    <terrain name="door" tile="17"/>
@@ -9,7 +9,7 @@
   <tile id="0" terrain="0,0,0,0"/>
   <tile id="17" terrain="1,1,1,1"/>
  </tileset>
- <layer name="floor" width="50" height="50">
+ <layer id="1" name="floor" width="50" height="50">
   <properties>
    <property name="collidable" value="false"/>
   </properties>
@@ -17,7 +17,7 @@
    eJzt1kEOgjAQBdDZgBtSXOhGjbJj6xE4CkfhKByFo3AUh8AkTTOlqLHU5L9kYos1mZ9SkCjstFROVBmibioedxt+GlXmVGGVreQcXMOBqOEsY9wuw9wckuXsrHsStVwj70XDNdjf8ZzM/Nn/vGGPK+lZRL3UkXuUsW3KwHtUcQ35zvuk5ciUdaVyjXtvOUNrdtwLly+P1IPm/ZMSZn4G9FGbXRHK4Z4ZkUKOUO9bcmhnP6bpveC7f+7KtRDtTMXgyyFuy/xirXeFng2xyP3yaS+p5Ci+7CWFDML+D/LPOTLPWOZba2/v9JpS3661npAjLcgBAAAAAAAAAAAAAAAQ3wv1oxO5
   </data>
  </layer>
- <layer name="statics" width="50" height="50">
+ <layer id="2" name="statics" width="50" height="50">
   <properties>
    <property name="collidable" value="true"/>
   </properties>
@@ -25,7 +25,7 @@
    eJztl01ugzAQhZ22gi7AZJmld62US3AUjsJROApH8VH6BnvUqWtSIvFXaT5pREpC9F7nz6mMMQXCxsDrwfxDyENpjLvgSmGjD/bWIGpzfn/Q2rEHAp56G64O4fF6pICPMX0W9xyi31HuLNDRQW+b3q9M8DSXB84jPPpNBT4B5SS9xzni/HBwncV8UZ78jlIfQjmh2snlRRJ9jfDSwktLHorwfE/vV9tLnYVqHJp6/h/PfU7MAX/F9Yb4MFNuujrm5GAfbZmpK8nF/PRB+j9N8IHcdM1JasuKPIi+oDrrLsm9Ivp4N8GHDXNisKGP+iPnl83UUx1qv2Uv7CHO2oE8sA/6PHutD8xNrragZ7jG9+x3T9OMmnYlebiG/dJlvvIwUi+8O9AH3iFuQfO0G2knpvlgztAr0ousI6790vzeJ2XSW0fuRdSQa4RWgnuX/n5BvIp4y3yHnGd7aM6R6/OllOH81VrRR+spew72kWqyC3bLyc5XLl4996/oY/fHs35jeYtJZuv0WwMztV/q476LyuXwWZxmEp1rmzhrHz2zho97jLXgcy+ffW3c6bJf+Ky7Zl+v7UNCnnK/AbfgbHWpKIqiKIqiKIqiKIqiKIqiKM/yBYIkVHg=
   </data>
  </layer>
- <objectgroup name="objects">
+ <objectgroup id="3" name="objects">
   <properties>
    <property name="collidable" value="false"/>
   </properties>
@@ -98,12 +98,12 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="cameras">
+ <objectgroup id="4" name="cameras">
   <object id="11" name="camera_hall" type="camera" x="32" y="176" width="16" height="16"/>
   <object id="12" name="camera_start" type="camera" x="96" y="96" width="16" height="16"/>
   <object id="15" name="camera_hall2" type="camera" x="184.333" y="259.333" width="16" height="16"/>
  </objectgroup>
- <objectgroup name="triggers">
+ <objectgroup id="5" name="triggers">
   <object id="13" name="cameraTrigger_hall" type="trigger" x="51.6667" y="164" width="8" height="8">
    <properties>
     <property name="behaviour_move_camera" value="timer=3 type=move_camera target=camera_hall"/>
