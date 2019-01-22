@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2017
+-- Copyright (C) Brad Ellis 2013-2019
 --
 --
 -- utils.lua
@@ -9,12 +9,16 @@
 
 
 
+local jlutil = {}
+
+
+
 -------------------------------------------------------------------------------
 -- unrequire
 --
 --
 -------------------------------------------------------------------------------
-function unrequire(module)
+function jlutil.unrequire(module)
 	package.loaded[module] = nil
   _G[module] = nil
 end
@@ -26,7 +30,7 @@ end
 --
 -- Rounds a floating-point number to its nearest whole.
 -------------------------------------------------------------------------------
-function jRound(n)
+function jlutil.jRound(n)
 	if n >= 0 then return math.floor(n + 0.5)
 	else return math.ceil(n - 0.5) end
 end
@@ -39,7 +43,7 @@ end
 -- Splits the string into a table of values, using anything other than a
 -- letter, number, underscore, or hyphen as a delimiter.
 -------------------------------------------------------------------------------
-function jlSplit(str)
+function jlutil.jlSplit(str)
   local vals = {}
   for s in str:gmatch("[%w_-]+") do
     vals[#vals + 1] = s
@@ -54,10 +58,10 @@ end
 --
 -- Splits the string into a table of values, using anything other than a
 -- letter, number, underscore, or hyphen as a delimiter. Additionally, this
--- function returns a key-value table. 
+-- function returns a key-value table.
 -------------------------------------------------------------------------------
-function jlSplitKV(str)
-  local vals = jlSplit(str)
+function jlutil.jlSplitKV(str)
+  local vals = jlutil.jlSplit(str)
   local kvVals = {}
   for i = 1, #vals, 2 do
     if nil == vals[i+1] then
@@ -69,3 +73,4 @@ function jlSplitKV(str)
   return kvVals
 end
 
+return jlutil
