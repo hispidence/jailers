@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- textures.lua
@@ -7,10 +7,14 @@
 -- Textures and sets thereof.
 -------------------------------------------------------------------------------
 
-TEXTURES_DIR = "textures/"
+local m = {}
 
-function getTextureByID(id)
-	for i, v in ipairs(rTextures) do
+local TEXTURES_DIR = "textures/"
+
+m.TEXTURES_DIR = TEXTURES_DIR
+
+function m.getTextureByID(id)
+	for i, v in ipairs(m.rTextures) do
 		if v.id == id then
       return i
     end
@@ -20,7 +24,7 @@ end
 
 -- Each key corresponds to an object state, and each value corresponds
 -- to a texture ID from rTextures.
-g_textureSets = {
+m.g_textureSets = {
   
   door_standard = {
     dormant = "door",
@@ -48,7 +52,7 @@ g_textureSets = {
   
 }
 
-rTextures = {
+m.rTextures = {
 	{id = "shelf_decayed1",
 	fname = TEXTURES_DIR .. "shelf_decayed1.png",
 	data = nil},
@@ -367,15 +371,17 @@ rTextures = {
 
 	{id = "spikeblockred",
 	fname = TEXTURES_DIR .. "spikeblockred.png",
-	data = nil},
+	data = nil}
 }
 
 --Dirty and oh so temporary
 -- TODO: fix it
-rTextures.mt = {
+m.rTextures.mt = {
   __index = function(table, key)
-    return rawget(table, getTextureByID(key))
+    return rawget(table, m.getTextureByID(key))
   end
 }
 
-setmetatable(rTextures, rTextures.mt)
+setmetatable(m.rTextures, m.rTextures.mt)
+
+return m

@@ -6,15 +6,12 @@
 --
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
-
 local gameConf = require("src.gameConf")
 local jlutil = require("src.utils")
 local vector = require("src.external.hump.vector")
 local createObject = require("src.entities.objectFauxFactory")
 local onCollide = require("src.collider")
-
-require("src.sounds")
-require("src.textures")
+local textures = require("src.textures")
 require("src.shaders")
 require("src.jlEvent")
 require("src.utils")
@@ -179,11 +176,7 @@ end
 -- Load the sounds and textures
 -------------------------------------------------------------------------------
 function loadResources()
-  for _, v in ipairs(lSounds) do
-    v.soundData = love.sound.newSoundData(v.fname)
-  end
-
-  for _, v in ipairs(rTextures) do
+  for _, v in ipairs(textures.rTextures) do
     v.data = love.graphics.newImage(v.fname)
     v.data:setFilter("nearest")
   end
@@ -486,16 +479,16 @@ function loadLevel(levelFileName)
   g_thePlayer = createObject("character")
   g_thePlayer:setClass("player")
   g_thePlayer:setTexture("resting",
-        love.graphics.newImage(TEXTURES_DIR .. "playerrest.png"),
+        love.graphics.newImage(textures.TEXTURES_DIR .. "playerrest.png"),
         false)
   g_thePlayer:setTexture("moving_vertical",
-        love.graphics.newImage(TEXTURES_DIR .. "playermoveup.png"),
+        love.graphics.newImage(textures.TEXTURES_DIR .. "playermoveup.png"),
         false)
   g_thePlayer:setTexture("moving_horizontal",
-        love.graphics.newImage(TEXTURES_DIR .. "playermove.png"),
+        love.graphics.newImage(textures.TEXTURES_DIR .. "playermove.png"),
         false)
   g_thePlayer:setTexture("dead",
-        love.graphics.newImage(TEXTURES_DIR .. "playerdeath.png"),
+        love.graphics.newImage(textures.TEXTURES_DIR .. "playerdeath.png"),
         false)
   g_thePlayer:setSize(pSize)
   g_thePlayer:setShapeOffsets(2, 2)
@@ -584,8 +577,7 @@ end
 function gameLoad(levelFileName)
   love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
   windowWidth, windowHeight, _ = love.window.getMode()
-  gameLogo = love.graphics.newImage(rTextures[getTextureByID("gamelogo")].fname)
-  love.window.setIcon(love.image.newImageData(TEXTURES_DIR .. "meleejailer_red.png"))
+  love.window.setIcon(love.image.newImageData(textures.TEXTURES_DIR .. "meleejailer_red.png"))
   fadeShader = love.graphics.newShader(fadeShaderSource)
   invisShader = love.graphics.newShader(invisShaderSource)
   debugWorldShader = love.graphics.newShader(debugShaderWorldSource)

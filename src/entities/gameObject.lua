@@ -7,10 +7,11 @@
 -- Game objects; basis for enemies and turrets, etc.
 -------------------------------------------------------------------------------
 
-require("src/utils")
-require("src/collider")
-local vector = require("src/external/hump.vector")
-local gameConf = require("src/gameConf")
+require("src.utils")
+require("src.collider")
+local textures = require("src.textures")
+local vector = require("src.external/hump.vector")
+local gameConf = require("src.gameConf")
 
 
 
@@ -422,16 +423,16 @@ function gameObject:assignTextureSet(textureSet)
 
   if textureSet then
 
-    local t = g_textureSets[textureSet]
+    local t = textures.g_textureSets[textureSet]
 
     -- Does the textureset exist?
     if t then
       for state, tex in pairs(t) do
 
         --do the asked-for textures exist?
-        if rTextures[tex] then
+        if textures.rTextures[tex] then
           self:setTexture(state,
-            rTextures[tex].data,
+            textures.rTextures[tex].data,
             true)
         else
           print("Warning! Texture \"" .. tex .. "\" does not exist " ..
