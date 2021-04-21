@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- collider.lua
@@ -25,7 +25,7 @@ local MAX_TESTS = 10
 -- it has collided. i.e. We want object a to end up as close to object b as it
 -- can be without actually being inside of it.
 -------------------------------------------------------------------------------
-function resolveCollision(a, b)
+local function resolveCollision(a, b)
   
   -- Players and enemies get reposition precedence over static objects
 	if b.object:getClass() == "player" then
@@ -113,7 +113,7 @@ end
 --
 -- Function passed to HC
 -------------------------------------------------------------------------------
-function onCollide(dt, objA, objB)
+local function onCollide(dt, objA, objB)
 	if (objA.object:getCategory() == "trigger" and objA.object:getState() == "dormant")
 		or (objB.object:getCategory() == "trigger" and objB.object:getState() == "dormant") then return end
 
@@ -223,3 +223,4 @@ function onCollide(dt, objA, objB)
 	end
 end
 
+return onCollide
