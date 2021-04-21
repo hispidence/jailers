@@ -6,14 +6,14 @@
 --
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
+
 local gameConf = require("src.gameConf")
 local jlutil = require("src.utils")
 local vector = require("src.external.hump.vector")
 local createObject = require("src.entities.objectFauxFactory")
 local onCollide = require("src.collider")
 local textures = require("src.textures")
-require("src.shaders")
-require("src.jlEvent")
+local shaders = require("src.shaders")
 require("src.utils")
 require("src.levelFunctions")
 
@@ -578,10 +578,10 @@ function gameLoad(levelFileName)
   love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
   windowWidth, windowHeight, _ = love.window.getMode()
   love.window.setIcon(love.image.newImageData(textures.TEXTURES_DIR .. "meleejailer_red.png"))
-  fadeShader = love.graphics.newShader(fadeShaderSource)
-  invisShader = love.graphics.newShader(invisShaderSource)
-  debugWorldShader = love.graphics.newShader(debugShaderWorldSource)
-  debugDebugShader = love.graphics.newShader(debugShaderDebugSource)
+  fadeShader = love.graphics.newShader(shaders.fadeShaderSource)
+  invisShader = love.graphics.newShader(shaders.invisShaderSource)
+  debugWorldShader = love.graphics.newShader(shaders.debugShaderWorldSource)
+  debugDebugShader = love.graphics.newShader(shaders.debugShaderDebugSource)
   setupUI()
   loadResources()
   local loaded, errStr = loadLevel(levelFileName)

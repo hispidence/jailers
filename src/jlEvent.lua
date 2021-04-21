@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- jlEvent.lua
@@ -7,7 +7,7 @@
 -- Events
 -------------------------------------------------------------------------------
 
-jlEvent = {}
+local jlEvent = {}
 
 jlEvent.__index = jlEvent
 --[[MAKE INTO A SINGLETON!!!]]--
@@ -67,3 +67,5 @@ end
 function jlEvent:getID()
 	return self.id
 end
+
+return jlEvent
