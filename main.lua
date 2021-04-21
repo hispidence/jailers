@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- main.lua
@@ -7,17 +7,15 @@
 -- Entry point for LÖVE
 -------------------------------------------------------------------------------
 
-require("src/gameMain")
+require("src.gameMain")
 
 function love.load(args)
   -- Launch level based on commandline args; eg, to load level0
   -- you would launch the game with love . level0
-  local levelName
+  local levelName = "guntest"
 
   if args[1] then
     levelName = args[1]
-  else
-    levelName = "guntest"
   end
 
   local loaded, errStr = gameLoad(levelName)
