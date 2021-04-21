@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2019
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- gameMain.lua
@@ -7,24 +7,21 @@
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
 
-local gameConf = require("src/gameConf")
+local gameConf = require("src.gameConf")
+local jlutil = require("src.utils")
+local vector = require("src.external.hump.vector")
+local createObject = require("src.entities.objectFauxFactory")
+local onCollide = require("src.collider")
 
-local jlutil = require("src/utils")
+require("src.sounds")
+require("src.textures")
+require("src.shaders")
+require("src.jlEvent")
+require("src.utils")
+require("src.levelFunctions")
 
-local vector = require("src/external/hump/vector")
-
-local createObject = require("src/entities/objectFauxFactory")
-require("src/uiData")
-require("src/collider")
-require("src/sounds")
-require("src/textures")
-require("src/shaders")
-require("src/jlEvent")
-require("src/utils")
-require("src/levelFunctions")
-
-require("src/external/AnAL")
-require("src/external/TEsound")
+require("src.external.AnAL")
+require("src.external.TEsound")
 
 
 local g_usingTiled = true
@@ -32,7 +29,7 @@ local g_usingTiled = true
 local sti
 local tiledMap
 if g_usingTiled then
-  sti = require("src/external/sti")
+  sti = require("src.external.sti")
 end
 
 
@@ -49,7 +46,7 @@ local g_debugDraw = false
 -------------------------------------------------------------------------------
 -- Set game manager, GUI, and gamestate variables
 -------------------------------------------------------------------------------
-local g_gm = require("src/gameManager")
+local g_gm = require("src.gameManager")
 local g_config = gameConf
 
 local g_pixelLocked = false
