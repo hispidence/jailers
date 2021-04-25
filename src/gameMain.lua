@@ -11,7 +11,7 @@ local gameConf = require("src.gameConf")
 local jlutil = require("src.utils")
 local vector = require("src.external.hump.vector")
 local createObject = require("src.entities.objectFauxFactory")
-local onCollide = require("src.collider")
+local onCollide = require("src.onCollide")
 local textures = require("src.textures")
 local shaders = require("src.shaders")
 local collisionBehaviours = require("src.levelFunctions")
@@ -24,6 +24,8 @@ local collisionBehaviours = require("src.levelFunctions")
 local sti = require("src.external.sti")
 require("src.external.AnAL")
 local tiledMap
+-- calls through to HC, so basically an external lib
+local theCollider = require("src.collider")
 
 
 
