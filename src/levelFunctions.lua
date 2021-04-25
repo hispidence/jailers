@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- levelFunctions.lua
@@ -8,11 +8,10 @@
 -- the player.
 -------------------------------------------------------------------------------
 
+local gm = require("src.gameManager")
+local jlEvent = require("src.jlEvent")
 
-
-local gm = require("src/gameManager")
-
-g_collisionBehaviours = {
+local collisionBehaviours = {
 	endLevel =
 	function(args)
     return function()
@@ -75,3 +74,5 @@ g_collisionBehaviours = {
     end
 	end
 }
+
+return collisionBehaviours
