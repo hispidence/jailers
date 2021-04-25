@@ -7,10 +7,11 @@
 -- Handles collision resolution; fires off events and repositions entities.
 -------------------------------------------------------------------------------
 
-local vector = require("src/external/hump/vector")
+local vector = require("src.external.hump.vector")
 
-HC = require("src/external/HC")
-gm = require("src/gameManager")
+local HC = require("src.external.HC")
+local gm = require("src.gameManager")
+local jlEvent = require("src.jlEvent")
 
 theCollider = HC.new(128)
 
