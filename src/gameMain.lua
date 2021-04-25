@@ -14,20 +14,16 @@ local createObject = require("src.entities.objectFauxFactory")
 local onCollide = require("src.collider")
 local textures = require("src.textures")
 local shaders = require("src.shaders")
-require("src.utils")
-require("src.levelFunctions")
+local collisionBehaviours = require("src.levelFunctions")
 
+
+
+-------------------------------------------------------------------------------
+-- External libs
+-------------------------------------------------------------------------------
+local sti = require("src.external.sti")
 require("src.external.AnAL")
-require("src.external.TEsound")
-
-
-local g_usingTiled = true
-
-local sti
 local tiledMap
-if g_usingTiled then
-  sti = require("src.external.sti")
-end
 
 
 
