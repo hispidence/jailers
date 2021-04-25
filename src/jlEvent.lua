@@ -10,7 +10,7 @@
 local jlEvent = {}
 
 jlEvent.__index = jlEvent
---[[MAKE INTO A SINGLETON!!!]]--
+
 setmetatable(jlEvent,
 		{__call = function(cls, ...)
 			return cls.new(...)
