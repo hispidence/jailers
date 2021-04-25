@@ -2,18 +2,15 @@
 -- Copyright (C) Hispidence 2013-2021
 --
 --
--- collider.lua
+-- onCollide.lua
 --
 -- Handles collision resolution; fires off events and repositions entities.
 -------------------------------------------------------------------------------
 
 local vector = require("src.external.hump.vector")
 
-local HC = require("src.external.HC")
 local gm = require("src.gameManager")
 local jlEvent = require("src.jlEvent")
-
-theCollider = HC.new(128)
 
 local MAX_TESTS = 10
 
