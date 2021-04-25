@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2019
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- gameObject.lua
@@ -8,10 +8,10 @@
 -------------------------------------------------------------------------------
 
 require("src.utils")
-require("src.collider")
 local textures = require("src.textures")
 local vector = require("src.external/hump.vector")
 local gameConf = require("src.gameConf")
+local theCollider = require("src.collider")
 
 
 
