@@ -60,9 +60,9 @@ local g_fonts = {}
 -- Creates a function which prints out a table of strings over the game's
 -- actual graphics.
 -------------------------------------------------------------------------------
-function createDebugTablePrint(colour, startX, startY, wrap, alignment)
+local function createDebugTablePrint(colour, startX, startY, wrap, alignment)
 
-  function debugTablePrint(textTable)
+  local function debugTablePrint(textTable)
     for i, v in ipairs(textTable) do
       local text = v
       local yOffset = ((i - 1) * 20);
@@ -91,7 +91,7 @@ g_thePlayer = nil
 -------------------------------------------------------------------------------
 -- Build the map.
 -------------------------------------------------------------------------------
-function buildMap(width, height)
+local function buildMap(width, height)
   local map = {}
   for y = 1, height do
     map[y] = {}
@@ -102,6 +102,8 @@ function buildMap(width, height)
   return map
 end
 
+--todo make this local and put it in the right place... then get rid of it
+--and add some better collision detection
 function youShallNotPass(theMap, wallPos, wallSize)
   local tempSize = vector(0,0)--wallSize:clone()
   local blockSize = g_currentLevel.levelAttribs.blockSize
@@ -119,7 +121,7 @@ function youShallNotPass(theMap, wallPos, wallSize)
   end
 end
 
-function youCanPass(theMap, wallPos, wallSize)
+local function youCanPass(theMap, wallPos, wallSize)
   local tempSize = vector(0,0)
   local blockSize = g_currentLevel.levelAttribs.blockSize
   local tablePosX, tablePosY
@@ -143,7 +145,7 @@ end
 --
 -- Get world space coordinates of grid position
 -------------------------------------------------------------------------------
-function toWorldSpace(col, row, ww, wh)
+local function toWorldSpace(col, row, ww, wh)
   local x = (col - 1) * ww
   local y = (row - 1) * wh
   return x, y
@@ -156,7 +158,7 @@ end
 --
 -- Set menu texture and font sizes
 -------------------------------------------------------------------------------
-function setupUI()
+local function setupUI()
   g_fonts[1] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 20 * g_config.scale)
   g_fonts[2] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 25 * g_config.scale)
   g_fonts[3] = love.graphics.newFont(FONT_PROCIONO_REGULAR, 10 * g_config.scale)
@@ -171,7 +173,7 @@ end
 --
 -- Load the sounds and textures
 -------------------------------------------------------------------------------
-function loadResources()
+local function loadResources()
   for _, v in ipairs(textures.rTextures) do
     v.data = love.graphics.newImage(v.fname)
     v.data:setFilter("nearest")
@@ -187,7 +189,7 @@ end
 --
 -- This needs to be looked over.
 -------------------------------------------------------------------------------
-function unloadLevel()
+local function unloadLevel()
   g_menuRefreshed = false
   g_gm:unload()
 
@@ -223,7 +225,7 @@ end
 --
 -- Populate object behaviours.
 -------------------------------------------------------------------------------
-function registerBehaviours(object, prop)
+local function registerBehaviours(object, prop)
   if prop.collision_behaviours then
     local behaviourTable = jlSplit(prop.collision_behaviours)
     for k, v in ipairs(behaviourTable) do
@@ -232,13 +234,13 @@ function registerBehaviours(object, prop)
         local b = jlSplitKV(prop[v])
 
         -- If the collision behaviour exists in the script, we can go ahead
-        if g_collisionBehaviours[b["type"]] ~= nil then
+        if collisionBehaviours[b["type"]] ~= nil then
           local args =  b
           args.timer = args.timer and tonumber(args.timer) or 0
           args["sender"] = object:getID()
 
           object:addCollisionBehaviour(
-            g_collisionBehaviours[b["type"]](args)
+            collisionBehaviours[b["type"]](args)
           )
         else
           print("Warning! Collison behaviour tables " ..
@@ -263,7 +265,7 @@ end
 --
 -- A camera comprises only a position, a name, and a state.
 -------------------------------------------------------------------------------
-function addCamera(camera)
+local function addCamera(camera)
   local newCamera = createObject("camera")
 
   if not camera.name or "" == camera.name then
@@ -290,7 +292,7 @@ end
 --
 -- Add triggers to the g_entityTriggers table.
 -------------------------------------------------------------------------------
-function addEntityTrigger(trig)
+local function addEntityTrigger(trig)
   local trigID = #g_entityTriggers + 1
   local theTrigger = createObject("trigger")
 
@@ -329,7 +331,7 @@ end
 --
 -- Add walls to the g_entityWalls table.
 -------------------------------------------------------------------------------
-function addEntityWall(block, x, y)
+local function addEntityWall(block, x, y)
   local blockID = #g_entityWalls+ 1
   local theBlock = createObject("scenery")
 
@@ -361,7 +363,7 @@ end
 --
 -- Add block-based objects (e.g. switches, doors) to the g_entityBlocks table.
 -------------------------------------------------------------------------------
-function addEntityBlock(block)
+local function addEntityBlock(block)
   local blockID = #g_entityBlocks + 1
 
   assert(block.name and "" ~= block.name)
@@ -418,7 +420,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function hasDuplicates(t)
+local function hasDuplicates(t)
   local hash = {}
   local foundDuplicate = false
   local id
@@ -442,7 +444,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function loadLevel(levelFileName)
+local function loadLevel(levelFileName)
 
   tiledMap = sti("src/levels/" .. levelFileName .. ".lua")
 
@@ -653,14 +655,14 @@ local pIncX = vector(0, 0)
 local pIncY = vector(0, 0)
 local pPos = vector(0,0)
 
-function getBlockByID(id)
+local function getBlockByID(id)
   for i, v in ipairs(g_entityBlocks) do
     if id == v:getID() then return i end
   end
   return 0
 end
 
-function processEvent(e)
+local function processEvent(e)
   -- An event's ID and description are basically the same thing, but somehow
   -- different. It's an oddity which I haven't yet had the courage to
   -- investigate/fix.
@@ -867,10 +869,6 @@ function gameUpdate(dt)
   g_thePlayer:getTopRight(rayStarts[2])
   g_thePlayer:getBottomLeft(rayStarts[3])
   g_thePlayer:getBottomRight(rayStarts[4])
-
-
-  TEsound.cleanup()
-
 end
 
 function gameKeyPressed(key)
@@ -921,10 +919,11 @@ function gameJoystickPressed(joystick, button)
   elseif g_gm:getState() == "splash" then
         g_gm:setState("running")
   end
-
 end
 
-function img_iter(img)
+
+
+local function img_iter(img)
   local x, y = 0,0
   local w = img:getWidth()
   local h = img:getHeight()
