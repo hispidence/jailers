@@ -10,7 +10,7 @@
 
 
 
-require("src/jlEvent")
+local jlEvent = require("src.jlEvent")
 local vector = require("src/external/hump.vector")
 
 local ston = nil
