@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2019
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- gameManager.lua
@@ -11,7 +11,7 @@
 
 
 local jlEvent = require("src.jlEvent")
-local vector = require("src/external/hump.vector")
+local vector = require("src.external.hump.vector")
 
 local ston = nil
 
@@ -20,9 +20,9 @@ local gameManager = {}
 gameManager.__index = gameManager
 --[[TODO: MAKE INTO SOMETHING THAT ISN'T A SINGLETON!!!]]--
 setmetatable(gameManager,
-		{__call = function(cls, ...)
-			return cls.new(...)
-		end})
+	{__call = function(cls, ...)
+		return cls.new(...)
+	end})
 
 function gameManager.new()
 	local self = setmetatable({}, gameManager)
@@ -83,7 +83,6 @@ function gameManager:init()
 	self.storedGunsAges = {}
 
   self.padMapping = {}
---	==self.stored
 end
 
 function gameManager:getButtons()
@@ -424,7 +423,6 @@ function gameManager:loadState()
 		if v:getState() ~= "dead" and v:getInvisible() == false then youShallNotPass(pathMap, v:getPos(), v:getSize()) end
 	end
 end
-	--	end
 
 function gameManager:unload()
 	self.events = {}
