@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2017
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- gun_shotgun.lua
@@ -7,9 +7,9 @@
 -- Script for shotgun-type gun turret.
 -------------------------------------------------------------------------------
 
-require("src/firingBehaviour")
+local firingBehaviour = require("src.firingBehaviour")
 
-local vector = require("src/external/hump/vector")
+local vector = require("src.external.hump.vector")
 
 local firingBehaviourFactory = {}
 
