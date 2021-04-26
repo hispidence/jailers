@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2017
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- firingBehaviour.lua
@@ -7,9 +7,9 @@
 -- Object to contain gun behaviour.
 -------------------------------------------------------------------------------
 
-local vector = require("src/external/hump/vector")
+local vector = require("src.external.hump.vector")
 
-firingBehaviour = {}
+local firingBehaviour = {}
 
 firingBehaviour.__index = firingBehaviour
 
@@ -117,3 +117,5 @@ end
 function firingBehaviour:setCalcInitialsFunc(calcInitialsFunc)
 	self.calcInitials = calcInitialsFunc
 end
+
+return firingBehaviour
