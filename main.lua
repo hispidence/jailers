@@ -7,7 +7,7 @@
 -- Entry point for LÖVE
 -------------------------------------------------------------------------------
 
-require("src.gameMain")
+local gameMain = require("src.gameMain")
 
 function love.load(args)
   -- Launch level based on commandline args; eg, to load level0
@@ -18,7 +18,7 @@ function love.load(args)
     levelName = args[1]
   end
 
-  local loaded, errStr = gameLoad(levelName)
+  local loaded, errStr = gameMain.gameLoad(levelName)
 
   if not loaded then
     love.errhand(errStr)
@@ -28,18 +28,18 @@ function love.load(args)
 end
 
 function love.draw()
-  gameDraw()
+  gameMain.gameDraw()
 end
 
 function love.update(dt)
-  gameUpdate(dt)
+  gameMain.gameUpdate(dt)
 end
 
 function love.keypressed(key)
-  gameKeyPressed(key)
+  gameMain.gameKeyPressed(key)
 end
 
 function love.joystickpressed(joystick, button)
-  gameJoystickPressed(joystick, button)
+  gameMain.gameJoystickPressed(joystick, button)
 end
 
