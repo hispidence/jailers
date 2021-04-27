@@ -7,6 +7,18 @@
 -- Gamestate, game loops, initialisation, 'n' that.
 -------------------------------------------------------------------------------
 
+
+
+-------------------------------------------------------------------------------
+-- module
+-------------------------------------------------------------------------------
+local gameMain = {}
+
+
+
+-------------------------------------------------------------------------------
+-- requirements
+-------------------------------------------------------------------------------
 local gameConf = require("src.gameConf")
 local jlutil = require("src.utils")
 local vector = require("src.external.hump.vector")
@@ -574,7 +586,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function gameLoad(levelFileName)
+function gameMain.gameLoad(levelFileName)
   love.window.setMode(g_config.widthInBlocks * 16, g_config.heightInBlocks * 16)
   windowWidth, windowHeight, _ = love.window.getMode()
   love.window.setIcon(love.image.newImageData(textures.TEXTURES_DIR .. "meleejailer_red.png"))
@@ -597,7 +609,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function gameDraw()
+function gameMain.gameDraw()
 
   love.graphics.setShader(fadeShader)
   love.graphics.scale(g_config.scale, g_config.scale)
@@ -716,7 +728,7 @@ end
 --
 --
 -------------------------------------------------------------------------------
-function gameUpdate(dt)
+function gameMain.gameUpdate(dt)
   if (not love.window.hasFocus()) or g_gm:getState() == "paused" then return end
   -- Cap the delta time at 0.07. This should prevent players from accidentally
   -- or deliberately running through walls if the game is running extremely
@@ -873,7 +885,7 @@ function gameUpdate(dt)
   g_thePlayer:getBottomRight(rayStarts[4])
 end
 
-function gameKeyPressed(key)
+function gameMain.gameKeyPressed(key)
   if g_gm:getState() == "paused" then
       if key == "q" then love.event.push("quit") end
       if key == "escape" or key == "p" then g_gm:pause() end
@@ -903,7 +915,7 @@ function gameKeyPressed(key)
 
 end
 
-function gameJoystickPressed(joystick, button)
+function gameMain.gameJoystickPressed(joystick, button)
   if g_gm:getState() == "paused" then
     if uiData.menuState == "paused" then
       g_gm:pause(); uiData.menuState = "paused"
@@ -945,3 +957,6 @@ local function img_iter(img)
     end
   end
 end
+
+return gameMain
+
