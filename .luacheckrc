@@ -1,1 +1,1 @@
-std = "std+love"
+std = "luajit+love"
