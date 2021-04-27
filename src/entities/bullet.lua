@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2019
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- bullet.lua
@@ -8,7 +8,7 @@
 -------------------------------------------------------------------------------
 
 -- get the base class
-local gameObject = require("src/entities/gameObject")
+local gameObject = require("src.entities.gameObject")
 
 local bullet = {}
 bullet.__index = bullet

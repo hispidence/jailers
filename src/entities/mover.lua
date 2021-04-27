@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- mover.lua
@@ -8,7 +8,7 @@
 -------------------------------------------------------------------------------
 
 -- The base class
-require("src/entities/gameObject")
+require("src.entities.gameObject")
 
 
 

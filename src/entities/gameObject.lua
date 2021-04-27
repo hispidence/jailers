@@ -9,7 +9,7 @@
 
 require("src.utils")
 local textures = require("src.textures")
-local vector = require("src.external/hump.vector")
+local vector = require("src.external.hump.vector")
 local gameConf = require("src.gameConf")
 local theCollider = require("src.collider")
 

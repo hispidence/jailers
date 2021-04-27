@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2019
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- character.lua
@@ -7,8 +7,8 @@
 -- Game objects which can move
 -------------------------------------------------------------------------------
 
-local gameObject = require("src/entities/gameObject")
-local vector = require("src/external/hump/vector")
+local gameObject = require("src.entities.gameObject")
+local vector = require("src.external.hump.vector")
 
 -- OO inheritance, after a fashion: fill character with gameObject's functions
 local character = {}

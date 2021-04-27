@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Copyright (C) Brad Ellis 2013-2016
+-- Copyright (C) Hispidence 2013-2021
 --
 --
 -- gun.lua
@@ -8,13 +8,13 @@
 -------------------------------------------------------------------------------
 
 
-local vector = require("src/external/hump/vector")
-local jlutil = require("src/utils")
+local vector = require("src.external.hump.vector")
+local jlutil = require("src.utils")
 
-local bullet = require("src/entities/bullet")
+local bullet = require("src.entities.bullet")
 
 -- OO stuff
-local gameObject = require("src/entities/gameObject")
+local gameObject = require("src.entities.gameObject")
 
 local gun = {}
 gun.__index = gun
