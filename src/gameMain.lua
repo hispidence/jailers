@@ -99,7 +99,7 @@ local g_entityWalls = {}
 local g_entityBlocks = {}
 local g_entityTriggers = {}
 local g_cameras = {}
-g_thePlayer = nil
+local g_thePlayer = nil
 
 
 -------------------------------------------------------------------------------
@@ -116,9 +116,9 @@ local function buildMap(width, height)
   return map
 end
 
---todo make this local and put it in the right place... then get rid of it
+--todo put this function in a more suitable place... then get rid of it
 --and add some better collision detection
-function youShallNotPass(theMap, wallPos, wallSize)
+local function youShallNotPass(theMap, wallPos, wallSize)
   local tempSize = vector(0,0)--wallSize:clone()
   local blockSize = g_currentLevel.levelAttribs.blockSize
   local tablePosX, tablePosY
@@ -824,12 +824,6 @@ function gameMain.gameUpdate(dt)
 
 
   g_thePlayer:updateAnim(modifiedDT)
-
-  g_thePlayer:updateSound(modifiedDT)
-
-  for i, v in ipairs(g_entityBlocks) do
-    v:updateSound(modifiedDT)
-  end
 
   g_thePlayer:move(pIncX)
 
