@@ -65,7 +65,7 @@ end
 -------------------------------------------------------------------------------
 function gameObject:init()
 	self.size = vector(1, 1)
-  self.angle = 0
+	self.angle = 0
 	self.position = vector(0,0)
 	self.direction = vector(0,0)
 	self.vel = vector(0,0)
@@ -73,7 +73,7 @@ function gameObject:init()
 	self.bData = nil
 	self.state = "dormant"
 	self.class = "object"
-  self.canCollide = false
+	self.canCollide = false
 	self.shapeOffsetX = 0
 	self.shapeOffsetY = 0
 	self.quad = nil
@@ -82,7 +82,7 @@ function gameObject:init()
 	self.sounds = {}
 	self.collisionBehaviour = {}
 	self.collisionShape = nil
-  self.collisionShapeType = nil
+	self.collisionShapeType = nil
 	self.category = nil
 	self.textures = {}
 	self.anims = {}
@@ -113,17 +113,6 @@ end
 
 
 -------------------------------------------------------------------------------
--- getVel
---
--- Return the object's velocity vector. Not used for most objects.
--------------------------------------------------------------------------------
-function gameObject:getVel()
-	return self.vel
-end
-
-
-
--------------------------------------------------------------------------------
 -- getCanCollide
 --
 -- Return whether or not the object can collide with anything
@@ -134,25 +123,48 @@ end
 
 
 
-	function gameObject:getCentre(buf)
-	  buf.x, buf.y = self.collisionShape:center()
-	end
+-------------------------------------------------------------------------------
+-- getCentre
+-------------------------------------------------------------------------------
+function gameObject:getCentre(buf)
+	buf.x, buf.y = self.collisionShape:center()
+end
 
-	function gameObject:getTopLeft(buf)
-	  buf.x, buf.y, _, _ = self.collisionShape:bbox()
-	end
 
-	function gameObject:getTopRight(buf)
-    _, buf.y, buf.x, _ = self.collisionShape:bbox()
-	end
 
-	function gameObject:getBottomLeft(buf)
-	  buf.x, _, _, buf.y = self.collisionShape:bbox()
-	end
+-------------------------------------------------------------------------------
+-- getTopLeft
+-------------------------------------------------------------------------------
+function gameObject:getTopLeft(buf)
+	buf.x, buf.y, _, _ = self.collisionShape:bbox()
+end
 
-	function gameObject:getBottomRight(buf)
-	  _, _, buf.x, buf.y = self.collisionShape:bbox()
-	end
+
+
+-------------------------------------------------------------------------------
+-- getTopRight
+-------------------------------------------------------------------------------
+function gameObject:getTopRight(buf)
+	_, buf.y, buf.x, _ = self.collisionShape:bbox()
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getBottomLeft
+-------------------------------------------------------------------------------
+function gameObject:getBottomLeft(buf)
+	buf.x, _, _, buf.y = self.collisionShape:bbox()
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getBottomRight
+-------------------------------------------------------------------------------
+function gameObject:getBottomRight(buf)
+	_, _, buf.x, buf.y = self.collisionShape:bbox()
+end
 
 
 
@@ -188,17 +200,6 @@ end
 
 
 -------------------------------------------------------------------------------
--- setVel
---
--- Set the object's velocity vector (has nothing to do with its direction)
--------------------------------------------------------------------------------
-function gameObject:setVel(vel)
-	self.vel = vel
-end
-
-
-
--------------------------------------------------------------------------------
 -- setCanCollide
 --
 -- Tell the object whether or not it should take part in collision resolution
@@ -220,157 +221,171 @@ end
 
 
 
-	-----------------------------------
-	--[[State, size, and other data]]--
-	-----------------------------------
-
-	function gameObject:setIgnoresBullets(ig)
-		self.ignoresBullets = true
-	end
-
-	function gameObject:ignoringBullets(ig)
-		return self.ignoresBullets
-	end
-
-	function gameObject:setBehaviourData(bd)
-		self.bData = bd
-	end
-
-	function gameObject:setInvisible(invis)
-		self.invisible = invis
-	end
-
-	function gameObject:getInvisible()
-		return self.invisible
-	end
-
-	function gameObject:setSound(key, value, repeating, time)
-		if 	self.sounds[key] == nil then
-			self.sounds[key] = {} end
-      self.sounds[key].data = value
-      self.sounds[key].repeating = repeating
-      self.sounds[key].wait = time
-      self.sounds[key].elapsed = time
-      self.sounds[key].done = false
-	end
-
-  function gameObject:setShapeOffsets(x, y)
-    self:setShapeOffsetX(x); self:setShapeOffsetY(y)
-  end
-
-  function gameObject:setShapeOffsetX(x)
-    self.shapeOffsetX = x
-  end
-
-  function gameObject:setShapeOffsetY(y)
-    self.shapeOffsetY = y
-  end
-
-	function gameObject:setCategory(c)
-		self.category = c
-	end
-
-	function gameObject:getCategory()
-		return self.category
-	end
-
-	function gameObject:setID(id)
-		self.id = id
-	end
-
-	function gameObject:getID()
-		return self.id
-	end
-
-	function gameObject:setCollisionBehaviour(c)
-		self.collisionBehaviour = c
-	end
-
-  function gameObject:addCollisionBehaviour(c)
-		self.collisionBehaviour[#self.collisionBehaviour+1] = c
-	end
+-------------------------------------------------------------------------------
+-- ignoringBullets
+-------------------------------------------------------------------------------
+function gameObject:ignoringBullets()
+	return self.ignoresBullets
+end
 
 
-	function gameObject:getCollisionBehaviour()
-		return self.collisionBehaviour
-	end
 
-	function gameObject:setState(s)
-		self.state = s
-	end
+-------------------------------------------------------------------------------
+-- setInvisible
+-------------------------------------------------------------------------------
+function gameObject:setInvisible(invis)
+	self.invisible = invis
+end
 
-	function gameObject:getState()
-		return self.state
-	end
 
-	function gameObject:getSize()
-		return self.size
-	end
 
+-------------------------------------------------------------------------------
+-- getInvisible
+-------------------------------------------------------------------------------
+function gameObject:getInvisible()
+	return self.invisible
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setShapeOffsets
+-------------------------------------------------------------------------------
+function gameObject:setShapeOffsets(x, y)
+	self.shapeOffsetX = x
+	self.shapeOffsetY = y
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setCategory
+-------------------------------------------------------------------------------
+function gameObject:setCategory(c)
+	self.category = c
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getCategory
+-------------------------------------------------------------------------------
+function gameObject:getCategory()
+	return self.category
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getID
+-------------------------------------------------------------------------------
+function gameObject:setID(id)
+	self.id = id
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setID
+-------------------------------------------------------------------------------
+function gameObject:getID()
+	return self.id
+end
+
+
+
+-------------------------------------------------------------------------------
+-- addCollisionBehaviour
+-------------------------------------------------------------------------------
+function gameObject:addCollisionBehaviour(c)
+	self.collisionBehaviour[#self.collisionBehaviour+1] = c
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getCollisionBehaviour
+-------------------------------------------------------------------------------
+function gameObject:getCollisionBehaviour()
+	return self.collisionBehaviour
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setState
+-------------------------------------------------------------------------------
+function gameObject:setState(s)
+	self.state = s
+end
+
+
+
+-------------------------------------------------------------------------------
+-- getState
+-------------------------------------------------------------------------------
+function gameObject:getState()
+	return self.state
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setSize
+-------------------------------------------------------------------------------
 function gameObject:setSize(vec)
 	self.size = vec
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getSize
+-------------------------------------------------------------------------------
+function gameObject:getSize()
+	return self.size
+end
+
+
+
+-------------------------------------------------------------------------------
+-- setClass
+-------------------------------------------------------------------------------
 function gameObject:setClass(newClass)
 	self.class = newClass
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getClass
+-------------------------------------------------------------------------------
 function gameObject:getClass()
 	return self.class
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setQuad
+-------------------------------------------------------------------------------
 function gameObject:setQuad(q)
 	self.quad = q
 end
 
 
-----------------------------
---[[Graphics and drawing]]--
-----------------------------
 
-function gameObject:update(dt)
-  -- do nothing, this object is empty
-end
-
+-------------------------------------------------------------------------------
+-- updateAnim
+-------------------------------------------------------------------------------
 function gameObject:updateAnim(dt)
 	if self.anims[self.state] then self.anims[self.state]:update(dt) end
-end
-
-function gameObject:playSound()
-	if self.sounds == nil then return end
-	local s = self.sounds[self.state]
-	if s then
-		--TEsound.play(s.data)
-	end
-end
-
-function gameObject:updateSound(dt)
-	if self.sounds == nil then return end
-	local s = self.sounds[self.state]
-	if s then
-		if (s.repeating == "false" or s.repeating == "once") and s.done then return end
-		s.elapsed = s.elapsed + dt
-		if s.elapsed > s.wait then
-			--TEsound.play(s.data)
-			s.elapsed = s.elapsed - s.wait
-			if s.repeating == "false" or s.repeating == "once" then s.done = true end
-		end
-	end
-end
-
-function gameObject:resetSounds()
-	for k, v in pairs(self.sounds) do
-		v.elapsed = v.wait
-		if v.repeating == "false" then v.done = false end
-	end
 end
 
 
 
 -------------------------------------------------------------------------------
 -- draw
---
--- Draws the object
 -------------------------------------------------------------------------------
 function gameObject:draw(pixelLocked)
 	if self.invisible then return end
@@ -407,9 +422,12 @@ function gameObject:drawDebug()
 end
 
 
+
+-------------------------------------------------------------------------------
+-- freeResources
+-------------------------------------------------------------------------------
 function gameObject:freeResources(collider)
 	collider:remove(self.collisionShape)
-	--don't free textures or sounds - they're not unique per instance
 end
 
 
@@ -473,25 +491,25 @@ end
 
 -------------------------------------------------------------------------------
 -- getTexture
---
---
 -------------------------------------------------------------------------------
 function gameObject:getTexture(key)
 	return self.textures[key].texture
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setAnim
+-------------------------------------------------------------------------------
 function gameObject:setAnim(key, value)
 	self.anims[key] = value
 end
 
-function gameObject:setAnimMode(key, m)
-	self.anims[key]:setMode(m)
-end
 
-function gameObject:getAnim(key)
-	return self.anims[key]
-end
 
+-------------------------------------------------------------------------------
+-- resetAnims
+-------------------------------------------------------------------------------
 function gameObject:resetAnims()
 	for k, a in pairs(self.anims) do
 		a:reset()
@@ -499,15 +517,21 @@ function gameObject:resetAnims()
 	end
 end
 
+
+
+-------------------------------------------------------------------------------
+-- resetAnim
+-------------------------------------------------------------------------------
 function gameObject:resetAnim(key)
 	self.anims[key]:reset()
 	self.anims[key]:play()
 end
 
---------------------------------------
---[[Collisions, pathing and events]]--
---------------------------------------
 
+
+-------------------------------------------------------------------------------
+-- processEvent
+-------------------------------------------------------------------------------
 function gameObject:processEvent(e)
 
 	if e:getDesc() == "switchOn" then
@@ -536,8 +560,6 @@ end
 
 -------------------------------------------------------------------------------
 -- setCollisionRectangle
---
--- Create collision shape
 -------------------------------------------------------------------------------
 function gameObject:setCollisionRectangle()
 	self.collisionShape = theCollider:rectangle(0,0, self.size.x, self.size.y)
@@ -549,8 +571,6 @@ end
 
 -------------------------------------------------------------------------------
 -- setCollisionCircle
---
--- Create collision shape
 -------------------------------------------------------------------------------
 function gameObject:setCollisionCircle()
 	self.collisionShape = theCollider:circle(0, 0, self.size.x/2.8)
@@ -570,23 +590,12 @@ function gameObject:getCollisionShape()
 end
 
 
+
+-------------------------------------------------------------------------------
+-- intersectsRay
+-------------------------------------------------------------------------------
 function gameObject:intersectsRay(sx, sy, dx, dy)
 	return self.collisionShape:intersectsRay(sx, sy, dx, dy)
-end
-
-function gameObject:collidesRays(starts, dirs)
-	for i = 1,4 do
-		if self:intersectsRay(starts[i].x, starts[i].y, dirs[i].x, dirs[i].y) then
-			if self:intersectsRay(starts[i+4].x, starts[i+4].y, dirs[i+4].x, dirs[i+4].y) then
-				return true
-			end
-		end
-	end
-	return false
-end
-
-function gameObject:findNearest(blockSize)
-	return jRound(self.position.x/blockSize) + 1, jRound(self.position.y/blockSize)+1
 end
 
 return gameObject
