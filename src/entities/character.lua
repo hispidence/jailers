@@ -13,7 +13,7 @@ local vector = require("src.external.hump.vector")
 -- OO inheritance, after a fashion: fill character with gameObject's functions
 local character = {}
 for k,v in pairs(gameObject) do
-	character[k]=v
+  character[k]=v
 end
 
 -- character objects have character as their metatable. When looking for
@@ -219,79 +219,36 @@ end
 --
 -- Arguments
 -- blockSize - the size of a single square tile in standard LÖVE units
---			   (I'm not actually sure what said units are)
+--         (I'm not actually sure what said units are)
 --
 -- Starts the character on its path, copied in at character:copyPath
 -------------------------------------------------------------------------------
 function character:startPath(blockSize)
 
-	-- Set the character's point along the path to the start point
-	self.currentPoint = 1
-	
-	-- The character's current target coordinates (from its previous path)
-	-- might correspond to a node in its new path. If so, its current point
-	-- along the new path (i.e. the index of the next node it needs to get to)
-	-- will be set to the index of the node corresponding to the target
-	-- coordinates.
-	for i,v in ipairs(self.path) do
-		if v.col == self.pathTarget.c and v.row == self.pathTarget.r then
-			self.currentPoint = i
-			break
-		end 
-	end
-	
-	-- Get the coordinates of the next target. 
-	-- self.target is like self.pathTarget, but is in world space,
-	-- and is used in character:testPathCollision to to determine
-	-- whether or not the character has hit its target node.
-	local x, y = self:toWorldSpace(self.path[self.currentPoint].col, 
-				       	self.path[self.currentPoint].row,
-				       	blockSize)
-	
-	self.target = vector(x,y)
-end
-
-
-	
--------------------------------------------------------------------------------
--- character:setPathBox
---
--- Sets up the path box. This invisible box exists in the centre of the
--- character, and is used to test whether or not the character  has reached its
--- current target node (i.e. whether the centre of the target is within the
--- path box.
--------------------------------------------------------------------------------
-function character:setPathBox()
-	--self.pathBox = theCollider:rectangle(0, 0, 2, 2)
-  --theCollider:remove(self.pathBox)
-	--self.pathBox.object = self
-end
-
-
-
--------------------------------------------------------------------------------
--- character:testPathCollision
---
--- Arguments
--- blockSize - the size of a single square tile in standard LÖVE units
---			   (I'm not actually sure what said units are)
---
--- Checks whether the character has hit the next node in its path, and sets
--- a new target if it has
--------------------------------------------------------------------------------
-function character:testPathCollision(blockSize)
-	if self.pathBox:contains(self.target.x, self.target.y) then
-		if(self.currentPoint < self.numPathNodes) then
-			-- Set the target node to the next one
-			self.currentPoint = self.currentPoint + 1
-			-- Set the grid-space target
-			self.pathTarget.r = self.path[self.currentPoint].row
-			self.pathTarget.c = self.path[self.currentPoint].col
-			-- Set the world-space target
-			local x, y = self:toWorldSpace(self.pathTarget.c, self.pathTarget.r, blockSize)
-			self.target = vector(x, y)
-		end
-	end
+  -- Set the character's point along the path to the start point
+  self.currentPoint = 1
+  
+  -- The character's current target coordinates (from its previous path)
+  -- might correspond to a node in its new path. If so, its current point
+  -- along the new path (i.e. the index of the next node it needs to get to)
+  -- will be set to the index of the node corresponding to the target
+  -- coordinates.
+  for i,v in ipairs(self.path) do
+    if v.col == self.pathTarget.c and v.row == self.pathTarget.r then
+      self.currentPoint = i
+      break
+    end 
+  end
+  
+  -- Get the coordinates of the next target. 
+  -- self.target is like self.pathTarget, but is in world space,
+  -- and is used in character:testPathCollision to to determine
+  -- whether or not the character has hit its target node.
+  local x, y = self:toWorldSpace(self.path[self.currentPoint].col, 
+                 self.path[self.currentPoint].row,
+                 blockSize)
+  
+  self.target = vector(x,y)
 end
 
 
@@ -300,16 +257,17 @@ end
 -- character:draw
 --
 -- Arguments
--- debug -	if true, draws the character's outline and the outline of its
--- 		   	pathbox instread of the graphic for the character itself
+-- debug -  if true, draws the character's outline and the outline of its
+--          pathbox instread of the graphic for the character itself
 --
 -- pixelLocked -  Are the graphics aligned to the 'pixel' grid?
 --
 -- Draws either the character or its and its path box's bounding boxes
 -------------------------------------------------------------------------------
 function character:draw(debug, pixelLocked)
-	gameObject.draw(self, debug, pixelLocked)
-	--if(debug) then self.pathBox:draw("line") end
+  gameObject.draw(self, debug, pixelLocked)
 end
+
+
 
 return character
