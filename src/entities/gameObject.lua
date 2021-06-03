@@ -23,17 +23,17 @@ gameObject.__index = gameObject
 
 -- Give gameObject something resembling a C++-style constructor.
 setmetatable(gameObject,
-		{__call = function(cls, ...)
-			return cls.new(...)
-		end}
+  {__call = function(cls, ...)
+    return cls.new(...)
+  end}
 )
 
 
 
 function gameObject.new()
-	local self = setmetatable({}, gameObject)
-	self:init()
-	return self
+  local self = setmetatable({}, gameObject)
+  self:init()
+  return self
 end
 
 
@@ -64,23 +64,23 @@ end
 -- Sets default values.
 -------------------------------------------------------------------------------
 function gameObject:init()
-	self.size = vector(1, 1)
-	self.angle = 0
-	self.position = vector(0,0)
-	self.direction = vector(0,0)
-	self.invisible = false
-	self.state = "dormant"
-	self.class = "object"
-	self.canCollide = false
-	self.shapeOffsetX = 0
-	self.shapeOffsetY = 0
-	self.id = nil
-	self.collisionBehaviour = {}
-	self.collisionShape = nil
-	self.collisionShapeType = nil
-	self.category = nil
-	self.textures = {}
-	self.anims = {}
+  self.size = vector(1, 1)
+  self.angle = 0
+  self.position = vector(0,0)
+  self.direction = vector(0,0)
+  self.invisible = false
+  self.state = "dormant"
+  self.class = "object"
+  self.canCollide = false
+  self.shapeOffsetX = 0
+  self.shapeOffsetY = 0
+  self.id = nil
+  self.collisionBehaviour = {}
+  self.collisionShape = nil
+  self.collisionShapeType = nil
+  self.category = nil
+  self.textures = {}
+  self.anims = {}
 end
 
 
@@ -91,7 +91,7 @@ end
 -- Return the object's world-space position; a HUMP vector.
 -------------------------------------------------------------------------------
 function gameObject:getPos()
-	return self.position
+  return self.position
 end
 
 
@@ -102,7 +102,7 @@ end
 -- Return the object's direction vector.
 -------------------------------------------------------------------------------
 function gameObject:getDir()
-	return self.direction
+  return self.direction
 end
 
 
@@ -113,7 +113,7 @@ end
 -- Return whether or not the object can collide with anything
 -------------------------------------------------------------------------------
 function gameObject:getCanCollide()
-	return self.canCollide
+  return self.canCollide
 end
 
 
@@ -122,7 +122,7 @@ end
 -- getCentre
 -------------------------------------------------------------------------------
 function gameObject:getCentre(buf)
-	buf.x, buf.y = self.collisionShape:center()
+  buf.x, buf.y = self.collisionShape:center()
 end
 
 
@@ -131,7 +131,7 @@ end
 -- getTopLeft
 -------------------------------------------------------------------------------
 function gameObject:getTopLeft(buf)
-	buf.x, buf.y, _, _ = self.collisionShape:bbox()
+  buf.x, buf.y, _, _ = self.collisionShape:bbox()
 end
 
 
@@ -140,7 +140,7 @@ end
 -- getTopRight
 -------------------------------------------------------------------------------
 function gameObject:getTopRight(buf)
-	_, buf.y, buf.x, _ = self.collisionShape:bbox()
+  _, buf.y, buf.x, _ = self.collisionShape:bbox()
 end
 
 
@@ -149,7 +149,7 @@ end
 -- getBottomLeft
 -------------------------------------------------------------------------------
 function gameObject:getBottomLeft(buf)
-	buf.x, _, _, buf.y = self.collisionShape:bbox()
+  buf.x, _, _, buf.y = self.collisionShape:bbox()
 end
 
 
@@ -158,7 +158,7 @@ end
 -- getBottomRight
 -------------------------------------------------------------------------------
 function gameObject:getBottomRight(buf)
-	_, _, buf.x, buf.y = self.collisionShape:bbox()
+  _, _, buf.x, buf.y = self.collisionShape:bbox()
 end
 
 
@@ -169,7 +169,7 @@ end
 -- Set the object's direction angle (has no bearing on its velocity vector)
 -------------------------------------------------------------------------------
 function gameObject:setDir(dir)
-	self.direction = dir
+  self.direction = dir
 end
 
 
@@ -200,7 +200,7 @@ end
 -- Tell the object whether or not it should take part in collision resolution
 -------------------------------------------------------------------------------
 function gameObject:setCanCollide(c)
-	self.canCollide = c
+  self.canCollide = c
 end
 
 
@@ -220,7 +220,7 @@ end
 -- ignoringBullets
 -------------------------------------------------------------------------------
 function gameObject:ignoringBullets()
-	return self.ignoresBullets
+  return self.ignoresBullets
 end
 
 
@@ -229,7 +229,7 @@ end
 -- setInvisible
 -------------------------------------------------------------------------------
 function gameObject:setInvisible(invis)
-	self.invisible = invis
+  self.invisible = invis
 end
 
 
@@ -238,7 +238,7 @@ end
 -- getInvisible
 -------------------------------------------------------------------------------
 function gameObject:getInvisible()
-	return self.invisible
+  return self.invisible
 end
 
 
@@ -247,8 +247,8 @@ end
 -- setShapeOffsets
 -------------------------------------------------------------------------------
 function gameObject:setShapeOffsets(x, y)
-	self.shapeOffsetX = x
-	self.shapeOffsetY = y
+  self.shapeOffsetX = x
+  self.shapeOffsetY = y
 end
 
 
@@ -257,7 +257,7 @@ end
 -- setCategory
 -------------------------------------------------------------------------------
 function gameObject:setCategory(c)
-	self.category = c
+  self.category = c
 end
 
 
@@ -266,7 +266,7 @@ end
 -- getCategory
 -------------------------------------------------------------------------------
 function gameObject:getCategory()
-	return self.category
+  return self.category
 end
 
 
@@ -275,7 +275,7 @@ end
 -- getID
 -------------------------------------------------------------------------------
 function gameObject:setID(id)
-	self.id = id
+  self.id = id
 end
 
 
@@ -284,7 +284,7 @@ end
 -- setID
 -------------------------------------------------------------------------------
 function gameObject:getID()
-	return self.id
+  return self.id
 end
 
 
@@ -293,7 +293,7 @@ end
 -- addCollisionBehaviour
 -------------------------------------------------------------------------------
 function gameObject:addCollisionBehaviour(c)
-	self.collisionBehaviour[#self.collisionBehaviour+1] = c
+  self.collisionBehaviour[#self.collisionBehaviour+1] = c
 end
 
 
@@ -302,7 +302,7 @@ end
 -- getCollisionBehaviour
 -------------------------------------------------------------------------------
 function gameObject:getCollisionBehaviour()
-	return self.collisionBehaviour
+  return self.collisionBehaviour
 end
 
 
@@ -311,7 +311,7 @@ end
 -- setState
 -------------------------------------------------------------------------------
 function gameObject:setState(s)
-	self.state = s
+  self.state = s
 end
 
 
@@ -320,7 +320,7 @@ end
 -- getState
 -------------------------------------------------------------------------------
 function gameObject:getState()
-	return self.state
+  return self.state
 end
 
 
@@ -329,7 +329,7 @@ end
 -- setSize
 -------------------------------------------------------------------------------
 function gameObject:setSize(vec)
-	self.size = vec
+  self.size = vec
 end
 
 
@@ -338,7 +338,7 @@ end
 -- getSize
 -------------------------------------------------------------------------------
 function gameObject:getSize()
-	return self.size
+  return self.size
 end
 
 
@@ -347,7 +347,7 @@ end
 -- setClass
 -------------------------------------------------------------------------------
 function gameObject:setClass(newClass)
-	self.class = newClass
+  self.class = newClass
 end
 
 
@@ -356,7 +356,7 @@ end
 -- getClass
 -------------------------------------------------------------------------------
 function gameObject:getClass()
-	return self.class
+  return self.class
 end
 
 
@@ -365,7 +365,7 @@ end
 -- updateAnim
 -------------------------------------------------------------------------------
 function gameObject:updateAnim(dt)
-	if self.anims[self.state] then self.anims[self.state]:update(dt) end
+  if self.anims[self.state] then self.anims[self.state]:update(dt) end
 end
 
 
@@ -374,8 +374,8 @@ end
 -- draw
 -------------------------------------------------------------------------------
 function gameObject:draw(pixelLocked)
-	if self.invisible then return end
-	local drawPos = self:getPos():clone()
+  if self.invisible then return end
+  local drawPos = self:getPos():clone()
 
   if(pixelLocked) then
     drawPos.x = jRound(drawPos.x)
@@ -413,7 +413,7 @@ end
 -- freeResources
 -------------------------------------------------------------------------------
 function gameObject:freeResources(collider)
-	collider:remove(self.collisionShape)
+  collider:remove(self.collisionShape)
 end
 
 
@@ -463,14 +463,14 @@ end
 -- Give the object its textures and describe how to draw them
 -------------------------------------------------------------------------------
 function gameObject:setTexture(key, value, repeating)
-	if self.textures[key] == nil then
-		 self.textures[key] = {}
-	end
-	value:setFilter("nearest")
-	self.textures[key].texture = value
-	if repeating then
-		self.textures[key].texture:setWrap("repeat", "repeat")
-	end
+  if self.textures[key] == nil then
+     self.textures[key] = {}
+  end
+  value:setFilter("nearest")
+  self.textures[key].texture = value
+  if repeating then
+    self.textures[key].texture:setWrap("repeat", "repeat")
+  end
 end
 
 
@@ -479,7 +479,7 @@ end
 -- getTexture
 -------------------------------------------------------------------------------
 function gameObject:getTexture(key)
-	return self.textures[key].texture
+  return self.textures[key].texture
 end
 
 
@@ -488,7 +488,7 @@ end
 -- setAnim
 -------------------------------------------------------------------------------
 function gameObject:setAnim(key, value)
-	self.anims[key] = value
+  self.anims[key] = value
 end
 
 
@@ -497,10 +497,10 @@ end
 -- resetAnims
 -------------------------------------------------------------------------------
 function gameObject:resetAnims()
-	for k, a in pairs(self.anims) do
-		a:reset()
-		a:play()
-	end
+  for k, a in pairs(self.anims) do
+    a:reset()
+    a:play()
+  end
 end
 
 
@@ -509,8 +509,8 @@ end
 -- resetAnim
 -------------------------------------------------------------------------------
 function gameObject:resetAnim(key)
-	self.anims[key]:reset()
-	self.anims[key]:play()
+  self.anims[key]:reset()
+  self.anims[key]:play()
 end
 
 
@@ -520,25 +520,25 @@ end
 -------------------------------------------------------------------------------
 function gameObject:processEvent(e)
 
-	if e:getDesc() == "switchOn" then
-		self.state = "used"
+  if e:getDesc() == "switchOn" then
+    self.state = "used"
 
-	elseif e:getID() == "changestate" then
-		self.state = e:getDesc()
+  elseif e:getID() == "changestate" then
+    self.state = e:getDesc()
 
-	elseif e:getID() == "move" then
-		self:setPos(e:getData())
+  elseif e:getID() == "move" then
+    self:setPos(e:getData())
 
-	elseif e:getID() == "removeblock" then
-		self.state = "dead"
-		local e = jlEvent(self.id, "main", "removeblock", "none")
-		gm:sendEvent(e)
+  elseif e:getID() == "removeblock" then
+    self.state = "dead"
+    local e = jlEvent(self.id, "main", "removeblock", "none")
+    gm:sendEvent(e)
 
-	elseif e:getID() == "addblock" then
-		self.state = "dormant"
-		local e = jlEvent(self.id, "main", "addblock", "none")
-		gm:sendEvent(e)
-	end
+  elseif e:getID() == "addblock" then
+    self.state = "dormant"
+    local e = jlEvent(self.id, "main", "addblock", "none")
+    gm:sendEvent(e)
+  end
 
 end
 
@@ -548,9 +548,9 @@ end
 -- setCollisionRectangle
 -------------------------------------------------------------------------------
 function gameObject:setCollisionRectangle()
-	self.collisionShape = theCollider:rectangle(0,0, self.size.x, self.size.y)
+  self.collisionShape = theCollider:rectangle(0,0, self.size.x, self.size.y)
   self.collisionShapeType = "rectangle"
-	self.collisionShape.object = self
+  self.collisionShape.object = self
 end
 
 
@@ -559,9 +559,9 @@ end
 -- setCollisionCircle
 -------------------------------------------------------------------------------
 function gameObject:setCollisionCircle()
-	self.collisionShape = theCollider:circle(0, 0, self.size.x/2.8)
+  self.collisionShape = theCollider:circle(0, 0, self.size.x/2.8)
   self.collisionShapeType = "circle"
-	self.collisionShape.object = self
+  self.collisionShape.object = self
 end
 
 
@@ -572,7 +572,7 @@ end
 -- Get collision shape
 -------------------------------------------------------------------------------
 function gameObject:getCollisionShape()
-	return self.collisionShape
+  return self.collisionShape
 end
 
 
@@ -581,7 +581,7 @@ end
 -- intersectsRay
 -------------------------------------------------------------------------------
 function gameObject:intersectsRay(sx, sy, dx, dy)
-	return self.collisionShape:intersectsRay(sx, sy, dx, dy)
+  return self.collisionShape:intersectsRay(sx, sy, dx, dy)
 end
 
 return gameObject
