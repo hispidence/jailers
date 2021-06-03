@@ -32,48 +32,42 @@ setmetatable(character,
 		end
 	})
 
+
+
+-------------------------------------------------------------------------------
+-- new
+-------------------------------------------------------------------------------
 function character.new(...)
 	local self = setmetatable({}, character)
 	self:init(...)
 	return self
 end
 
-function character:tex_iter()
-	local t = self.textures
-	local i = nil
-	local fn = nil
-	local tex = nil
-	return function()
-		i = next(t, i)
-		if i~= nil then
-			fn = t[i].fileName
-			tex = t[i].texture
-			return i, fn, tex
-		end
-		return nil
-	end
-end
 
+
+-------------------------------------------------------------------------------
+-- init
+-------------------------------------------------------------------------------
 function character:init(objType)
 	gameObject.init(self)
 	self:setClass(objType)
 	self.size = vector(14, 14)
 	self.speed = 0
 	self.oldPos = vector(0,0)
-	self.moveVec = vector(0,0)
 	self.path = {}
 	self.numPathNodes = {}
 	self.currentPoint = 0
-	self.pathTimer = 0
 	self.pathTarget = {r = 0, c = 0}
 	self.target = vector(0,0)
-	self.wallMap = nil
 	self.pathBox = nil
 	self.deathBehaviour = nil
-	self.flatMap = {}
-	self.rayToTarget = {x = 0, y = 0}
 end
 
+
+
+-------------------------------------------------------------------------------
+-- freeResources
+-------------------------------------------------------------------------------
 function character:freeResources(collider)
 	if pathBox then collider:remove(self.pathBox) end
 	gameObject.freeResources(self, collider)
@@ -148,14 +142,6 @@ function character:setPos(pos)
 	--				self.position.y +((self.size.y/2)))
 end
 
-function character:getMoveVec()
-	return self.moveVec
-end
-
-function character:setMoveVec(v)
-	self.moveVec = v
-end
-
 function character:getSpeed()
 	return self.speed
 end
@@ -166,18 +152,6 @@ end
 
 function character:getTarget()
 	return self.target
-end
-
-function character:setTarget(t)
-	self.target = t
-end
-
-function character:setWallMap(w)
-	self.wallMap = w
-end
-
-function character:getWallMap()
-	return self.wallMap
 end
 
 
@@ -223,22 +197,6 @@ function character:getPath()
 	return self.path
 end
 
-function character:setPathTimer(t)
-	self.pathTimer = t
-end
-
-function character:incPathTimer(dt)
-	self.pathTimer = self.pathTimer + dt
-end
-
-function character:getPathTimer()
-	return self.pathTimer
-end
-
-function character:testPathTimer(t)
-	if self.pathTimer >= t then self.pathTimer = self.pathTimer - t; return true end
-	return false
-end
 
 function character:toWorldSpace(col, row, blockSize)
 	local x = (col - 1) * blockSize
