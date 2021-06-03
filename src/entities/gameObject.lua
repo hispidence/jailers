@@ -30,6 +30,9 @@ setmetatable(gameObject,
 
 
 
+-------------------------------------------------------------------------------
+-- new
+-------------------------------------------------------------------------------
 function gameObject.new()
   local self = setmetatable({}, gameObject)
   self:init()
