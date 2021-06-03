@@ -224,23 +224,14 @@ function character:copyPath(p)
   end
 end
 
-function character:getPath()
-  return self.path
-end
 
-
+-------------------------------------------------------------------------------
+-- toWorldSpace
+-------------------------------------------------------------------------------
 function character:toWorldSpace(col, row, blockSize)
   local x = (col - 1) * blockSize
   local y = (row - 1) * blockSize
   return x + (blockSize/2), y + (blockSize/2)
-end
-
-function character:isAtEndOfPath()
-  if self.path then
-    return self.currentPoint == self.numPathNodes 
-  else
-    return false
-  end
 end
 
 
@@ -276,27 +267,10 @@ function character:startPath(blockSize)
   -- and is used in character:testPathCollision to to determine
   -- whether or not the character has hit its target node.
   local x, y = self:toWorldSpace(self.path[self.currentPoint].col, 
-                 self.path[self.currentPoint].row,
-                 blockSize)
+                                 self.path[self.currentPoint].row,
+                                 blockSize)
   
   self.target = vector(x,y)
-end
-
-
-
--------------------------------------------------------------------------------
--- character:draw
---
--- Arguments
--- debug -  if true, draws the character's outline and the outline of its
---          pathbox instread of the graphic for the character itself
---
--- pixelLocked -  Are the graphics aligned to the 'pixel' grid?
---
--- Draws either the character or its and its path box's bounding boxes
--------------------------------------------------------------------------------
-function character:draw(debug, pixelLocked)
-  gameObject.draw(self, debug, pixelLocked)
 end
 
 

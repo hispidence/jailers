@@ -7,7 +7,6 @@
 -- Game objects; basis for enemies and turrets, etc.
 -------------------------------------------------------------------------------
 
-require("src.utils")
 local textures = require("src.textures")
 local vector = require("src.external.hump.vector")
 local gameConf = require("src.gameConf")
@@ -429,7 +428,6 @@ end
 function gameObject:assignTextureSet(textureSet)
 
   if textureSet then
-
     local t = textures.g_textureSets[textureSet]
 
     -- Does the textureset exist?
@@ -579,12 +577,5 @@ function gameObject:getCollisionShape()
 end
 
 
-
--------------------------------------------------------------------------------
--- intersectsRay
--------------------------------------------------------------------------------
-function gameObject:intersectsRay(sx, sy, dx, dy)
-  return self.collisionShape:intersectsRay(sx, sy, dx, dy)
-end
 
 return gameObject
