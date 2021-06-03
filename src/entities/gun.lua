@@ -20,41 +20,34 @@ local gun = {}
 gun.__index = gun
 
 setmetatable(gun,
-	{__index = gameObject,
-	__call = function(cls, ...)
-		return cls.new(...)
-		end
-	})
+  {__index = gameObject,
+  __call = function(cls, ...)
+    return cls.new(...)
+    end
+  })
 
 
 
 -------------------------------------------------------------------------------
 -- new
---
---
 -------------------------------------------------------------------------------
 function gun.new()
-	local self = setmetatable(gameObject(), gun)
-	self:init()
-	return self
+  local self = setmetatable(gameObject(), gun)
+  self:init()
+  return self
 end
 
 
 
 -------------------------------------------------------------------------------
 -- init
---
---
 -------------------------------------------------------------------------------
 function gun:init()
-	gameObject.init(self)
-	self.firingBehaviourBullet = nil
-	self.firingBehaviourGun = nil
-	self.bulletCollisionBehaviour = nil
-	self.bulletsMade = 0
+  gameObject.init(self)
+  self.bulletsMade = 0
   self.bullets = nil
-	self.bulletOffset = vector(1, 0)
-	self.bulletTextureSet = {}
+  self.bulletOffset = vector(1, 0)
+  self.bulletTextureSet = {}
   self.firingBehaviour = nil
 end
 
@@ -107,8 +100,6 @@ end
 
 -------------------------------------------------------------------------------
 -- createBullet
---
---
 -------------------------------------------------------------------------------
 function gun:createBullet()
   local b = bullet()
@@ -133,12 +124,10 @@ end
 
 
 ---------------------------------------------------------------------------------------------------
---	gun:update(dt)
---
---
+--  gun:update(dt)
 ---------------------------------------------------------------------------------------------------
 function gun:update(dt)
-	if "active" == self.state then
+  if "active" == self.state then
     self.firingBehaviour:updateGun(dt, self.position)
     for _, v in ipairs(self.bullets) do
       v:update(dt)
@@ -150,8 +139,6 @@ end
 
 ---------------------------------------------------------------------------------------------------
 --  gun:draw(dt)
---
---
 ---------------------------------------------------------------------------------------------------
 function gun:draw()
   gameObject.draw(self)
@@ -161,5 +148,7 @@ function gun:draw()
     end
   end
 end
+
+
 
 return gun
