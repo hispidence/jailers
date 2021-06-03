@@ -68,18 +68,13 @@ function gameObject:init()
 	self.angle = 0
 	self.position = vector(0,0)
 	self.direction = vector(0,0)
-	self.vel = vector(0,0)
 	self.invisible = false
-	self.bData = nil
 	self.state = "dormant"
 	self.class = "object"
 	self.canCollide = false
 	self.shapeOffsetX = 0
 	self.shapeOffsetY = 0
-	self.quad = nil
 	self.id = nil
-	self.ignoredBullets = false
-	self.sounds = {}
 	self.collisionBehaviour = {}
 	self.collisionShape = nil
 	self.collisionShapeType = nil
@@ -362,15 +357,6 @@ end
 -------------------------------------------------------------------------------
 function gameObject:getClass()
 	return self.class
-end
-
-
-
--------------------------------------------------------------------------------
--- setQuad
--------------------------------------------------------------------------------
-function gameObject:setQuad(q)
-	self.quad = q
 end
 
 

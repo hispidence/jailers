@@ -125,13 +125,6 @@ function gun:createBullet()
 
   b:assignTextureSet(self.bulletTextureSet)
 
-	b:setQuad(love.graphics.newQuad(0,
-													0,
-													b:getSize().x,
-													b:getSize().y,
-													b:getSize().x,
-													b:getSize().y))
-
   -- Hopefully, lua will give each bullet the SAME closure
   b:setFiringBehaviour(self.firingBehaviour)
   return b

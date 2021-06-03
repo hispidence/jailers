@@ -392,12 +392,6 @@ local function addEntityBlock(block)
 
   local size = vector(gameConf.blockSize, gameConf.blockSize)
   theBlock:setSize(size)
-  theBlock:setQuad(love.graphics.newQuad(0,
-                          0,
-                          size.x,
-                          size.y,
-                          size.x,
-                          size.y))
 
   theBlock:setCanCollide(true)
   theBlock:setCollisionRectangle()
