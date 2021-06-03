@@ -26,11 +26,11 @@ character.__index = character
 --
 -- Give character a C++-style constructor.
 setmetatable(character,
-	{__index = gameObject,
-	__call = function(cls, ...)
-		return cls.new(...)
-		end
-	})
+  {__index = gameObject,
+  __call = function(cls, ...)
+    return cls.new(...)
+    end
+  })
 
 
 
@@ -38,9 +38,9 @@ setmetatable(character,
 -- new
 -------------------------------------------------------------------------------
 function character.new(...)
-	local self = setmetatable({}, character)
-	self:init(...)
-	return self
+  local self = setmetatable({}, character)
+  self:init(...)
+  return self
 end
 
 
@@ -49,18 +49,18 @@ end
 -- init
 -------------------------------------------------------------------------------
 function character:init(objType)
-	gameObject.init(self)
-	self:setClass(objType)
-	self.size = vector(14, 14)
-	self.speed = 0
-	self.oldPos = vector(0,0)
-	self.path = {}
-	self.numPathNodes = {}
-	self.currentPoint = 0
-	self.pathTarget = {r = 0, c = 0}
-	self.target = vector(0,0)
-	self.pathBox = nil
-	self.deathBehaviour = nil
+  gameObject.init(self)
+  self:setClass(objType)
+  self.size = vector(14, 14)
+  self.speed = 0
+  self.oldPos = vector(0,0)
+  self.path = {}
+  self.numPathNodes = {}
+  self.currentPoint = 0
+  self.pathTarget = {r = 0, c = 0}
+  self.target = vector(0,0)
+  self.pathBox = nil
+  self.deathBehaviour = nil
 end
 
 
@@ -69,89 +69,120 @@ end
 -- freeResources
 -------------------------------------------------------------------------------
 function character:freeResources(collider)
-	if pathBox then collider:remove(self.pathBox) end
-	gameObject.freeResources(self, collider)
+  if pathBox then collider:remove(self.pathBox) end
+  gameObject.freeResources(self, collider)
 end
 
 
--------------------------------------------------
---[[Movement, collision detection and pathing]]--
--------------------------------------------------
 
+-------------------------------------------------------------------------------
+-- processEvent
+-------------------------------------------------------------------------------
 function character:processEvent(e)
-	gameObject.processEvent(self, e)
-	if e:getID() == "collision" then
-		if e:getDesc() == "active_mover" then
-			if self.deathBehaviour ~= nil then 
-				for _, v in ipairs(self.deathBehaviour)	do v() end
-			end
-			self.setState(self, "dead")
-			if self.id == "player" then
-				gm:setState("dead")
-			end
-		end
-	if e:getDesc() == "dormant_bullet" and self.id == "player" then
-		if self.deathBehaviour ~= nil then 
-			for _, v in ipairs(self.deathBehaviour)	do v() end
-		end
-		self.setState(self, "dead")
-		if self.id == "player" then
-			gm:setState("dead")
-		end
-	elseif (e:getDesc() == "attacking_path_jailer_melee" or e:getDesc() == "attacking_direct_jailer_melee") and self.id == "player" then
-		if self.deathBehaviour ~= nil then 
-			for _, v in ipairs(self.deathBehaviour)	do v() end
-		end
-		self.setState(self, "dead")
-		if self.id == "player" then
-			gm:setState("dead")
-		end
-	end
-	elseif e:getID() == "activate" then 
-		if self.state ~= "dead" then self.state = e:getDesc() end
-	end
+  gameObject.processEvent(self, e)
+  if e:getID() == "collision" then
+    if e:getDesc() == "active_mover" then
+      if self.deathBehaviour ~= nil then 
+        for _, v in ipairs(self.deathBehaviour)  do v() end
+      end
+      self.setState(self, "dead")
+      if self.id == "player" then
+        gm:setState("dead")
+      end
+    end
+  if e:getDesc() == "dormant_bullet" and self.id == "player" then
+    if self.deathBehaviour ~= nil then 
+      for _, v in ipairs(self.deathBehaviour)  do v() end
+    end
+    self.setState(self, "dead")
+    if self.id == "player" then
+      gm:setState("dead")
+    end
+  elseif (e:getDesc() == "attacking_path_jailer_melee" or e:getDesc() == "attacking_direct_jailer_melee") and self.id == "player" then
+    if self.deathBehaviour ~= nil then 
+      for _, v in ipairs(self.deathBehaviour)  do v() end
+    end
+    self.setState(self, "dead")
+    if self.id == "player" then
+      gm:setState("dead")
+    end
+  end
+  elseif e:getID() == "activate" then 
+    if self.state ~= "dead" then self.state = e:getDesc() end
+  end
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getOldPos
+-------------------------------------------------------------------------------
 function character:getOldPos()
-	return self.oldPos
+  return self.oldPos
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getFrameMoveVec
+-------------------------------------------------------------------------------
 function character:getFrameMoveVec()
-	return vector(self.position.x-self.oldPos.x, self.position.y-self.oldPos.y)
+  return vector(self.position.x-self.oldPos.x, self.position.y-self.oldPos.y)
 end
 
+
+
+-------------------------------------------------------------------------------
+-- move
+-------------------------------------------------------------------------------
 function character:move(pos)
-	--gameObject.setDir(self, pos)
-	self.oldPos.x, self.oldPos.y = self.position.x, self.position.y
-	gameObject.move(self, pos)
-	--self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
-	--				self.position.y +((self.size.y/2)))
+  self.oldPos.x, self.oldPos.y = self.position.x, self.position.y
+  gameObject.move(self, pos)
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setDeathBehaviour
+-------------------------------------------------------------------------------
 function character:setDeathBehaviour(b)
-	self.deathBehaviour = b
+  self.deathBehaviour = b
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getDeathBehaviour
+-------------------------------------------------------------------------------
 function character:getDeathBehaviour()
-	return self.deathBehaviour
+  return self.deathBehaviour
 end
 
-function character:setPos(pos)
-	gameObject.setPos(self, pos)
-	--self.pathBox:moveTo(self.position.x + ((self.size.x/2)),
-	--				self.position.y +((self.size.y/2)))
-end
 
+
+-------------------------------------------------------------------------------
+-- getSpeed
+-------------------------------------------------------------------------------
 function character:getSpeed()
-	return self.speed
+  return self.speed
 end
 
+
+
+-------------------------------------------------------------------------------
+-- setSpeed
+-------------------------------------------------------------------------------
 function character:setSpeed(s)
-	self.speed = s
+  self.speed = s
 end
 
+
+
+-------------------------------------------------------------------------------
+-- getTarget
+-------------------------------------------------------------------------------
 function character:getTarget()
-	return self.target
+  return self.target
 end
 
 
@@ -165,51 +196,51 @@ end
 -- Copies the nodes from a Jumper path to the character's internal path
 -------------------------------------------------------------------------------
 function character:copyPath(p)
-	if p == nil then
-		-- If no path, then discard character's internal path
-		self.currentPoint = 0; self.pathTarget = {r = 0, c = 0}
-		self.numPathNodes = 0
-		self.path = nil
-	else
-		-- Discard character's old path
-		self.path = {}
+  if p == nil then
+    -- If no path, then discard character's internal path
+    self.currentPoint = 0; self.pathTarget = {r = 0, c = 0}
+    self.numPathNodes = 0
+    self.path = nil
+  else
+    -- Discard character's old path
+    self.path = {}
 
-		-- Copy node data from the Jumper path to the internal path.
-		-- While writing this part I made the unfortunate discovery that
-		-- Lua's length operator (#) is apparently implementation-dependent,
-		-- meaning that I couldn't rely on it doing what I wanted it to do,
-		-- which was to return the number of values up to the first nil.
-		-- Discarding and recreating the path each time isn't the most
-		-- elegant alternative, but whatever.
-		local count = 1
-		for node, _ in p:nodes() do
-			self.path[count] = {}
-			self.path[count].col = node.x
-			self.path[count].row = node.y
-			count = count + 1
-		end
-		self.path[count] = nil
-		self.numPathNodes = count - 1
-	end
+    -- Copy node data from the Jumper path to the internal path.
+    -- While writing this part I made the unfortunate discovery that
+    -- Lua's length operator (#) is apparently implementation-dependent,
+    -- meaning that I couldn't rely on it doing what I wanted it to do,
+    -- which was to return the number of values up to the first nil.
+    -- Discarding and recreating the path each time isn't the most
+    -- elegant alternative, but whatever.
+    local count = 1
+    for node, _ in p:nodes() do
+      self.path[count] = {}
+      self.path[count].col = node.x
+      self.path[count].row = node.y
+      count = count + 1
+    end
+    self.path[count] = nil
+    self.numPathNodes = count - 1
+  end
 end
 
 function character:getPath()
-	return self.path
+  return self.path
 end
 
 
 function character:toWorldSpace(col, row, blockSize)
-	local x = (col - 1) * blockSize
-	local y = (row - 1) * blockSize
-	return x + (blockSize/2), y + (blockSize/2)
+  local x = (col - 1) * blockSize
+  local y = (row - 1) * blockSize
+  return x + (blockSize/2), y + (blockSize/2)
 end
 
 function character:isAtEndOfPath()
-	if self.path then
-		return self.currentPoint == self.numPathNodes 
-	else
-		return false
-	end
+  if self.path then
+    return self.currentPoint == self.numPathNodes 
+  else
+    return false
+  end
 end
 
 
