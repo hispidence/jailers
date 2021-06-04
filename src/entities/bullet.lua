@@ -14,27 +14,30 @@ local bullet = {}
 bullet.__index = bullet
 
 setmetatable(bullet,
-	{__index = gameObject,
-	__call = function(cls, ...)
-		return cls.new(...)
-		end
-	})
+  {__index = gameObject,
+  __call = function(cls, ...)
+    return cls.new(...)
+    end
+  })
 
+
+
+-------------------------------------------------------------------------------
+-- new
+-------------------------------------------------------------------------------
 function bullet.new()
-	local self = setmetatable(gameObject(), bullet)
-	self:init()
-	return self
+  local self = setmetatable(gameObject(), bullet)
+  self:init()
+  return self
 end
 
 
 
 -------------------------------------------------------------------------------
 -- init
---
---
 -------------------------------------------------------------------------------
 function bullet:init()
-	gameObject.init(self)
+  gameObject.init(self)
   self:reset()
   self.gunID = nil
   self.firingBehaviour = nil
@@ -44,22 +47,18 @@ end
 
 -------------------------------------------------------------------------------
 -- setGunID
---
---
 -------------------------------------------------------------------------------
 function bullet:setGunID(id)
-	self.gunID = id
+  self.gunID = id
 end
 
 
 
 -------------------------------------------------------------------------------
 -- reset
---
---
 -------------------------------------------------------------------------------
 function bullet:reset()
-	self.state = "dormant"
+  self.state = "dormant"
   self.invisible = true
   self.canCollide = false
 
@@ -80,12 +79,10 @@ end
 
 -------------------------------------------------------------------------------
 -- processEvent
---
---
 -------------------------------------------------------------------------------
 function bullet:processEvent(e)
-	gameObject.processEvent(self, e)
-	if e:getID() == "collision" then
+  gameObject.processEvent(self, e)
+  if e:getID() == "collision" then
     if e:getSender() == self.gunID and not self.readyToCollide then
       self.wasColliding = true
     elseif e:getDesc() ~= "active_bullet" then
@@ -101,21 +98,17 @@ end
 
 
 -------------------------------------------------------------------------------
--- setFiringBehaviour
---
---
+--  setFiringBehaviour
 -------------------------------------------------------------------------------
 function bullet:setFiringBehaviour(fb)
-	self.firingBehaviour = fb
+  self.firingBehaviour = fb
 end
 
 
 
----------------------------------------------------------------------------------------------------
---	update
---
---
----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+--  update
+-------------------------------------------------------------------------------
 function bullet:update(dt)
   if "active" == self.state then
     if(not self.wasColliding) then
@@ -128,8 +121,8 @@ function bullet:update(dt)
     vec.y = self.vel.y * dt
 
     self:move(vec)
-	end
-	if "dormant" == self.state then
+  end
+  if "dormant" == self.state then
     local ready = self.firingBehaviour:updateBullet(dt)
     if(ready) then
       self.position, self.vel = self.firingBehaviour:calcInitials()
@@ -142,5 +135,7 @@ function bullet:update(dt)
     end
   end
 end
+
+
 
 return bullet
